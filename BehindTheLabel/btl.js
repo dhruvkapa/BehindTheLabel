@@ -224,6 +224,125 @@ async function analyzeWithTensorFlow() {
   }
 }
 
+// Comprehensive list of known clothing brands
+const KNOWN_BRANDS = [
+  // Fast Fashion & Major Retailers
+  'Nike', 'Adidas', 'Puma', 'H&M', 'Zara', 'Forever 21', 'Shein', 'Uniqlo', 'Gap', 'Old Navy',
+  'Tommy Hilfiger', 'Calvin Klein', 'Ralph Lauren', 'Lacoste', 'Polo',
+  
+  // Luxury & Premium
+  'Gucci', 'Prada', 'Cartier', 'Louis Vuitton', 'Versace', 'Burberry', 'Fendi', 'Chanel',
+  'Dior', 'Hermes', 'Valentino', 'Armani', 'DKNY',
+  
+  // Sportswear & Athletic
+  'Reebok', 'New Balance', 'Asics', 'Saucony', 'Under Armour', 'Lululemon', 'Gymshark',
+  'Decathlon', 'Joma', 'Kappa',
+  
+  // Casual & Contemporary
+  'Abercrombie', 'Hollister', 'American Eagle', 'Aeropostale', 'Banana Republic', 'J.Crew',
+  'Uniqlo', 'Everlane', 'Patagonia', 'The North Face', 'Columbia',
+  
+  // Fast Fashion (Budget)
+  'Primark', 'Boohoo', 'Pretty Little Thing', 'Missguided', 'Fashion Nova', 'ASOS',
+  'Shein', 'Forever 21', 'Aliexpress', 'Wish',
+  
+  // Outdoor & Workwear
+  'Carhartt', 'Dickies', 'Timberland', 'Dr Martens', 'Salomon', 'Merrell',
+  
+  // Denim & Casual
+  'Levi\'s', 'Lee', 'Wrangler', 'True Religion', 'Diesel', 'AG Jeans', 'Hilfiger Denim',
+  
+  // Footwear brands
+  'Converse', 'Vans', 'Crocs', 'Skechers', 'Clarks', 'Birkenstock',
+  
+  // Swimwear
+  'Speedo', 'Rip Curl', 'Billabong', 'Quiksilver', 'Volcom',
+  
+  // Activewear
+  'Lululemon', 'Gymshark', 'Alo Yoga', 'Sweaty Betty', 'Allbirds',
+  
+  // Value brands
+  'Marks and Spencer', 'Next', 'River Island', 'New Look', 'Dorothy Perkins',
+  
+  // Plus size & specialty
+  'Torrid', 'ASOS Curve', 'Eloquii', 'Ulla Popken',
+  
+  // Outdoor/Technical
+  'Arc\'teryx', 'The North Face', 'Patagonia', 'Marmot', 'Mountain Hardwear',
+  'Black Diamond', 'REI', 'Sportiva'
+];
+
+// Fuzzy string matching for brand detection
+function levenshteinDistance(str1, str2) {
+  const len1 = str1.length;
+  const len2 = str2.length;
+  const matrix = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(0));
+
+  for (let i = 0; i <= len1; i++) matrix[i][0] = i;
+  for (let j = 0; j <= len2; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= len1; i++) {
+    for (let j = 1; j <= len2; j++) {
+      const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
+      );
+    }
+  }
+  return matrix[len1][len2];
+}
+
+// Filter and match brands from extracted text
+function filterBrands(extractedText) {
+  const words = extractedText.toUpperCase().split(/\s+/).filter(w => w.length > 2);
+  const detectedBrands = [];
+  const usedIndices = new Set();
+
+  // Check for exact or fuzzy matches
+  KNOWN_BRANDS.forEach(brand => {
+    const brandUpper = brand.toUpperCase();
+    
+    // First, check for exact substring matches
+    if (extractedText.includes(brandUpper)) {
+      if (!detectedBrands.find(b => b.name === brand)) {
+        detectedBrands.push({ name: brand, confidence: 'high', method: 'exact' });
+      }
+      return;
+    }
+
+    // Check individual words for fuzzy matches
+    for (let i = 0; i < words.length; i++) {
+      if (usedIndices.has(i)) continue;
+      
+      const word = words[i];
+      const distance = levenshteinDistance(word, brandUpper);
+      const maxLen = Math.max(word.length, brandUpper.length);
+      const similarity = 1 - (distance / maxLen);
+
+      // If similarity is high enough (>75%), consider it a match
+      if (similarity > 0.75 && word.length > 3) {
+        if (!detectedBrands.find(b => b.name === brand)) {
+          detectedBrands.push({ 
+            name: brand, 
+            confidence: similarity > 0.85 ? 'high' : 'medium', 
+            method: 'fuzzy' 
+          });
+          usedIndices.add(i);
+        }
+        return;
+      }
+    }
+  });
+
+  // Sort by confidence
+  return detectedBrands.sort((a, b) => {
+    const confidenceOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+    return confidenceOrder[b.confidence] - confidenceOrder[a.confidence];
+  });
+}
+
 // Extract text from image using OCR (Tesseract.js)
 async function extractTextFromImage() {
   try {
@@ -235,26 +354,26 @@ async function extractTextFromImage() {
     
     console.log("OCR Result:", result);
     
-    // Extract brand-relevant keywords from the text
-    const extractedText = result.data.text.toUpperCase();
-    const lines = extractedText.split('\n').filter(line => line.trim().length > 0);
+    // Extract text and detect brands
+    const extractedText = result.data.text;
+    const detectedBrands = filterBrands(extractedText);
     
     return {
       fullText: extractedText,
-      lines: lines,
+      detectedBrands: detectedBrands,
       confidence: result.data.confidence
     };
   } catch (error) {
     console.error("OCR Error:", error);
-    return { fullText: "", lines: [], confidence: 0 };
+    return { fullText: "", detectedBrands: [], confidence: 0 };
   }
 }
 
 // Display analysis results
-function displayResults(predictions, textResults = { fullText: "", lines: [], confidence: 0 }) {
+function displayResults(predictions, textResults = { fullText: "", detectedBrands: [], confidence: 0 }) {
   let html = "";
   
-  // SECTION 1: Detected Objects
+  // SECTION 1: Detected Objects (from COCO-SSD)
   if (predictions && predictions.length > 0) {
     html += "<p><strong>🔍 Detected Items:</strong></p>";
     html += "<ul>";
@@ -280,35 +399,26 @@ function displayResults(predictions, textResults = { fullText: "", lines: [], co
     html += "</ul>";
   }
   
-  // SECTION 2: Extracted Text / Brand Information
-  if (textResults && textResults.lines && textResults.lines.length > 0) {
-    html += "<p style='margin-top: 20px;'><strong>🏷️ Text/Brand Information Detected:</strong></p>";
+  // SECTION 2: Brand Detection (Improved)
+  if (textResults && textResults.detectedBrands && textResults.detectedBrands.length > 0) {
+    html += "<p style='margin-top: 20px;'><strong>🏷️ Brand Detected:</strong></p>";
+    html += "<ul>";
     
-    // Filter for likely brand names (short, meaningful text)
-    const brandCandidates = textResults.lines.filter(line => {
-      const trimmed = line.trim();
-      return trimmed.length > 2 && trimmed.length < 50 && /[A-Z]/.test(trimmed);
-    }).slice(0, 10);
+    textResults.detectedBrands.slice(0, 5).forEach(brand => {
+      const confidenceIcon = brand.confidence === 'high' ? '✓' : '?';
+      html += `<li><strong>${brand.name}</strong> <span style="font-size: 0.85rem; color: #999;">(${brand.confidence} confidence)</span></li>`;
+    });
     
-    if (brandCandidates.length > 0) {
-      html += "<ul>";
-      brandCandidates.forEach(brand => {
-        html += `<li><strong>${brand}</strong></li>`;
-      });
-      html += "</ul>";
-    } else {
-      html += "<p style='color: #666; font-size: 0.9rem;'>No clear text detected. Try a clearer photo of the label or brand tag.</p>";
-    }
-    
-    html += `<p style='font-size: 0.85rem; color: #999;'>OCR Confidence: ${(textResults.confidence).toFixed(1)}%</p>`;
+    html += "</ul>";
+    html += `<p style='font-size: 0.85rem; color: #999; margin-top: 10px;'>OCR Confidence: ${(textResults.confidence).toFixed(1)}%</p>`;
   } else if (!predictions || predictions.length === 0) {
-    html += "<p>No items detected. Try capturing a clearer image with visible brand labels.</p>";
+    html += "<p>No items or text detected. Try capturing a clearer image with visible brand labels.</p>";
   } else {
-    html += "<p style='color: #666; font-size: 0.9rem;'>No text detected. Position the camera directly on the brand label for better results.</p>";
+    html += "<p style='color: #666; font-size: 0.9rem;'>No known brand detected. Position the camera directly on the brand label for better results.</p>";
   }
   
   html += "<p style='margin-top: 20px; padding: 12px; background-color: #fef3c7; border-radius: 8px; font-size: 0.9rem;'>";
-  html += "<strong>💡 Tip:</strong> For best results, photograph the brand label or tag directly. This will extract visible text and brand information from your clothing.";
+  html += "<strong>💡 Tip:</strong> For best results, photograph the brand label or tag directly. Ensure the text is clear and well-lit.";
   html += "</p>";
   
   html += `<button id="fallbackSearchBrandBtn" class="search-brand-fallback-btn">🔍 Search Brand Database Instead</button>`;

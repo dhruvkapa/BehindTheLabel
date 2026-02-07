@@ -84,6 +84,17 @@ nav a:hover {
   background-color: #1d4ed8;
 }
 
+/* LEARN MORE LINK IN NAV */
+.learn-more-link {
+  color: #dc2626 !important;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.learn-more-link:hover {
+  color: #b91c1c !important;
+}
+
 /* =========================
    HERO SECTION
 ========================= */
@@ -175,6 +186,18 @@ nav a:hover {
   max-width: 800px;
   margin: auto;
   text-align: center;
+}
+
+/* =========================
+   ILLUSTRATION
+========================= */
+.illustration {
+  max-width: 400px;
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 24px auto;
+  filter: grayscale(100%);
 }
 
 /* =========================
