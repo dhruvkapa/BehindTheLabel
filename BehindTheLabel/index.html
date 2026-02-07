@@ -10,6 +10,13 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- TensorFlow.js for FREE image recognition -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+
+  <!-- Tesseract.js for FREE text extraction (OCR) -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5"></script>
 </head>
 <body>
 
@@ -76,7 +83,47 @@
       <p>Public pressure drives ethical change faster than policy alone.</p>
     </div>
   </div>
+
 </section>
+
+<section class="counter-section">
+  <h2>Children Affected Worldwide</h2>
+
+  <div class="counter-number" id="childCounter">0</div>
+
+  <p class="counter-caption">
+    Estimated number of children currently in forced labour or child labour worldwide.<br>
+    <span>Source: International Labour Organization (ILO)</span>
+  </p>
+</section>
+
+<section class="map-section">
+  <h2>Global Impact Map</h2>
+  <p class="map-description">
+    This map highlights regions with higher estimated prevalence of forced labour
+    and child labour based on international reports.
+  </p>
+
+  <div id="map"></div>
+
+  <p class="map-source">
+    Source: International Labour Organization (ILO), Walk Free Foundation
+  </p>
+</section>
+
+<p class="map-source">
+  Red markers indicate regions with higher estimated prevalence of forced labour
+  and child labour. Data is based on aggregated international reporting and does
+  not represent real-time counts.
+</p>
+<!-- Leaflet CSS -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <!-- ================= TOOL ================= -->
 <section id="tool" class="section">
@@ -193,6 +240,69 @@
 <footer>
   <p>© 2026 Behind The Label • Built for ethical awareness</p>
 </footer>
+
+<!-- ================= CAMERA BUTTON ================= -->
+<button id="cameraBtn" class="floating-camera-btn" title="Scan clothing brand">
+  <img src="images/camera-icon.svg" alt="Camera" class="camera-btn-icon">
+</button>
+
+<!-- ================= BRAND SEARCH BUTTON ================= -->
+<button id="brandSearchBtn" class="floating-brand-btn" title="Search brand ethics">
+  🔍
+</button>
+
+<!-- ================= CAMERA MODAL ================= -->
+<div id="cameraModal" class="camera-modal">
+  <div class="camera-modal-content">
+    <button id="closeModal" class="close-modal">&times;</button>
+    <h2>Clothing Brand Scanner</h2>
+    
+    <div class="camera-container">
+      <video id="cameraFeed" autoplay playsinline></video>
+      <canvas id="canvas" style="display: none;"></canvas>
+    </div>
+    
+    <div class="camera-controls">
+      <button id="captureBtn" class="capture-btn">📸 Capture</button>
+    </div>
+    
+    <div id="resultsContainer" class="results-container" style="display: none;">
+      <h3>Analysis Results</h3>
+      <div id="analysisResults"></div>
+      <button id="scanAgainBtn" class="scan-again-btn">Scan Another</button>
+    </div>
+
+    <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+      <p>Analyzing image...</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================= BRAND SEARCH MODAL ================= -->
+<div id="brandSearchModal" class="brand-search-modal">
+  <div class="brand-search-modal-content">
+    <button id="closeBrandModal" class="close-modal">&times;</button>
+    <h2>Brand Ethics Search</h2>
+    
+    <div class="brand-search-container">
+      <input 
+        type="text" 
+        id="brandSearchInput" 
+        placeholder="Enter a brand name (e.g., Nike, H&M, Zara)" 
+        class="brand-search-input"
+      >
+      <button id="searchBrandBtn" class="search-brand-btn">Search</button>
+    </div>
+    
+    <div id="brandResultsContainer" class="brand-results-container" style="display: none;">
+      <div id="brandResults"></div>
+    </div>
+
+    <div id="brandLoadingSpinner" class="loading-spinner" style="display: none;">
+      <p>Searching brand database...</p>
+    </div>
+  </div>
+</div>
 
 <script src="btl.js"></script>
 </body>
