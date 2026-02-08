@@ -261,6 +261,13 @@ nav a:hover {
   font-size: 0.95rem;
 }
 
+.card-icon {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 16px;
+  display: block;
+}
+
 /* =========================
    FEATURE LIST
 ========================= */
