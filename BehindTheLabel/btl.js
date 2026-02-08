@@ -1,122 +1,173 @@
-document.getElementById("learnMoreBtn").addEventListener("click", () => {
-  document.getElementById("about").scrollIntoView({
-    behavior: "smooth"
-  });
-});
+// Wrap all DOM-dependent code in DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOMContentLoaded fired - btl.js loading...');
 
+  // Learn More Button
+  const learnMoreBtn = document.getElementById("learnMoreBtn");
+  if (learnMoreBtn) {
+    learnMoreBtn.addEventListener("click", () => {
+      document.getElementById("about").scrollIntoView({
+        behavior: "smooth"
+      });
+    });
+    console.log('Learn More button attached');
+  } else {
+    console.warn('Learn More button not found');
+  }
 
-// Partner logo reveal on scroll
-const partnerLogo = document.querySelector('.partner-logo');
-
-const observer = new IntersectionObserver(
-  ([entry]) => {
-    if (entry.isIntersecting) {
-      partnerLogo.classList.add('visible');
-    }
-  },
-  { threshold: 0.4 }
-);
-
-if (partnerLogo) {
-  observer.observe(partnerLogo);
-}
+  // Partner logo reveal on scroll
+  const partnerLogo = document.querySelector('.partner-logo');
+  
+  if (partnerLogo) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          partnerLogo.classList.add('visible');
+          console.log('Partner logo revealed');
+        }
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(partnerLogo);
+    console.log('Partner logo observer attached');
+  } else {
+    console.error('Partner logo element not found');
+  }
 
 
 const targetNumber = 160000000; // 160 million (ILO estimate)
 const duration = 4000; // 4 seconds animation
 const counterElement = document.getElementById("childCounter");
 
-let start = 0;
-const increment = targetNumber / (duration / 16);
-let hasAnimated = false;
+if (counterElement) {
+  let start = 0;
+  const increment = targetNumber / (duration / 16);
+  let hasAnimated = false;
 
-function updateCounter() {
-  start += increment;
+  function updateCounter() {
+    start += increment;
 
-  if (start < targetNumber) {
-    counterElement.textContent = Math.floor(start).toLocaleString();
-    requestAnimationFrame(updateCounter);
-  } else {
-    counterElement.textContent = targetNumber.toLocaleString();
+    if (start < targetNumber) {
+      counterElement.textContent = Math.floor(start).toLocaleString();
+      requestAnimationFrame(updateCounter);
+    } else {
+      counterElement.textContent = targetNumber.toLocaleString();
+      console.log('Counter animation complete');
+    }
   }
-}
 
-// Observe counter section for scroll animation
-const counterObserver = new IntersectionObserver(
-  ([entry]) => {
-    if (entry.isIntersecting && !hasAnimated) {
+  function triggerAnimation() {
+    if (!hasAnimated) {
       hasAnimated = true;
+      console.log('Counter animation triggered');
       updateCounter();
     }
-  },
-  { threshold: 0.3 }
-);
+  }
 
-if (counterElement) {
+  // Observe counter section for scroll animation
+  const counterObserver = new IntersectionObserver(
+    ([entry]) => {
+      console.log('Counter intersection event:', entry.isIntersecting);
+      if (entry.isIntersecting && !hasAnimated) {
+        triggerAnimation();
+      }
+    },
+    { threshold: 0.1 }
+  );
+
   counterObserver.observe(counterElement);
+  console.log('Counter observer attached, element text:', counterElement.textContent);
+  
+  // If element is already visible on page load, start animation immediately
+  setTimeout(() => {
+    if (!hasAnimated) {
+      const rect = counterElement.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        console.log('Counter already in view, triggering animation');
+        triggerAnimation();
+      }
+    }
+  }, 500);
+} else {
+  console.error('Counter element with id "childCounter" not found');
 }
 
 
-const map = L.map("map", {
-  zoomControl: false
-}).setView([20, 0], 2);
+  // Initialize map after Leaflet is loaded
+  if (typeof L === 'undefined') {
+    console.error('Leaflet library not loaded');
+  } else {
+    const mapElement = document.getElementById("map");
+    if (!mapElement) {
+      console.error('Map element with id "map" not found');
+    } else {
+      try {
+        const map = L.map("map", {
+          zoomControl: false
+        }).setView([20, 0], 2);
 
-L.tileLayer(
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-  {
-    attribution: "© Esri, USGS"
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+          {
+            attribution: "© Esri, USGS"
+          }
+        ).addTo(map);
+
+        const regions = [
+          {
+            name: "South Asia",
+            coords: [22, 78],
+            risk: "High",
+            description: "High prevalence of child labour in agriculture and manufacturing."
+          },
+          {
+            name: "Sub-Saharan Africa",
+            coords: [1, 20],
+            risk: "High",
+            description: "Highest proportion of children in child labour globally."
+          },
+          {
+            name: "East Asia & Pacific",
+            coords: [15, 105],
+            risk: "Medium",
+            description: "Forced labour linked to supply chains and manufacturing."
+          },
+          {
+            name: "Latin America",
+            coords: [-10, -55],
+            risk: "Medium",
+            description: "Child labour persists in informal economies."
+          },
+          {
+            name: "Middle East & North Africa",
+            coords: [25, 45],
+            risk: "Medium",
+            description: "Migrant labour vulnerability and forced labour risks."
+          }
+        ];
+
+        regions.forEach(region => {
+          L.circleMarker(region.coords, {
+            radius: 10,
+            color: "#000000",        // black outline for contrast
+            fillColor: "#FF1044",    // bright neon red fill
+            fillOpacity: 1,
+            weight: 2
+          })
+            .addTo(map)
+            .bindPopup(`
+              <strong>${region.name}</strong><br>
+              <em>Elevated risk of forced or child labour</em><br>
+              ${region.description}
+            `);
+        });
+
+        console.log('Map initialized successfully');
+      } catch (error) {
+        console.error('Error initializing map:', error);
+      }
+    }
   }
-).addTo(map);
-
-
-const regions = [
-  {
-    name: "South Asia",
-    coords: [22, 78],
-    risk: "High",
-    description: "High prevalence of child labour in agriculture and manufacturing."
-  },
-  {
-    name: "Sub-Saharan Africa",
-    coords: [1, 20],
-    risk: "High",
-    description: "Highest proportion of children in child labour globally."
-  },
-  {
-    name: "East Asia & Pacific",
-    coords: [15, 105],
-    risk: "Medium",
-    description: "Forced labour linked to supply chains and manufacturing."
-  },
-  {
-    name: "Latin America",
-    coords: [-10, -55],
-    risk: "Medium",
-    description: "Child labour persists in informal economies."
-  },
-  {
-    name: "Middle East & North Africa",
-    coords: [25, 45],
-    risk: "Medium",
-    description: "Migrant labour vulnerability and forced labour risks."
-  }
-];
-
-regions.forEach(region => {
-  L.circleMarker(region.coords, {
-    radius: 10,
-    color: "#000000",        // black outline for contrast
-    fillColor: "#FF1044",    // bright neon red fill
-    fillOpacity: 1,
-    weight: 2
-  })
-    .addTo(map)
-    .bindPopup(`
-      <strong>${region.name}</strong><br>
-      <em>Elevated risk of forced or child labour</em><br>
-      ${region.description}
-    `);
-});
 
 /* =========================
    CAMERA SCANNER
@@ -137,25 +188,49 @@ const scanAgainBtn = document.getElementById("scanAgainBtn");
 let currentStream = null;
 let model = null;
 
+if (!cameraBtn) {
+  console.warn('Camera button not found');
+}
+
+// Check if browser supports required APIs
+if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+  console.warn('Camera API not supported in this browser');
+  if (cameraBtn) cameraBtn.style.display = 'none';
+}
+
+if (typeof cocoSsd === 'undefined') {
+  console.warn('COCO-SSD library not loaded');
+}
+
+if (typeof Tesseract === 'undefined') {
+  console.warn('Tesseract.js library not loaded');
+}
+
 // Open camera modal
-cameraBtn.addEventListener("click", () => {
-  cameraModal.classList.add("active");
-  startCamera();
-});
+if (cameraBtn) {
+  cameraBtn.addEventListener("click", () => {
+    cameraModal.classList.add("active");
+    startCamera();
+  });
+}
 
 // Close camera modal
-closeModal.addEventListener("click", () => {
-  cameraModal.classList.remove("active");
-  stopCamera();
-});
-
-// Click outside modal to close
-cameraModal.addEventListener("click", (e) => {
-  if (e.target === cameraModal) {
+if (closeModal) {
+  closeModal.addEventListener("click", () => {
     cameraModal.classList.remove("active");
     stopCamera();
-  }
-});
+  });
+}
+
+// Click outside modal to close
+if (cameraModal) {
+  cameraModal.addEventListener("click", (e) => {
+    if (e.target === cameraModal) {
+      cameraModal.classList.remove("active");
+      stopCamera();
+    }
+  });
+}
 
 // Start camera feed
 async function startCamera() {
@@ -164,7 +239,9 @@ async function startCamera() {
       video: { facingMode: "environment" }
     });
     cameraFeed.srcObject = currentStream;
+    console.log('Camera started successfully');
   } catch (error) {
+    console.error("Error accessing camera:", error);
     alert("Error accessing camera: " + error.message);
   }
 }
@@ -173,33 +250,41 @@ async function startCamera() {
 function stopCamera() {
   if (currentStream) {
     currentStream.getTracks().forEach(track => track.stop());
+    console.log('Camera stopped');
   }
 }
 
 // Capture image from camera
-captureBtn.addEventListener("click", async () => {
-  const ctx = canvas.getContext("2d");
-  canvas.width = cameraFeed.videoWidth;
-  canvas.height = cameraFeed.videoHeight;
-  ctx.drawImage(cameraFeed, 0, 0);
-  
-  loadingSpinner.style.display = "block";
-  captureBtn.style.display = "none";
-  
-  // Load model if not already loaded
-  if (!model) {
-    try {
-      model = await cocoSsd.load();
-    } catch (error) {
-      loadingSpinner.style.display = "none";
-      analysisResults.innerHTML = `<p style="color: red;">Error loading AI model: ${error.message}</p>`;
-      resultsContainer.style.display = "block";
-      return;
+if (captureBtn) {
+  captureBtn.addEventListener("click", async () => {
+    const ctx = canvas.getContext("2d");
+    canvas.width = cameraFeed.videoWidth;
+    canvas.height = cameraFeed.videoHeight;
+    ctx.drawImage(cameraFeed, 0, 0);
+    
+    loadingSpinner.style.display = "block";
+    captureBtn.style.display = "none";
+    
+    // Load model if not already loaded
+    if (!model) {
+      try {
+        if (typeof cocoSsd === 'undefined') {
+          throw new Error('COCO-SSD library not loaded');
+        }
+        model = await cocoSsd.load();
+        console.log('COCO-SSD model loaded');
+      } catch (error) {
+        console.error('Error loading AI model:', error);
+        loadingSpinner.style.display = "none";
+        analysisResults.innerHTML = `<p style="color: red;">Error loading AI model: ${error.message}</p>`;
+        resultsContainer.style.display = "block";
+        return;
+      }
     }
-  }
-  
-  analyzeWithTensorFlow();
-});
+    
+    analyzeWithTensorFlow();
+  });
+}
 
 // Analyze image with TensorFlow.js (FREE - no API key needed)
 async function analyzeWithTensorFlow() {
@@ -440,11 +525,13 @@ function displayResults(predictions, textResults = { fullText: "", detectedBrand
 }
 
 // Scan again
-scanAgainBtn.addEventListener("click", () => {
-  resultsContainer.style.display = "none";
-  captureBtn.style.display = "block";
-  cameraFeed.style.display = "block";
-});
+if (scanAgainBtn) {
+  scanAgainBtn.addEventListener("click", () => {
+    resultsContainer.style.display = "none";
+    captureBtn.style.display = "block";
+    cameraFeed.style.display = "block";
+  });
+}
 
 /* =========================
    BRAND SEARCH
@@ -573,36 +660,61 @@ const brandResults = document.getElementById("brandResults");
 const brandLoadingSpinner = document.getElementById("brandLoadingSpinner");
 
 // Open brand search modal
-brandSearchBtn.addEventListener("click", () => {
-  brandSearchModal.classList.add("active");
-  brandSearchInput.focus();
-});
+if (brandSearchBtn) {
+  brandSearchBtn.addEventListener("click", () => {
+    if (brandSearchModal) {
+      brandSearchModal.classList.add("active");
+    }
+    if (brandSearchInput) {
+      brandSearchInput.focus();
+    }
+  });
+}
 
 // Close brand search modal
-closeBrandModal.addEventListener("click", () => {
-  brandSearchModal.classList.remove("active");
-  brandSearchInput.value = "";
-  brandResultsContainer.style.display = "none";
-});
+if (closeBrandModal) {
+  closeBrandModal.addEventListener("click", () => {
+    if (brandSearchModal) {
+      brandSearchModal.classList.remove("active");
+    }
+    if (brandSearchInput) {
+      brandSearchInput.value = "";
+    }
+    if (brandResultsContainer) {
+      brandResultsContainer.style.display = "none";
+    }
+  });
+}
 
 // Click outside modal to close
-brandSearchModal.addEventListener("click", (e) => {
-  if (e.target === brandSearchModal) {
-    brandSearchModal.classList.remove("active");
-    brandSearchInput.value = "";
-    brandResultsContainer.style.display = "none";
-  }
-});
+if (brandSearchModal) {
+  brandSearchModal.addEventListener("click", (e) => {
+    if (e.target === brandSearchModal) {
+      brandSearchModal.classList.remove("active");
+      if (brandSearchInput) {
+        brandSearchInput.value = "";
+      }
+      if (brandResultsContainer) {
+        brandResultsContainer.style.display = "none";
+      }
+    }
+  });
+}
 
 // Search for brand
-searchBrandBtn.addEventListener("click", searchBrand);
-brandSearchInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    searchBrand();
-  }
-});
+if (searchBrandBtn) {
+  searchBrandBtn.addEventListener("click", searchBrand);
+}
+if (brandSearchInput) {
+  brandSearchInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      searchBrand();
+    }
+  });
+}
 
 function searchBrand() {
+  if (!brandSearchInput) return;
   const searchQuery = brandSearchInput.value.trim().toLowerCase();
   
   if (!searchQuery) {
@@ -610,19 +722,27 @@ function searchBrand() {
     return;
   }
   
-  brandLoadingSpinner.style.display = "block";
-  brandResultsContainer.style.display = "none";
+  if (brandLoadingSpinner) {
+    brandLoadingSpinner.style.display = "block";
+  }
+  if (brandResultsContainer) {
+    brandResultsContainer.style.display = "none";
+  }
   
   // Simulate API delay for realism
   setTimeout(() => {
     const brandData = brandDatabase[searchQuery];
     
-    brandLoadingSpinner.style.display = "none";
-    brandResultsContainer.style.display = "block";
+    if (brandLoadingSpinner) {
+      brandLoadingSpinner.style.display = "none";
+    }
+    if (brandResultsContainer) {
+      brandResultsContainer.style.display = "block";
+    }
     
-    if (brandData) {
+    if (brandData && brandResults) {
       displayBrandResults(brandData);
-    } else {
+    } else if (brandResults) {
       // If brand not in database, show generic message
       brandResults.innerHTML = `
         <h3>"${searchQuery}" - Information</h3>
@@ -644,6 +764,11 @@ function searchBrand() {
 }
 
 function displayBrandResults(brandData) {
+  if (!brandResults) {
+    console.error('brandResults element not found');
+    return;
+  }
+
   let html = `
     <h3>${brandData.name}</h3>
     <div class="warning-box">
@@ -688,3 +813,5 @@ function displayBrandResults(brandData) {
   
   brandResults.innerHTML = html;
 }
+
+}); // End of DOMContentLoaded

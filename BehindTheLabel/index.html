@@ -41,6 +41,10 @@
 
 <!-- ================= HERO ================= -->
 <section class="hero">
+  <video id="heroVideo" class="hero-video" autoplay muted playsinline aria-hidden="true">
+    <source src="videos/hero.mp4" type="video/mp4">
+  </video>
+  <div class="video-overlay" aria-hidden="true"></div>
   <div class="hero-content">
     <img src="logo.png" alt="Behind The Label Logo" class="hero-logo">
 
@@ -310,5 +314,31 @@
 </div>
 
 <script src="btl.js"></script>
+<script>
+  (function () {
+    const loopEnd = 1 * 60 + 44; // 1:44 = 104 seconds
+    const video = document.getElementById('heroVideo');
+    if (!video) return;
+
+    video.addEventListener('loadedmetadata', function () {
+      video.play().catch(() => {});
+    });
+
+    // Check every frame if we've reached the 1:44 mark
+    video.addEventListener('timeupdate', function () {
+      if (video.currentTime >= loopEnd) {
+        try {
+          video.currentTime = 0;
+          video.play().catch(() => {});
+        } catch (e) {}
+      }
+    });
+
+    // If metadata already loaded, play immediately
+    if (video.readyState >= 1) {
+      video.play().catch(() => {});
+    }
+  })();
+</script>
 </body>
 </html>
