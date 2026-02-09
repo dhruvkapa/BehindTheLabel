@@ -293,6 +293,7 @@ nav a:hover {
   color: white;
   text-align: center;
   padding: 96px 20px;
+  
 }
 
 .cta h2 {
@@ -308,6 +309,7 @@ nav a:hover {
   margin-right: auto;
 }
 
+
 .cta button {
   padding: 14px 30px;
   font-size: 1rem;
@@ -322,6 +324,36 @@ nav a:hover {
 .cta button:hover {
   background-color: #e5e7eb;
 }
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+
+  width: fit-content;     
+  margin: 24px auto 0;    
+}
+
+.cta-link {
+  background-color: #FF7700;
+  color: #fff;
+
+  padding: 14px 28px;
+  border-radius: 8px;
+
+  text-decoration: none;      
+  font-weight: 600;
+  display: inline-block;
+
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cta-link.secondary {
+  background-color: #FF7700; /* slightly different warm tone */
+  color: #fff;
+}
+
 
 /* =========================
    FOOTER
