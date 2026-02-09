@@ -35,6 +35,8 @@ body {
 
 /* BRAND (LEFT) */
 .brand {
+  text-decoration: none;   /* removes underline */
+  color: inherit;          /* keeps normal text color */
   display: flex;
   align-items: center;
   gap: 12px;
