@@ -1045,3 +1045,152 @@ footer {
     padding: 20px;
   }
 }
+
+/* =========================
+   LANYARD (IJM)
+========================= */
+
+.lanyard-stage {
+  display: grid;
+  place-items: center;
+  padding: 28px 0 10px;
+}
+
+/* The whole hanging system rotates */
+.lanyard {
+  position: relative;
+  width: 320px;
+  height: 420px;
+  transform-style: preserve-3d;
+  transform-origin: 50% 0%;
+  will-change: transform;
+}
+
+/* Strap */
+.lanyard-strap {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 16px;
+  height: 210px;
+  transform: translateX(-50%);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #0ea5e9, #1d4ed8);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+/* Clip */
+.lanyard-clip {
+  position: absolute;
+  left: 50%;
+  top: 190px;
+  width: 34px;
+  height: 22px;
+  transform: translateX(-50%);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #e5e7eb, #9ca3af);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.14);
+}
+
+/* Badge */
+.lanyard-badge {
+  position: absolute;
+  left: 50%;
+  top: 210px;
+  width: 280px;
+  height: 170px;
+  transform: translateX(-50%);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  box-shadow:
+    0 18px 55px rgba(2, 8, 23, 0.20),
+    0 4px 14px rgba(2, 8, 23, 0.10);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+/* Hole at top of badge */
+.badge-hole {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #e5e7eb;
+  border: 2px solid rgba(0,0,0,0.08);
+}
+
+/* Logo inside badge */
+.badge-logo {
+  width: 160px;
+  max-width: 90%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin-top: 10px;
+}
+
+.badge-text {
+  text-align: center;
+  margin-top: 14px;       /* a bit more space from the logo */
+  line-height: 1.25;
+}
+
+.badge-text strong {
+  display: block;
+  font-weight: 800;
+  font-size: 0.98rem;
+  color: #0f172a;
+  margin-bottom: 10px;    /* <-- THIS creates space before “Project Partner” */
+}
+
+.badge-text span {
+  display: inline-block;
+  font-size: 0.92rem;
+  color: #64748b;
+  letter-spacing: 0.01em;
+}
+
+/* Partner copy spacing */
+.partner-copy {
+  max-width: 820px;
+  margin: 16px auto 0;
+  text-align: center;
+}
+
+/* subtle idle swing */
+@keyframes lanyardSwing {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(1.2deg); }
+  50%  { transform: rotate(0deg); }
+  75%  { transform: rotate(-1.2deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.lanyard.is-idle {
+  animation: lanyardSwing 4.5s ease-in-out infinite;
+}
+
+.lanyard { user-select: none; touch-action: none; }
+
+.lanyard-strap {
+  pointer-events: auto; /* important */
+  cursor: grab;
+}
+
+.lanyard-strap:active {
+  cursor: grabbing;
+}
+
+/* prevents text selection / touch scrolling while dragging */
+.lanyard, .lanyard-strap {
+  user-select: none;
+  touch-action: none;
+}
+.lanyard-strap { z-index: 3; }
+.lanyard-clip  { z-index: 2; }
+.lanyard-badge { z-index: 1; }

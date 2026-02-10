@@ -814,4 +814,118 @@ function displayBrandResults(brandData) {
   brandResults.innerHTML = html;
 }
 
+// =========================
+// IJM Lanyard: drag strap or badge
+// =========================
+(function initLanyardDrag() {
+  const lanyard = document.getElementById("ijmLanyard");
+  if (!lanyard) return;
+
+  const strap = document.getElementById("ijmStrap");
+  const badge = lanyard.querySelector(".lanyard-badge");
+
+  lanyard.classList.add("is-idle");
+
+  let dragging = false;
+  let raf = null;
+
+  let targetX = 0, targetY = 0;
+  let curX = 0, curY = 0;
+
+  let lastX = 0, lastY = 0;
+
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function animate() {
+    curX += (targetX - curX) * 0.12;
+    curY += (targetY - curY) * 0.12;
+
+    lanyard.style.transform = `rotateX(${curY}deg) rotateY(${curX}deg)`;
+    raf = requestAnimationFrame(animate);
+  }
+
+  function startAnim() {
+    if (!raf) raf = requestAnimationFrame(animate);
+  }
+
+  function stopAnim() {
+    if (raf) {
+      cancelAnimationFrame(raf);
+      raf = null;
+    }
+  }
+
+  function beginDrag(e) {
+    dragging = true;
+    lanyard.classList.remove("is-idle");
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+
+    // lock pointer to the element being dragged
+    try { e.target.setPointerCapture(e.pointerId); } catch (_) {}
+
+    startAnim();
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+
+    targetX = clamp(targetX + dx * 0.18, -18, 18);
+    targetY = clamp(targetY - dy * 0.14, -14, 14);
+  }
+
+  function endDrag(e) {
+    dragging = false;
+    try { e.target.releasePointerCapture(e.pointerId); } catch (_) {}
+
+    const settle = () => {
+      targetX *= 0.86;
+      targetY *= 0.86;
+
+      if (Math.abs(targetX) < 0.25 && Math.abs(targetY) < 0.25) {
+        targetX = 0;
+        targetY = 0;
+        lanyard.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        stopAnim();
+        lanyard.classList.add("is-idle");
+        return;
+      }
+      requestAnimationFrame(settle);
+    };
+
+    requestAnimationFrame(settle);
+  }
+
+  // Attach dragging to STRAP and BADGE (and optionally the whole lanyard)
+  const dragHandles = [strap, badge].filter(Boolean);
+
+  dragHandles.forEach((el) => {
+    el.addEventListener("pointerdown", (e) => {
+      el.style.cursor = "grabbing";
+      beginDrag(e);
+    });
+    el.addEventListener("pointermove", onMove);
+    el.addEventListener("pointerup", (e) => {
+      el.style.cursor = "grab";
+      endDrag(e);
+    });
+    el.addEventListener("pointercancel", (e) => {
+      el.style.cursor = "grab";
+      endDrag(e);
+    });
+  });
+})();
+
+
 }); // End of DOMContentLoaded
+
+
