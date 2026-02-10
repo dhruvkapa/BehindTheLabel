@@ -35,9 +35,8 @@ body {
 
 /* BRAND (LEFT) */
 .brand {
-  text-decoration: none;   /* removes underline */
-  color: inherit;          /* keeps normal text color */
-  display: flex;
+  text-decoration: none;   
+  color: inherit;          
   align-items: center;
   gap: 12px;
 }
@@ -97,9 +96,7 @@ nav a:hover {
   color: #b91c1c !important;
 }
 
-/* =========================
-   HERO SECTION
-========================= */
+/* HERO SECTION */
 .hero {
   min-height: 90vh;
   display: flex;
@@ -148,9 +145,9 @@ nav a:hover {
 }
 
 .hero-logo {
-  max-width: 140px;   /* controls size */
-  width: auto;        /* prevents stretching */
-  height: auto;       /* preserves aspect ratio */
+  max-width: 140px;   
+  width: auto;        
+  height: auto;       
   display: block;
 
   margin: 0 auto 24px;
@@ -195,9 +192,7 @@ nav a:hover {
   transform: translateY(-2px);
 }
 
-/* =========================
-   SECTIONS
-========================= */
+/* SECTIONS */
 .section {
   padding: 96px 20px;
   max-width: 1100px;
@@ -223,9 +218,9 @@ nav a:hover {
   text-align: center;
 }
 
-/* =========================
+/* 
    ILLUSTRATION
-========================= */
+ */
 .illustration {
   max-width: 400px;
   width: 100%;
@@ -235,9 +230,9 @@ nav a:hover {
   filter: grayscale(100%);
 }
 
-/* =========================
+/* 
    CARDS
-========================= */
+ */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -270,9 +265,9 @@ nav a:hover {
   display: block;
 }
 
-/* =========================
+/* 
    FEATURE LIST
-========================= */
+ */
 .feature-list {
   list-style: none;
   margin-top: 32px;
@@ -287,9 +282,9 @@ nav a:hover {
   color: #374151;
 }
 
-/* =========================
+/* 
    CTA SECTION
-========================= */
+ */
 .cta {
   background-color: #2563eb;
   color: white;
@@ -357,9 +352,9 @@ nav a:hover {
 }
 
 
-/* =========================
+/* 
    FOOTER
-========================= */
+ */
 footer {
   background-color: #111827;
   color: #9ca3af;
@@ -368,9 +363,9 @@ footer {
   font-size: 0.9rem;
 }
 
-/* =========================
+/* 
    RESPONSIVE
-========================= */
+ */
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
@@ -387,9 +382,9 @@ footer {
   }
 }
 
-/* =========================
+/* 
    MEET THE TEAM
-========================= */
+ */
 .team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -431,9 +426,9 @@ footer {
 }
 
 
-/* =========================
+/* 
    MEET OUR PARTNER
-========================= */
+ */
 .partner-card {
   max-width: 700px;
   margin: 48px auto 0;
@@ -472,9 +467,9 @@ footer {
   opacity: 1;
 }
 
-/* =========================
+/* 
    LOGO ANIMATION
-========================= */
+ */
 
 .brand {
   display: flex;
@@ -515,9 +510,9 @@ footer {
   width: 100%;
 }
 
-/* =========================
+/* 
    HERO LOGO REVEAL
-========================= */
+ */
 
 .hero-logo {
   width: 140px;
@@ -573,9 +568,9 @@ footer {
   }
 }
 
-/* =========================
+/* 
    PARTNER LOGO ANIMATION
-========================= */
+ */
 
 .partner-logo-container {
   display: flex;
@@ -662,9 +657,9 @@ footer {
   animation: softPulse 2.5s ease-in-out infinite;
 }
 
-/* =========================
+/* 
    CAMERA SCANNER
-========================= */
+ */
 
 .floating-camera-btn {
   position: fixed;
@@ -892,9 +887,9 @@ footer {
   font-weight: 600;
 }
 
-/* =========================
+/* 
    BRAND SEARCH
-========================= */
+ */
 
 .floating-brand-btn {
   display: none;
@@ -1048,9 +1043,9 @@ footer {
   }
 }
 
-/* =========================
+/* 
    LANYARD (IJM)
-========================= */
+ */
 
 .lanyard-stage {
   display: grid;
@@ -1193,5 +1188,90 @@ footer {
 .lanyard, .lanyard-strap {
   user-select: none;
   touch-action: none;
+}
+
+/* 
+   Flashlight Blur Title
+ */
+
+.flashlight-title {
+  position: relative;
+  display: inline-block;
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+
+  /* Start blurred */
+  filter: blur(6px);
+
+  /* Needed for masking */
+  --x: 50%;
+  --y: 50%;
+
+  /* Mask creates the circular reveal */
+  mask-image: radial-gradient(
+    circle 80px at var(--x) var(--y),
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 45%,
+    rgba(0,0,0,0) 65%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle 80px at var(--x) var(--y),
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 45%,
+    rgba(0,0,0,0) 65%
+  );
+
+  transition: filter 0.25s ease;
+}
+
+/* Slightly sharpen when hovering */
+.flashlight-title:hover {
+  filter: blur(3px);
+}
+
+
+/* Wrapper centers the title */
+.flashlight-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Flashlight title */
+.flashlight-title {
+  position: relative;
+  display: inline-block;
+
+  font-size: 3rem;      /* ⬅️ bigger title */
+  font-weight: 700;
+  text-align: center;
+
+  filter: blur(6px);
+
+  --x: 50%;
+  --y: 50%;
+
+  mask-image: radial-gradient(
+    circle 120px at var(--x) var(--y),
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 45%,
+    rgba(0,0,0,0) 65%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle 120px at var(--x) var(--y),
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 45%,
+    rgba(0,0,0,0) 65%
+  );
+
+  transition: filter 0.25s ease;
+}
+
+
+.flashlight-title:hover {
+  filter: blur(3px);
 }
 

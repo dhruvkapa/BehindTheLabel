@@ -169,11 +169,11 @@ if (counterElement) {
     }
   }
 
-/* =========================
+/* =
    CAMERA SCANNER
-========================= */
+ */
 
-// Using TensorFlow.js with COCO-SSD for FREE object detection (no API key needed)
+// Using TensorFlow.js with COCO-SSD for  object detection 
 const cameraBtn = document.getElementById("cameraBtn");
 const cameraModal = document.getElementById("cameraModal");
 const closeModal = document.getElementById("closeModal");
@@ -286,7 +286,7 @@ if (captureBtn) {
   });
 }
 
-// Analyze image with TensorFlow.js (FREE - no API key needed)
+// Analyze image with TensorFlow.js 
 async function analyzeWithTensorFlow() {
   try {
     // Run object detection on the captured image
@@ -458,7 +458,7 @@ async function extractTextFromImage() {
 function displayResults(predictions, textResults = { fullText: "", detectedBrands: [], confidence: 0 }) {
   let html = "";
   
-  // SECTION 1: Detected Objects (from COCO-SSD)
+  // SECTION 1: Detected Objects 
   if (predictions && predictions.length > 0) {
     html += "<p><strong>🔍 Detected Items:</strong></p>";
     html += "<ul>";
@@ -484,7 +484,7 @@ function displayResults(predictions, textResults = { fullText: "", detectedBrand
     html += "</ul>";
   }
   
-  // SECTION 2: Brand Detection (Improved)
+  // SECTION 2: Brand Detection
   if (textResults && textResults.detectedBrands && textResults.detectedBrands.length > 0) {
     html += "<p style='margin-top: 20px;'><strong>🏷️ Brand Detected:</strong></p>";
     html += "<ul>";
@@ -814,9 +814,9 @@ function displayBrandResults(brandData) {
   brandResults.innerHTML = html;
 }
 
-// =========================
+
 // IJM Lanyard: drag strap or badge
-// =========================
+
 (function initLanyardDrag() {
   const lanyard = document.getElementById("ijmLanyard");
   if (!lanyard) return;
@@ -905,7 +905,7 @@ function displayBrandResults(brandData) {
     requestAnimationFrame(settle);
   }
 
-  // Attach dragging to STRAP and BADGE (and optionally the whole lanyard)
+  // Attach dragging to STRAP and BADGE
   const dragHandles = [strap, badge].filter(Boolean);
 
   dragHandles.forEach((el) => {
@@ -924,6 +924,28 @@ function displayBrandResults(brandData) {
     });
   });
 })();
+
+ 
+// Flashlight effect for title
+
+const flashlight = document.getElementById("flashlightTitle");
+
+if (flashlight) {
+  flashlight.addEventListener("mousemove", (e) => {
+    const rect = flashlight.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    flashlight.style.setProperty("--x", `${x}%`);
+    flashlight.style.setProperty("--y", `${y}%`);
+  });
+
+  flashlight.addEventListener("mouseleave", () => {
+    flashlight.style.setProperty("--x", `50%`);
+    flashlight.style.setProperty("--y", `50%`);
+  });
+}
+
 
 }); // End of DOMContentLoaded
 
