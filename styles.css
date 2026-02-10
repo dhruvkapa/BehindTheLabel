@@ -35,6 +35,8 @@ body {
 
 /* BRAND (LEFT) */
 .brand {
+  text-decoration: none;   /* removes underline */
+  color: inherit;          /* keeps normal text color */
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1045,6 +1047,7 @@ footer {
     padding: 20px;
   }
 }
+<<<<<<< HEAD
 
 /* =========================
    LANYARD (IJM)
@@ -1194,3 +1197,5 @@ footer {
 .lanyard-strap { z-index: 3; }
 .lanyard-clip  { z-index: 2; }
 .lanyard-badge { z-index: 1; }
+=======
+>>>>>>> 531b92af4bc7d9a6139a4cd5b4d80024ae80cb54
