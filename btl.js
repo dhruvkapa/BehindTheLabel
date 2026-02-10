@@ -925,7 +925,6 @@ function displayBrandResults(brandData) {
   });
 })();
 
-
 }); // End of DOMContentLoaded
 
 
