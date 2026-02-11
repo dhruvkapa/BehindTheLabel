@@ -1274,4 +1274,62 @@ footer {
 .flashlight-title:hover {
   filter: blur(3px);
 }
+/* 
+   CTA 
+   */
 
+.cta {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.cta-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;       /* centers caption under image */
+  text-align: center;
+}
+
+.cta-image {
+  width: 50px;              /* smaller size */
+  height: auto;
+  display: block;
+  border-radius: 16px;
+
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cta-image:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.32);
+}
+
+.cta-caption {
+  margin-top: 0.45rem;
+  font-size: 0.15rem;        /* subtle caption */
+  color: #E94F37;
+  letter-spacing: 0.02em;
+}
+
+/* Mobile tweak */
+@media (max-width: 480px) {
+  .cta-image {
+    width: 140px;
+  }
+}
+
+
+.cta-item .cta-caption {
+  font-size: 0.7rem;
+  margin-top: 0.4rem;
+  color: #E94F37;
+}
