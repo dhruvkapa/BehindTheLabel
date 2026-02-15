@@ -1333,3 +1333,241 @@ footer {
   margin-top: 0.4rem;
   color: #E94F37;
 }
+
+
+
+
+.forced-labour-section {
+  padding: 80px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.forced-labour-section h2 {
+  text-align: center;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin-bottom: 30px;
+}
+
+.video-container {
+  max-width: 700px;
+  margin: 0 auto 40px auto;
+
+  aspect-ratio: 16 / 9;   
+  border-radius: 16px;
+  overflow: hidden;
+
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+.video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;     
+  display: block;
+}
+
+/* =========================
+   Petition Page
+========================= */
+
+.petition-page {
+  position: relative;
+  min-height: calc(100vh - 80px);
+  padding: 90px 16px 60px;
+  display: flex;
+  justify-content: center;
+}
+
+.signature-background {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sig-tag {
+  position: absolute;
+  font-weight: 700;
+  font-size: 16px;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.petition-card {
+  position: relative;
+  z-index: 1;
+  width: min(920px, 100%);
+  background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(15,23,42,0.10);
+  backdrop-filter: blur(8px);
+  border-radius: 22px;
+  padding: 28px 22px;
+  box-shadow: 0 18px 60px rgba(2, 8, 23, 0.18);
+}
+
+.petition-card h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.8rem, 3vw, 2.3rem);
+}
+
+.petition-subtitle {
+  margin: 0 0 18px;
+  color: #475569;
+  line-height: 1.55;
+}
+
+.petition-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.form-row label {
+  display: block;
+  font-size: 0.95rem;
+  color: #0f172a;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.form-row input {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(15,23,42,0.16);
+  background: rgba(255,255,255,0.92);
+  outline: none;
+}
+
+.form-row input:focus {
+  border-color: rgba(233,79,55,0.55);
+  box-shadow: 0 0 0 4px rgba(233,79,55,0.12);
+}
+
+.checkbox {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.petition-submit {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: none;
+  background: #E94F37;
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.petition-submit:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.petition-msg {
+  margin: 0;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.petition-stats {
+  display: flex;
+  gap: 18px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  background: rgba(255,255,255,0.75);
+  border: 1px solid rgba(15,23,42,0.08);
+  border-radius: 16px;
+  padding: 12px 14px;
+  min-width: 140px;
+}
+
+.stat-number {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.stat-label {
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.petition-list-wrap {
+  margin-top: 22px;
+}
+
+.signature-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.signature-list li {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(15,23,42,0.08);
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.petition-note {
+  margin-top: 18px;
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+/* =========================
+   SIGNATURE TICKER
+========================= */
+
+.signature-ticker {
+  width: 100%;
+  overflow: hidden;
+  background: #ffffff;              /* White background */
+  border-top: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 14px 0;
+  position: relative;
+}
+
+.ticker-track {
+  display: inline-block;
+  white-space: nowrap;
+  animation: tickerScroll 45s linear infinite;  /* slower */
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1481BA;
+  letter-spacing: 0.5px;
+}
+
+
+.ticker-track span {
+  margin: 0 45px;
+}
+
+@keyframes tickerScroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.signature-ticker {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}

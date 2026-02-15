@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Petition • Behind The Label</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header class="navbar">
+  <div class="brand">
+    <img src="logo.png" alt="Behind The Label Logo" class="logo">
+    <span>Behind The Label</span>
+  </div>
+
+  <nav>
+    <a href="index.html#about">About</a>
+    <a href="index.html#why">Why It Matters</a>
+    <a href="forced-labour.html" class="learn-more-link">Learn More</a>
+    <a href="index.html#tool">Our Tool</a>
+    <a href="index.html#team">Team</a>
+    <a href="index.html#partner">Partner</a>
+    <a href="petition.html" class="nav-btn">Petition</a>
+  </nav>
+</header>
+
+<main class="petition-page">
+  <!-- Signature “background” layer -->
+  <div id="signatureBackground" class="signature-background" aria-hidden="true"></div>
+
+  <section class="petition-card">
+    <!-- ===== Scrolling Signature Ticker ===== -->
+<div class="signature-ticker">
+  <div class="ticker-track" id="tickerTrack">
+    <span>Loading recent supporters...</span>
+  </div>
+</div>
+
+    <h1>Petition</h1>
+    <p class="petition-subtitle">
+      Add your name to support stronger supply-chain transparency and accountability.
+    </p>
+
+    <form id="petitionForm" class="petition-form" autocomplete="off">
+      <div class="form-row">
+        <label for="sigName">Full Name</label>
+        <input id="sigName" name="sigName" type="text" placeholder="e.g., Alex Chen" required minlength="2" maxlength="60">
+      </div>
+
+      <div class="form-row">
+        <label for="sigCity">City (optional)</label>
+        <input id="sigCity" name="sigCity" type="text" placeholder="e.g., Edmonton" maxlength="60">
+      </div>
+
+      <div class="form-row">
+        <label class="checkbox">
+          <input id="sigConsent" type="checkbox" required>
+          <span>I understand my name will appear on this page.</span>
+        </label>
+      </div>
+
+      <button type="submit" class="petition-submit">Sign Petition</button>
+
+      <p id="petitionMsg" class="petition-msg" aria-live="polite"></p>
+    </form>
+
+    <div class="petition-stats">
+      <div class="stat">
+        <div id="sigCount" class="stat-number">0</div>
+        <div class="stat-label">Signatures</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">Goal</div>
+        <div class="stat-label">1,000</div>
+      </div>
+    </div>
+
+    <div class="petition-list-wrap">
+      <h2>Recent Signatures</h2>
+      <ul id="signatureList" class="signature-list"></ul>
+    </div>
+
+    <p class="petition-note">
+    </p>
+  </section>
+</main>
+
+<script src="petition.js"></script>
+</body>
+</html>
