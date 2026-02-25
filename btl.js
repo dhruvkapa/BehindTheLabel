@@ -947,6 +947,25 @@ if (flashlight) {
 }
 
 
+// Scroll-triggered animations for sections
+document.addEventListener("DOMContentLoaded", () => {
+  const sections = document.querySelectorAll(".animate-on-scroll");
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("active");
+          observer.unobserve(entry.target); // run once
+        }
+      });
+    },
+    { threshold: 0.25 }
+  );
+
+  sections.forEach(section => observer.observe(section));
+});
+
 }); // End of DOMContentLoaded
 
 

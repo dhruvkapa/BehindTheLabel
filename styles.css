@@ -1829,3 +1829,109 @@ footer {
     font-size: 1.8rem;
   }
 }
+/* Container */
+.control-section {
+  max-width: 1100px;
+  margin: 60px auto;
+  padding: 40px 20px;
+  font-family: 'Inter', sans-serif;
+}
+
+.control-title {
+  text-align: center;
+  font-size: 2.8rem;
+  margin-bottom: 40px;
+  color: #1e293b;
+
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+}
+
+.control-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+/* Card Basics */
+.control-card {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.can-card {
+  transform: translateX(-30px);
+  border-top: 5px solid #10b981;
+}
+
+.cant-card {
+  transform: translateX(30px);
+  border-top: 5px solid #ef4444;
+}
+
+/* Trigger Animations when the SECTION gets .active */
+.control-section.active .control-title,
+.control-section.active .control-card {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+/* List Item Stagger */
+.stagger-list li {
+  list-style: none;
+  margin-bottom: 15px;
+  padding-left: 25px;
+  position: relative;
+
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.stagger-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #94a3b8;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* When section is active, animate list items */
+.control-section.active .stagger-list li {
+  animation: listPop 0.45s ease forwards;
+}
+
+/* Delays */
+.control-section.active .stagger-list li:nth-child(1) { animation-delay: 0.35s; }
+.control-section.active .stagger-list li:nth-child(2) { animation-delay: 0.50s; }
+.control-section.active .stagger-list li:nth-child(3) { animation-delay: 0.65s; }
+.control-section.active .stagger-list li:nth-child(4) { animation-delay: 0.80s; }
+
+@keyframes listPop {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Styling Helpers */
+.highlight-can { color: #10b981; }
+.highlight-cant { color: #ef4444; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.icon {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.can-card .icon { color: #10b981; }
+.cant-card .icon { color: #ef4444; }
