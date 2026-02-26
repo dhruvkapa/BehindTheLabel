@@ -1,23 +1,673 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Petition • Behind The Label</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Sign the Petition • Behind The Label</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Special+Elite&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================
+       ROOT & RESET
+    ========================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:     #080808;
+      --ink:       #111111;
+      --charcoal:  #1a1a1a;
+      --ash:       #2c2c2c;
+      --smoke:     #5a5a5a;
+      --mist:      #9a9a9a;
+      --cream:     #f0ebe0;
+      --parchment: #d9d0bc;
+      --paper:     #e8e0d0;
+      --red:       #c0392b;
+      --red-hot:   #e74c3c;
+      --red-dim:   #7b1e14;
+      --gold:      #b8923a;
+    }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+
+    body {
+      background: var(--black);
+      color: var(--cream);
+      font-family: 'Playfair Display', Georgia, serif;
+      cursor: none;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* =========================================
+       CURSOR
+    ========================================= */
+    .cursor-dot {
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      width: 8px; height: 8px;
+      background: var(--red-hot); border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-ring {
+      position: fixed; top: 0; left: 0; z-index: 9998;
+      width: 36px; height: 36px;
+      border: 1px solid rgba(231,76,60,0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: all 0.18s ease;
+    }
+    a, button, input, label { cursor: none; }
+
+    /* =========================================
+       NOISE OVERLAY
+    ========================================= */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 9990;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; opacity: 0.3;
+    }
+
+    /* =========================================
+       INK SPLASH CANVAS (background)
+    ========================================= */
+    #inkCanvas {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; opacity: 0.6;
+    }
+
+    /* =========================================
+       NAVBAR
+    ========================================= */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: linear-gradient(to bottom, rgba(8,8,8,0.97), transparent);
+      border-bottom: 1px solid rgba(192,57,43,0.15);
+    }
+    .brand {
+      display: flex; align-items: center; gap: 0.7rem;
+      text-decoration: none;
+    }
+    .brand .logo { width: 34px; filter: brightness(0) invert(1); }
+    .brand span {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--cream);
+    }
+    nav { display: flex; align-items: center; gap: 2rem; }
+    nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--mist);
+      text-decoration: none; transition: color 0.2s;
+      position: relative;
+    }
+    nav a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 100%;
+      height: 1px; background: var(--red); transition: right 0.3s;
+    }
+    nav a:hover { color: var(--cream); }
+    nav a:hover::after { right: 0; }
+    nav a.nav-btn {
+      padding: 0.4rem 1rem; border: 1px solid var(--red); color: var(--red-hot);
+    }
+    nav a.nav-btn::after { display: none; }
+    nav a.nav-btn:hover { background: var(--red); color: var(--cream); }
+
+    /* =========================================
+       MAIN WRAPPER
+    ========================================= */
+    main {
+      position: relative; z-index: 1;
+      padding: 120px 2rem 6rem;
+      min-height: 100vh;
+    }
+
+    /* =========================================
+       HERO HEADLINE
+    ========================================= */
+    .petition-hero {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .petition-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.4em;
+      text-transform: uppercase; color: var(--red);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.2s forwards;
+    }
+
+    .petition-hero-title {
+      font-size: clamp(3.5rem, 10vw, 7.5rem);
+      font-weight: 900; line-height: 0.95;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 1s 0.4s forwards;
+    }
+    .petition-hero-title em {
+      display: block; font-style: italic;
+      color: var(--red-hot);
+    }
+
+    .petition-hero-sub {
+      font-family: 'Special Elite', serif;
+      font-size: 1.05rem; line-height: 1.8;
+      color: var(--parchment); max-width: 540px;
+      margin: 0 auto;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.7s forwards;
+    }
+
+    /* Typewriter cursor */
+    .typewriter-cursor {
+      display: inline-block;
+      width: 2px; height: 1.1em;
+      background: var(--red);
+      vertical-align: middle;
+      margin-left: 2px;
+      animation: blink 0.8s step-end infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* =========================================
+       PROGRESS THERMOMETER
+    ========================================= */
+    .progress-wrap {
+      max-width: 720px; margin: 0 auto 5rem;
+      opacity: 0; animation: fadeUp 0.8s 1s forwards;
+    }
+
+    .progress-header {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 0.8rem;
+    }
+    .progress-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--smoke);
+    }
+    .progress-count {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 900; color: var(--cream);
+    }
+    .progress-count span {
+      font-size: 0.9rem; color: var(--smoke); font-weight: 400;
+    }
+
+    .progress-track {
+      height: 6px; background: var(--ash);
+      position: relative; overflow: visible;
+    }
+    .progress-bar {
+      height: 100%; background: var(--red);
+      width: 0%; transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+    }
+    .progress-bar::after {
+      content: '';
+      position: absolute; right: -4px; top: 50%;
+      transform: translateY(-50%);
+      width: 14px; height: 14px;
+      background: var(--red-hot);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--red-hot);
+    }
+    .progress-goal {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.15em;
+      color: var(--smoke); text-align: right;
+      margin-top: 0.5rem;
+    }
+
+    /* =========================================
+       TWO-COLUMN LAYOUT
+    ========================================= */
+    .petition-layout {
+      max-width: 1100px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    /* =========================================
+       TICKER
+    ========================================= */
+    .signature-ticker {
+      overflow: hidden;
+      border: 1px solid var(--ash);
+      border-left: 3px solid var(--red);
+      padding: 0.7rem 1rem;
+      margin-bottom: 3rem;
+      background: rgba(192,57,43,0.05);
+      max-width: 1100px; margin-left: auto; margin-right: auto;
+      margin-bottom: 3rem;
+      opacity: 0; animation: fadeUp 0.7s 1.2s forwards;
+    }
+    .ticker-inner {
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+    .ticker-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--red);
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .ticker-track {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; color: var(--mist);
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .ticker-names {
+      display: inline-block;
+      animation: tickerScroll 25s linear infinite;
+    }
+    @keyframes tickerScroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* =========================================
+       FORM SIDE
+    ========================================= */
+    .form-side {
+      opacity: 0; animation: fadeUp 0.8s 1.3s forwards;
+    }
+
+    .form-section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--red);
+      margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .form-section-label::before {
+      content: ''; display: block;
+      width: 30px; height: 1px; background: var(--red);
+    }
+
+    .petition-form { display: flex; flex-direction: column; gap: 0; }
+
+    .form-row {
+      display: flex; flex-direction: column; gap: 0.5rem;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--ash);
+      position: relative;
+    }
+    .form-row:first-child { border-top: 1px solid var(--ash); }
+
+    .form-row label:not(.checkbox) {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--smoke);
+    }
+
+    .form-row input[type="text"] {
+      background: transparent;
+      border: none; outline: none;
+      font-family: 'Special Elite', serif;
+      font-size: 1.1rem; color: var(--cream);
+      padding: 0.3rem 0;
+      caret-color: var(--red);
+      transition: color 0.2s;
+    }
+    .form-row input[type="text"]::placeholder { color: var(--ash); }
+    .form-row input[type="text"]:focus { color: var(--cream); }
+
+    /* animated underline */
+    .form-row::after {
+      content: '';
+      position: absolute; bottom: -1px; left: 0; right: 100%;
+      height: 1px; background: var(--red);
+      transition: right 0.4s ease;
+    }
+    .form-row:focus-within::after { right: 0; }
+
+    /* checkbox */
+    .checkbox {
+      display: flex; align-items: flex-start; gap: 1rem;
+      font-size: 0.85rem; color: var(--mist); line-height: 1.6;
+    }
+    .checkbox input[type="checkbox"] {
+      appearance: none; width: 18px; height: 18px; min-width: 18px;
+      border: 1px solid var(--ash); background: transparent;
+      margin-top: 3px; cursor: none; position: relative;
+      transition: border-color 0.2s;
+    }
+    .checkbox input[type="checkbox"]:checked {
+      background: var(--red); border-color: var(--red);
+    }
+    .checkbox input[type="checkbox"]:checked::after {
+      content: '✓'; position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 0.7rem; color: white;
+    }
+    .checkbox input[type="checkbox"]:focus { border-color: var(--red); }
+
+    /* submit button */
+    .petition-submit {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 1.1rem 2.5rem;
+      background: var(--red); color: var(--cream);
+      border: none; margin-top: 2rem;
+      position: relative; overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .petition-submit::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--red-hot);
+      transform: translateX(-101%);
+      transition: transform 0.35s;
+    }
+    .petition-submit:hover::before { transform: translateX(0); }
+    .petition-submit span { position: relative; z-index: 1; }
+    .petition-submit:hover { transform: translateY(-2px); }
+    .petition-submit:active { transform: translateY(0); }
+    .petition-submit.signing {
+      pointer-events: none; opacity: 0.7;
+    }
+
+    /* message */
+    .petition-msg {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.1em;
+      margin-top: 1rem; min-height: 1.4em;
+      color: var(--red-hot);
+      opacity: 0; transition: opacity 0.4s;
+    }
+    .petition-msg.show { opacity: 1; }
+    .petition-msg.success { color: #2ecc71; }
+
+    /* =========================================
+       SIGNATURES SIDE
+    ========================================= */
+    .sigs-side {
+      opacity: 0; animation: fadeUp 0.8s 1.5s forwards;
+      position: relative;
+    }
+
+    /* Ghost names background */
+    .sig-bg-names {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+      border-radius: 2px;
+    }
+
+    .sig-bg-name {
+      position: absolute;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: rgba(192, 57, 43, 0.07);
+      white-space: nowrap;
+      user-select: none;
+      pointer-events: none;
+      animation: bgNameFloat linear infinite;
+      will-change: transform, opacity;
+    }
+
+    @keyframes bgNameFloat {
+      0%   { transform: translateY(0px) rotate(var(--rot)); opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { transform: translateY(var(--drift)) rotate(var(--rot)); opacity: 0; }
+    }
+
+    /* Ensure the real list sits above the ghost names */
+    .sig-header,
+    .signature-list { position: relative; z-index: 1; }
+
+    .sig-header {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 2rem;
+    }
+    .sig-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; font-weight: 700;
+    }
+    .sig-count-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.15em;
+      color: var(--red); text-transform: uppercase;
+    }
+
+    .signature-list {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 0;
+      max-height: 520px; overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--ash) transparent;
+    }
+
+    .sig-item {
+      display: flex; align-items: center; gap: 1.2rem;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--ash);
+      animation: sigEnter 0.5s ease forwards;
+      opacity: 0;
+    }
+    @keyframes sigEnter {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .sig-number {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; color: var(--smoke);
+      min-width: 28px; text-align: right;
+    }
+
+    .sig-ink {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--ash); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem; font-weight: 700; color: var(--cream);
+      border: 1px solid var(--ash);
+      transition: border-color 0.3s;
+    }
+    .sig-item:hover .sig-ink { border-color: var(--red); }
+
+    .sig-details { flex: 1; }
+    .sig-name {
+      font-family: 'Special Elite', serif;
+      font-size: 1rem; color: var(--cream);
+      margin-bottom: 0.15rem;
+    }
+    .sig-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.1em; color: var(--smoke);
+    }
+
+    .sig-wave {
+      width: 50px; height: 16px; flex-shrink: 0; opacity: 0.4;
+    }
+
+    /* =========================================
+       MANIFESTO SECTION
+    ========================================= */
+    .manifesto-section {
+      max-width: 1100px; margin: 6rem auto 0;
+      border-top: 1px solid var(--ash);
+      padding-top: 5rem;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 5rem; align-items: start;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s, transform 0.8s;
+    }
+    .manifesto-section.visible { opacity: 1; transform: translateY(0); }
+
+    .manifesto-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--red);
+    }
+
+    .manifesto-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 900;
+      line-height: 1.1; margin-top: 1rem;
+    }
+
+    .manifesto-body p {
+      font-family: 'Special Elite', serif;
+      font-size: 1rem; line-height: 2;
+      color: var(--parchment); margin-bottom: 1.5rem;
+      border-left: 2px solid var(--red-dim);
+      padding-left: 1.5rem;
+    }
+    .manifesto-body p:last-child { margin-bottom: 0; }
+
+    /* =========================================
+       FOOTER
+    ========================================= */
+    footer {
+      background: var(--black);
+      padding: 2rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid var(--ash);
+      margin-top: 6rem;
+      position: relative; z-index: 1;
+    }
+    footer p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.15em; color: var(--smoke);
+    }
+    footer a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.15em; color: var(--smoke);
+      text-decoration: none; transition: color 0.2s;
+    }
+    footer a:hover { color: var(--cream); }
+
+    /* =========================================
+       INK BURST PARTICLE
+    ========================================= */
+    .ink-burst {
+      position: fixed; pointer-events: none; z-index: 9000;
+      border-radius: 50%;
+      background: var(--red);
+      width: 6px; height: 6px;
+      animation: burst 0.8s ease-out forwards;
+    }
+    @keyframes burst {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+      100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+    }
+
+    /* success overlay */
+    .success-overlay {
+      position: fixed; inset: 0; z-index: 8000;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(8,8,8,0.9);
+      backdrop-filter: blur(10px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    .success-overlay.show { opacity: 1; pointer-events: all; }
+    .success-box {
+      text-align: center;
+      animation: fadeUp 0.6s ease;
+    }
+    .success-box .big-check {
+      font-size: 5rem; margin-bottom: 1rem;
+      animation: checkPop 0.5s 0.2s ease both;
+    }
+    @keyframes checkPop {
+      0% { transform: scale(0) rotate(-20deg); }
+      60% { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(1) rotate(0); }
+    }
+    .success-box h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem; font-weight: 900;
+      margin-bottom: 0.8rem;
+    }
+    .success-box p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--mist);
+      margin-bottom: 2rem;
+    }
+    .success-box button {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.8rem 2rem;
+      background: transparent; border: 1px solid var(--ash);
+      color: var(--mist);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .success-box button:hover { border-color: var(--red); color: var(--cream); }
+
+    /* =========================================
+       KEYFRAMES
+    ========================================= */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+    @media (max-width: 900px) {
+      .petition-layout { grid-template-columns: 1fr; gap: 3rem; }
+      .manifesto-section { grid-template-columns: 1fr; gap: 2rem; }
+      .navbar { padding: 1rem 1.5rem; }
+      nav { gap: 1.2rem; }
+      nav a { font-size: 0.6rem; }
+    }
+    @media (max-width: 600px) {
+      nav { display: none; }
+    }
+  </style>
 </head>
 <body>
 
-<header class="navbar">
-  <div class="brand">
-    <a href="index.html"><img src="logo.png" alt="Behind The Label Logo" class="logo"></a>
-    <span>Behind The Label</span>
-  </div>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
+<!-- INK CANVAS -->
+<canvas id="inkCanvas"></canvas>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="big-check">✍</div>
+    <h2>Your Voice<br><em style="color:var(--red-hot);font-style:italic;">Has Been Heard</em></h2>
+    <p>Signature added to the petition</p>
+    <button id="closeSuccess">Continue Reading</button>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <a href="index.html" class="brand">
+    <img src="logo.png" alt="Behind The Label" class="logo">
+    <span>Behind The Label</span>
+  </a>
   <nav>
     <a href="index.html#about">About</a>
     <a href="index.html#why">Why It Matters</a>
-    <a href="forced-labour.html" class="learn-more-link">Learn More</a>
+    <a href="forced-labour.html">Learn More</a>
     <a href="index.html#tool">Our Tool</a>
     <a href="index.html#team">Team</a>
     <a href="index.html#partner">Partner</a>
@@ -25,67 +675,382 @@
   </nav>
 </header>
 
-<main class="petition-page">
-  <!-- Signature “background” layer -->
-  <div id="signatureBackground" class="signature-background" aria-hidden="true"></div>
+<main>
 
-  <section class="petition-card">
-    <!-- ===== Scrolling Signature Ticker ===== -->
-<div class="signature-ticker">
-  <div class="ticker-track" id="tickerTrack">
-    <span>Loading recent supporters...</span>
-  </div>
-</div>
-
-    <h1>Petition</h1>
-    <p class="petition-subtitle">
-      Add your name to support stronger supply-chain transparency and accountability.
+  <!-- HERO -->
+  <div class="petition-hero">
+    <p class="petition-eyebrow">Open Petition • 2026</p>
+    <h1 class="petition-hero-title">
+      Add Your<br>
+      <em id="typewriterTarget">Name.</em>
+    </h1>
+    <p class="petition-hero-sub">
+      Demand stronger supply-chain transparency and real accountability for corporations profiting from exploitation.
     </p>
+  </div>
 
-    <form id="petitionForm" class="petition-form" autocomplete="off">
-      <div class="form-row">
-        <label for="sigName">Full Name</label>
-        <input id="sigName" name="sigName" type="text" placeholder="e.g., Alex Chen" required minlength="2" maxlength="60">
-      </div>
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="progress-header">
+      <span class="progress-label">Signatures collected</span>
+      <div class="progress-count"><span id="sigCountDisplay">0</span> <span>/ 1,000</span></div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <p class="progress-goal">Goal: 1,000 signatures</p>
+  </div>
 
-      <div class="form-row">
-        <label for="sigCity">City (optional)</label>
-        <input id="sigCity" name="sigCity" type="text" placeholder="e.g., Edmonton" maxlength="60">
-      </div>
-
-      <div class="form-row">
-        <label class="checkbox">
-          <input id="sigConsent" type="checkbox" required>
-          <span>I understand my name will appear on this page.</span>
-        </label>
-      </div>
-
-      <button type="submit" class="petition-submit">Sign Petition</button>
-
-      <p id="petitionMsg" class="petition-msg" aria-live="polite"></p>
-    </form>
-
-    <div class="petition-stats">
-      <div class="stat">
-        <div id="sigCount" class="stat-number">0</div>
-        <div class="stat-label">Signatures</div>
-      </div>
-      <div class="stat">
-        <div class="stat-number">Goal</div>
-        <div class="stat-label">1,000</div>
+  <!-- LIVE TICKER -->
+  <div class="signature-ticker">
+    <div class="ticker-inner">
+      <span class="ticker-badge">⬥ Live</span>
+      <div class="ticker-track">
+        <div class="ticker-names" id="tickerNames">Loading signatories...</div>
       </div>
     </div>
+  </div>
 
-    <div class="petition-list-wrap">
-      <h2>Recent Signatures</h2>
+  <!-- MAIN LAYOUT -->
+  <div class="petition-layout">
+
+    <!-- FORM -->
+    <div class="form-side">
+      <p class="form-section-label">Sign the Petition</p>
+
+      <form id="petitionForm" class="petition-form" autocomplete="off">
+        <div class="form-row">
+          <label for="sigName">Full Name</label>
+          <input id="sigName" name="sigName" type="text" placeholder="e.g., Alex Chen" required minlength="2" maxlength="60">
+        </div>
+        <div class="form-row">
+          <label for="sigCity">City (optional)</label>
+          <input id="sigCity" name="sigCity" type="text" placeholder="e.g., Edmonton" maxlength="60">
+        </div>
+        <div class="form-row">
+          <label class="checkbox">
+            <input id="sigConsent" type="checkbox" required>
+            <span>I understand my name will appear on this public petition page.</span>
+          </label>
+        </div>
+
+        <button type="submit" class="petition-submit" id="submitBtn">
+          <span id="submitLabel">Sign the Petition →</span>
+        </button>
+        <p class="petition-msg" id="petitionMsg" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <!-- SIGNATURES -->
+    <div class="sigs-side">
+      <!-- Ghost name watermark layer -->
+      <div class="sig-bg-names" id="sigBgNames" aria-hidden="true"></div>
+
+      <div class="sig-header">
+        <h2>Signatories</h2>
+        <span class="sig-count-badge" id="sigCount">0 signed</span>
+      </div>
       <ul id="signatureList" class="signature-list"></ul>
     </div>
 
-    <p class="petition-note">
-    </p>
-  </section>
+  </div><!-- /petition-layout -->
+
+  <!-- MANIFESTO -->
+  <div class="manifesto-section" id="manifestoSection">
+    <div>
+      <p class="manifesto-label">Why We Petition</p>
+      <h2 class="manifesto-title">This Is Not<br>Optional.</h2>
+    </div>
+    <div class="manifesto-body">
+      <p>
+        Every product purchased is a vote. When corporations hide behind complex supply chains,
+        they count on our ignorance. This petition demands that Canada strengthen the
+        Fighting Against Forced Labour Act — closing loopholes and requiring independent audits.
+      </p>
+      <p>
+        160 million children are in labour. 40 million people live in modern slavery.
+        These are not statistics — they are people, and the products on your shelves
+        are connected to their suffering.
+      </p>
+      <p>
+        A signature takes ten seconds. Real transparency legislation will protect millions.
+        Sign, share, and demand change from those who have the power to make it.
+      </p>
+    </div>
+  </div>
+
 </main>
 
+<footer>
+  <p>© 2026 Behind The Label • Built for ethical awareness</p>
+  <a href="index.html">← Back to Home</a>
+</footer>
+
 <script src="petition.js"></script>
+
+<script>
+/* =============================================
+   CURSOR
+============================================= */
+const dot = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mx = -100, my = -100;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+  ring.style.left = mx + 'px'; ring.style.top = my + 'px';
+});
+document.querySelectorAll('a,button,input,label').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    ring.style.transform = 'translate(-50%,-50%) scale(1.6)';
+    ring.style.borderColor = 'rgba(231,76,60,0.8)';
+    dot.style.opacity = '0';
+  });
+  el.addEventListener('mouseleave', () => {
+    ring.style.transform = 'translate(-50%,-50%) scale(1)';
+    ring.style.borderColor = 'rgba(231,76,60,0.5)';
+    dot.style.opacity = '1';
+  });
+});
+
+/* =============================================
+   INK CANVAS BACKGROUND
+============================================= */
+const canvas = document.getElementById('inkCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function Particle(x, y) {
+  this.x = x + (Math.random() - 0.5) * 200;
+  this.y = y + (Math.random() - 0.5) * 200;
+  this.size = Math.random() * 3 + 0.5;
+  this.opacity = Math.random() * 0.15 + 0.03;
+  this.vx = (Math.random() - 0.5) * 0.4;
+  this.vy = Math.random() * 0.3 + 0.1;
+  this.life = 1;
+  this.decay = Math.random() * 0.002 + 0.001;
+}
+
+// seed some initial ink drops
+for (let i = 0; i < 60; i++) {
+  particles.push(new Particle(
+    Math.random() * window.innerWidth,
+    Math.random() * window.innerHeight
+  ));
+}
+
+function drawInk() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach((p, i) => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= p.decay;
+    if (p.life <= 0) {
+      particles[i] = new Particle(
+        Math.random() * window.innerWidth,
+        Math.random() * window.innerHeight * 3
+      );
+    }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(192, 57, 43, ${p.opacity * p.life})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawInk);
+}
+drawInk();
+
+// spawn ink on mouse move
+let lastSpawn = 0;
+document.addEventListener('mousemove', e => {
+  if (Date.now() - lastSpawn < 80) return;
+  lastSpawn = Date.now();
+  for (let i = 0; i < 2; i++) {
+    const p = new Particle(e.clientX, e.clientY);
+    p.opacity = 0.08;
+    p.size = Math.random() * 2 + 1;
+    p.life = 0.7;
+    particles.push(p);
+  }
+  if (particles.length > 200) particles.splice(0, 5);
+});
+
+/* =============================================
+   TYPEWRITER
+============================================= */
+const typeTarget = document.getElementById('typewriterTarget');
+const words = ['Name.', 'Voice.', 'Stand.'];
+let wordIdx = 0, charIdx = 0, deleting = false;
+
+function typeLoop() {
+  const word = words[wordIdx];
+  if (!deleting) {
+    typeTarget.textContent = word.slice(0, charIdx + 1);
+    charIdx++;
+    if (charIdx === word.length) {
+      deleting = true;
+      setTimeout(typeLoop, 2200);
+      return;
+    }
+    setTimeout(typeLoop, 100);
+  } else {
+    typeTarget.textContent = word.slice(0, charIdx - 1);
+    charIdx--;
+    if (charIdx === 0) {
+      deleting = false;
+      wordIdx = (wordIdx + 1) % words.length;
+      setTimeout(typeLoop, 400);
+      return;
+    }
+    setTimeout(typeLoop, 60);
+  }
+}
+setTimeout(typeLoop, 1800);
+
+/* =============================================
+   SCROLL REVEAL
+============================================= */
+const manifesto = document.getElementById('manifestoSection');
+new IntersectionObserver(([e]) => {
+  if (e.isIntersecting) e.target.classList.add('visible');
+}, { threshold: 0.1 }).observe(manifesto);
+
+/* =============================================
+   INK BURST on click
+============================================= */
+function spawnBurst(x, y) {
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'ink-burst';
+    const angle = (i / 12) * Math.PI * 2;
+    const dist = 40 + Math.random() * 60;
+    p.style.left = x + 'px'; p.style.top = y + 'px';
+    p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+    p.style.width = (Math.random() * 6 + 3) + 'px';
+    p.style.height = p.style.width;
+    p.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
+  }
+}
+document.addEventListener('click', e => spawnBurst(e.clientX, e.clientY));
+
+/* =============================================
+   GLOBAL UI HELPERS — called by petition.js
+============================================= */
+const GOAL = 1000;
+
+/* Progress bar + count displays */
+window.updateCount = function(n) {
+  const pct = Math.min((n / GOAL) * 100, 100);
+  document.getElementById('sigCountDisplay').textContent = n.toLocaleString();
+  document.getElementById('sigCount').textContent = n.toLocaleString() + ' signed';
+  const bar = document.getElementById('progressBar');
+  // Slight delay so the bar animates in after page paint
+  requestAnimationFrame(() => { bar.style.width = pct + '%'; });
+};
+
+/* Decorative hand-drawn SVG squiggle per signature row */
+window.randomWaveSvg = function() {
+  const pts = Array.from({ length: 6 }, (_, i) =>
+    `${i * 10},${8 - Math.random() * 8}`
+  ).join(' ');
+  return `<svg class="sig-wave" viewBox="0 0 50 16" xmlns="http://www.w3.org/2000/svg">
+    <polyline points="${pts}" fill="none" stroke="var(--red)" stroke-width="1.2" opacity="0.5"/>
+  </svg>`;
+};
+
+/* Build a single <li> for a signatory */
+window.renderSignature = function(sig, index, total) {
+  const li = document.createElement('li');
+  li.className = 'sig-item';
+  li.style.animationDelay = (index * 60) + 'ms';
+  const initials = sig.name.trim().split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const meta = [sig.city, sig.date].filter(Boolean).join(' · ');
+  li.innerHTML = `
+    <span class="sig-number">#${total - index}</span>
+    <div class="sig-ink">${initials}</div>
+    <div class="sig-details">
+      <div class="sig-name">${sig.name}</div>
+      <div class="sig-meta">${meta}</div>
+    </div>
+    ${window.randomWaveSvg()}
+  `;
+  return li;
+};
+
+/* Floating ghost-name watermark behind the signatures list */
+window.renderBgNames = function(sigs) {
+  const container = document.getElementById('sigBgNames');
+  if (!container || !sigs.length) return;
+
+  const pool = [];
+  while (pool.length < 40) sigs.forEach(s => pool.push(s.name));
+  pool.sort(() => Math.random() - 0.5);
+
+  container.innerHTML = '';
+  const fragment = document.createDocumentFragment();
+
+  pool.slice(0, 40).forEach(name => {
+    const el = document.createElement('span');
+    el.className = 'sig-bg-name';
+    el.textContent = name;
+    const left  = Math.random() * 100;
+    const top   = Math.random() * 120;
+    const size  = 0.7 + Math.random() * 1.4;
+    const rot   = (Math.random() - 0.5) * 14;
+    const dur   = 14 + Math.random() * 18;
+    const delay = -(Math.random() * dur);
+    const drift = -(60 + Math.random() * 80);
+    el.style.cssText = `
+      left:${left}%;top:${top}%;font-size:${size}rem;
+      --rot:${rot}deg;--drift:${drift}px;
+      animation-duration:${dur}s;animation-delay:${delay}s;
+    `;
+    fragment.appendChild(el);
+  });
+  container.appendChild(fragment);
+};
+
+/* Scrolling name ticker */
+window.updateTicker = function(sigs) {
+  const trackEl = document.getElementById('tickerNames');
+  if (!trackEl) return;
+  if (!sigs.length) { trackEl.textContent = 'Be the first to sign.'; return; }
+  const recent = sigs.slice(0, 20);
+  const text = recent.map(s => s.city ? `${s.name} (${s.city})` : s.name).join(' · ') + ' · ';
+  trackEl.textContent = text + text; // doubled for seamless loop
+};
+
+/* Submit button loading state */
+window.setSubmitLoading = function(loading) {
+  const btn   = document.getElementById('submitBtn');
+  const label = document.getElementById('submitLabel');
+  if (loading) {
+    btn.classList.add('signing');
+    label.textContent = 'Signing...';
+  } else {
+    btn.classList.remove('signing');
+    label.textContent = 'Sign the Petition →';
+  }
+};
+
+/* Success overlay */
+window.showSuccessOverlay = function() {
+  document.getElementById('successOverlay').classList.add('show');
+};
+
+document.getElementById('closeSuccess').addEventListener('click', () => {
+  document.getElementById('successOverlay').classList.remove('show');
+});
+</script>
 </body>
 </html>

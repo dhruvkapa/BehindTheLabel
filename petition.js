@@ -1,120 +1,118 @@
-// ✅ Paste your Apps Script Web App URL here:
+// ✅ Google Apps Script Web App URL
 const API_URL = "https://script.google.com/macros/s/AKfycbxMXsgOkaAjcoYWYqODzAzvbP6SM0zv6Wv863DwpnX98hXtXciF1HRqVYTqs6tcaIZthA/exec";
-const form = document.getElementById("petitionForm");
-const msg = document.getElementById("petitionMsg");
-const sigCount = document.getElementById("sigCount");
-const sigList = document.getElementById("signatureList");
-const sigBg = document.getElementById("signatureBackground");
 
+const form    = document.getElementById("petitionForm");
+const msgEl   = document.getElementById("petitionMsg");
+
+/* --------------------------------------------------
+   Escape HTML to prevent XSS
+-------------------------------------------------- */
 function escapeText(s) {
-  return (s || "").replace(/[<>&"]/g, c => ({ "<":"&lt;", ">":"&gt;", "&":"&amp;", "\"":"&quot;" }[c]));
+  return (s || "").replace(/[<>&"]/g, c =>
+    ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c])
+  );
 }
 
-function addNameToBackground(name) {
-  const tag = document.createElement("div");
-  tag.className = "sig-tag";
-  tag.textContent = name;
-
-  tag.style.left = `${Math.random() * 92}%`;
-  tag.style.top = `${Math.random() * 92}%`;
-
-  const rot = (Math.random() * 14) - 7;
-  const scale = 0.9 + Math.random() * 0.35;
-  tag.style.transform = `translate(-50%, -50%) rotate(${rot}deg) scale(${scale})`;
-  tag.style.opacity = String(0.10 + Math.random() * 0.12);
-
-  sigBg.appendChild(tag);
-}
-
+/* --------------------------------------------------
+   render(signatures)
+   Called after every fetch or submit.
+   Hands off to the global UI helpers defined in petition.html.
+-------------------------------------------------- */
 function render(signatures) {
-  // Count
-  sigCount.textContent = String(signatures.length);
+  const total = signatures.length;
 
-  // Recent list (top 10)
-  sigList.innerHTML = "";
-  signatures.slice(0, 10).forEach(s => {
-    const li = document.createElement("li");
-    li.textContent = s.city ? `${s.name} — ${s.city}` : s.name;
-    sigList.appendChild(li);
+  // 1. Progress bar + count
+  window.updateCount(total);
+
+  // 2. Signature list (most recent first, capped at 30)
+  const list = document.getElementById("signatureList");
+  list.innerHTML = "";
+  signatures.slice(0, 30).forEach((s, i) => {
+    // Normalise: petition.js receives { name, city, date } from the API
+    list.appendChild(window.renderSignature(s, i, total));
   });
 
-  // ===== TICKER =====
-  const ticker = document.getElementById("tickerTrack");
-  if (ticker) {
-    ticker.innerHTML = "";
+  // 3. Ghost name watermark in the background of the list panel
+  window.renderBgNames(signatures);
 
-    const recent = signatures.slice(0, 10);
+  // 4. Live ticker strip
+  window.updateTicker(signatures);
+}
 
-    if (recent.length === 0) {
-      ticker.innerHTML = "<span>Be the first to sign the petition.</span>";
-    } else {
-      recent.forEach(s => {
-        const span = document.createElement("span");
-        span.textContent = s.city ? `${s.name} — ${s.city}` : s.name;
-        ticker.appendChild(span);
-      });
-
-      // Duplicate content so scroll is seamless
-      recent.forEach(s => {
-        const span = document.createElement("span");
-        span.textContent = s.city ? `${s.name} — ${s.city}` : s.name;
-        ticker.appendChild(span);
-      });
+/* --------------------------------------------------
+   fetchSignatures — loads data from Google Sheets
+-------------------------------------------------- */
+async function fetchSignatures() {
+  try {
+    const res  = await fetch(API_URL);
+    const data = await res.json();
+    if (!data.ok) throw new Error("Failed to fetch signatures");
+    render(data.signatures);
+  } catch (err) {
+    if (msgEl) {
+      msgEl.textContent = "Could not load signatures yet. Check your API URL.";
+      msgEl.classList.add("show");
     }
   }
-
-  // Background names
-  sigBg.innerHTML = "";
-  signatures.slice(0, 200).forEach(s => addNameToBackground(s.name));
 }
 
-
-async function fetchSignatures() {
-  const res = await fetch(API_URL);
-  const data = await res.json();
-  if (!data.ok) throw new Error("Failed to fetch signatures");
-  render(data.signatures);
-}
-
+/* --------------------------------------------------
+   submitSignature — POSTs to Google Apps Script
+-------------------------------------------------- */
 async function submitSignature(name, city) {
   const payload = { name, city, userAgent: navigator.userAgent };
-
   const res = await fetch(API_URL, {
-    method: "POST",
+    method:  "POST",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(payload),
+    body:    JSON.stringify(payload),
   });
-
   const data = await res.json();
   if (!data.ok) throw new Error(data.error || "Failed to submit");
 }
 
+/* --------------------------------------------------
+   Form submit handler
+-------------------------------------------------- */
 if (form) {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    msg.textContent = "";
 
-    const name = document.getElementById("sigName").value.trim();
-    const city = document.getElementById("sigCity").value.trim();
+    const name    = document.getElementById("sigName").value.trim();
+    const city    = document.getElementById("sigCity").value.trim();
     const consent = document.getElementById("sigConsent").checked;
 
     if (!consent) {
-      msg.textContent = "Please check the consent box.";
+      msgEl.textContent = "Please check the consent box.";
+      msgEl.classList.add("show");
       return;
     }
 
+    // Loading state
+    window.setSubmitLoading(true);
+    msgEl.classList.remove("show");
+
     try {
       await submitSignature(name, city);
-      msg.textContent = "Thank you — your signature was added!";
+
+      // Reset form
       form.reset();
-      await fetchSignatures(); // refresh UI + background
+
+      // Refresh the full list from the API (source of truth)
+      await fetchSignatures();
+
+      // Show the animated success overlay
+      window.showSuccessOverlay();
+
     } catch (err) {
-      msg.textContent = `Error: ${err.message}`;
+      msgEl.textContent = `Error: ${err.message}`;
+      msgEl.classList.add("show");
+    } finally {
+      window.setSubmitLoading(false);
     }
   });
 }
 
-// Load existing signatures on page load
-fetchSignatures().catch(err => {
-  if (msg) msg.textContent = "Could not load signatures yet. Check your API URL.";
-});
+/* --------------------------------------------------
+   Boot — load signatures on page load
+-------------------------------------------------- */
+fetchSignatures();
