@@ -539,3 +539,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("btl.js init complete");
 });
+
+/* =========================
+     FAQ Accordion
+  ========================= */
+  const toggleFaq = (id) => {
+    const item = document.getElementById(id);
+    if (!item) return;
+    const isOpen = item.classList.contains('open');
+
+    // Close all
+    document.querySelectorAll('.faq-item').forEach(el => {
+      el.classList.remove('open');
+      el.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
+    });
+
+    // Open clicked if it was closed
+    if (!isOpen) {
+      item.classList.add('open');
+      item.querySelector('.faq-question')?.setAttribute('aria-expanded', 'true');
+    }
+  };
+
+  // Expose to global scope so onclick="toggleFaq(...)" works in HTML
+  window.toggleFaq = toggleFaq;
+

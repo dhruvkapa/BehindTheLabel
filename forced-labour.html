@@ -10,6 +10,8 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
 </head>
 <body>
 
@@ -38,7 +40,7 @@
 <section id="home" class="hero">
   <div class="hero-content">
     <div class="centered-logo" style="text-align: center; margin-bottom: 1rem;">
-      <img src="logo.png" href="index.html" alt="Behind The Label Logo" class="hero-logo centered-logo-img">
+      <img src="logo.png" alt="Behind The Label Logo" class="hero-logo centered-logo-img">
     </div>
     <h1><span>Child Slavery and</span> <span>Forced Labour</span></h1>
     <p style="color: #000000;">
@@ -48,257 +50,489 @@
 </section>
 
 <!-- ================= WHAT IS FORCED LABOUR ================= -->
-<section class="forced-labour-section">
+<section class="fl-section">
 
-  <h2>What Is Forced Labour?</h2>
+  <!-- Floating background words -->
+  <span class="fl-bg-word fl-bg-word--1">COERCION</span>
+  <span class="fl-bg-word fl-bg-word--2">HIDDEN</span>
+  <span class="fl-bg-word fl-bg-word--3">TRAPPED</span>
 
-  <div class="video-container">
-    <video autoplay muted loop playsinline>
-      <source src="videos/match-cut.mp4" type="video/mp4">
-    </video>
+  <div class="fl-inner">
+
+    <!-- Left: text content -->
+    <div class="fl-text">
+      <p class="fl-eyebrow">The Problem</p>
+      <h2 class="fl-title">What Is <em>Forced Labour?</em></h2>
+
+      <p class="fl-body">
+        Forced labour occurs when people are made to work against their will under threat of punishment.
+        This punishment does not always involve physical violence — it can also include withheld wages,
+        debt bondage, threats to family members, confiscation of identity documents, or restrictions on movement.
+      </p>
+
+      <p class="fl-body">
+        Forced labour exists in many industries worldwide, including agriculture, manufacturing, mining,
+        construction, domestic work, and fishing. Because global supply chains are complex and often cross
+        multiple countries, forced labour can remain hidden from both governments and consumers.
+      </p>
+
+      <!-- Threat tags -->
+      <div class="fl-tags">
+        <span class="fl-tag">Withheld Wages</span>
+        <span class="fl-tag">Debt Bondage</span>
+        <span class="fl-tag">Document Confiscation</span>
+        <span class="fl-tag">Threats to Family</span>
+        <span class="fl-tag">Restricted Movement</span>
+      </div>
+    </div>
+
+    <!-- Right: video -->
+    <div class="fl-video-wrap">
+      <div class="fl-video-frame">
+        <video autoplay muted loop playsinline>
+          <source src="videos/match-cut.mp4" type="video/mp4">
+        </video>
+        <!-- Animated corner accents -->
+        <span class="fl-corner fl-corner--tl"></span>
+        <span class="fl-corner fl-corner--tr"></span>
+        <span class="fl-corner fl-corner--bl"></span>
+        <span class="fl-corner fl-corner--br"></span>
+      </div>
+      <p class="fl-video-caption">Global supply chains hide exploitation in plain sight.</p>
+    </div>
+
   </div>
 
-  <p>
-    Forced labour occurs when people are made to work against their will under threat of punishment.
-    This punishment does not always involve physical violence, it can also include withheld wages,
-    debt bondage, threats to family members, confiscation of identity documents, or restrictions on movement.
-  </p>
-
-  <p>
-    Forced labour exists in many industries worldwide, including agriculture, manufacturing, mining,
-    construction, domestic work, and fishing. Because global supply chains are complex and often cross
-    multiple countries, forced labour can remain hidden from both governments and consumers.
-  </p>
-
 </section>
 
 
+ <!-- WHAT IS CHILD LABOUR + SLAVERY — split panel -->
+  <div class="definitions-block">
+    <div class="def-divider"></div>
 
-<!-- ================= WHAT IS CHILD LABOUR ================= -->
-<section class="section section-light">
-  <h2>What Is Child Labour?</h2>
-  <p>
-    Child labour refers to work that deprives children of their childhood, education, health, or dignity. Not all work done by children is considered harmful, but child labour becomes a serious issue when it interferes with schooling or exposes children to dangerous or exploitative conditions.
-  </p>
-  <p>
-    Children are particularly vulnerable to exploitation due to poverty, lack of access to education, displacement, and weak legal protections in some regions.
-  </p>
-</section>
-
-<!-- ================= WHAT IS CHILD SLAVERY ================= -->
-<section class="section">
-  <h2>What Is Child Slavery?</h2>
-  <p>
-    Child slavery is an extreme form of child exploitation. It occurs when children are forced to work under conditions they cannot escape, often through coercion, threats, or control by others. Children in slavery may be denied freedom, education, and basic rights, and are unable to leave their situation safely.
-  </p>
-  <p>
-    Child slavery is commonly linked to forced labour but can also involve other forms of exploitation, including trafficking.
-  </p>
-</section>
-
-<!-- ================= WHY PERSIST ================= -->
-<section class="section section-light">
-  <h2>Why Forced Labour and Child Slavery Persist</h2>
-  <p>
-    Several factors contribute to the continued existence of forced labour and child slavery:
-  </p>
-
-  <div class="cards">
-    <div class="card">
-      <h3>Poverty and Economic Inequality</h3>
-      <p>Lack of economic opportunities makes people vulnerable to exploitation.</p>
+    <!-- Left: Child Labour -->
+    <div class="def-panel def-panel--labour">
+      <div class="def-bg-word">LABOUR</div>
+      <p class="def-tag"><span class="def-tag-dot"></span>Definition</p>
+      <h2 class="def-heading">What Is<br><em>Child Labour?</em></h2>
+      <div class="def-body">
+        <p>Child labour refers to work that deprives children of their childhood, education, health, or dignity. Not all work done by children is considered harmful, but it becomes a serious issue when it interferes with schooling or exposes children to dangerous conditions.</p>
+        <div class="def-pills">
+          <span class="def-pill">Poverty</span>
+          <span class="def-pill">No Education</span>
+          <span class="def-pill">Displacement</span>
+          <span class="def-pill">Weak Protections</span>
+        </div>
+        <div class="def-severity">
+          <p class="def-severity-label">Severity Index</p>
+          <div class="def-severity-track"><div class="def-severity-fill"></div></div>
+        </div>
+      </div>
     </div>
 
-    <div class="card">
-      <h3>Limited Access to Education</h3>
-      <p>Without education, children have fewer opportunities and protections.</p>
-    </div>
-
-    <div class="card">
-      <h3>Weak Labour Law Enforcement</h3>
-      <p>Insufficient oversight allows unethical practices to continue.</p>
-    </div>
-
-    <div class="card">
-      <h3>Conflict and Displacement</h3>
-      <p>Vulnerable populations in crisis situations face higher exploitation risks.</p>
-    </div>
-
-    <div class="card">
-      <h3>Hidden Supply Chains</h3>
-      <p>Complex supplier networks make it difficult to track where products are made.</p>
-    </div>
-
-    <div class="card">
-      <h3>Insufficient Oversight</h3>
-      <p>Unethical practices remain hidden due to lack of transparency and monitoring.</p>
+    <!-- Right: Child Slavery -->
+    <div class="def-panel def-panel--slavery">
+      <div class="def-bg-word">SLAVERY</div>
+      <p class="def-tag"><span class="def-tag-dot"></span>Extreme Form</p>
+      <h2 class="def-heading">What Is<br><em>Child Slavery?</em></h2>
+      <div class="def-body">
+        <p>Child slavery is an extreme form of child exploitation. It occurs when children are forced to work under conditions they cannot escape — through coercion, threats, or control. Children may be denied freedom, education, and basic rights.</p>
+        <div class="def-pills">
+          <span class="def-pill">Coercion</span>
+          <span class="def-pill">Trafficking</span>
+          <span class="def-pill">No Freedom</span>
+          <span class="def-pill">No Rights</span>
+        </div>
+        <div class="def-severity">
+          <p class="def-severity-label">Severity Index</p>
+          <div class="def-severity-track"><div class="def-severity-fill"></div></div>
+        </div>
+      </div>
     </div>
   </div>
-</section>
 
-<!-- ================= GLOBAL IMPACT ================= -->
-<section class="section">
-  <h2>Global Impact</h2>
-  <p>
-    Millions of people worldwide are affected by forced labour and child exploitation. These practices generate significant illegal profits while denying workers and children their basic rights and opportunities. The impact extends beyond individuals, reinforcing cycles of poverty and inequality within communities.
-  </p>
-</section>
+  <!-- WHY PERSIST -->
+  <section class="persist-section">
+    <div class="persist-header">
+      <p class="persist-eyebrow">Root Causes</p>
+      <h2 class="persist-title">Why Forced Labour and Child Slavery Persist</h2>
+      <p class="persist-subtitle">Several deep-rooted factors continue to fuel exploitation worldwide.</p>
+    </div>
+    <div class="persist-grid">
+      <div class="persist-card">
+        <span class="persist-num">1</span>
+        <span class="persist-card-icon">💸</span>
+        <h3>Poverty and Economic Inequality</h3>
+        <p>Lack of economic opportunities makes people vulnerable to exploitation.</p>
+      </div>
+      <div class="persist-card">
+        <span class="persist-num">2</span>
+        <span class="persist-card-icon">📚</span>
+        <h3>Limited Access to Education</h3>
+        <p>Without education, children have fewer opportunities and protections.</p>
+      </div>
+      <div class="persist-card">
+        <span class="persist-num">3</span>
+        <span class="persist-card-icon">⚖️</span>
+        <h3>Weak Labour Law Enforcement</h3>
+        <p>Insufficient oversight allows unethical practices to continue.</p>
+      </div>
+      <div class="persist-card">
+        <span class="persist-num">4</span>
+        <span class="persist-card-icon">🌍</span>
+        <h3>Conflict and Displacement</h3>
+        <p>Vulnerable populations in crisis situations face higher exploitation risks.</p>
+      </div>
+      <div class="persist-card">
+        <span class="persist-num">5</span>
+        <span class="persist-card-icon">🕸️</span>
+        <h3>Hidden Supply Chains</h3>
+        <p>Complex supplier networks make it difficult to track where products are made.</p>
+      </div>
+      <div class="persist-card">
+        <span class="persist-num">6</span>
+        <span class="persist-card-icon">👁️</span>
+        <h3>Insufficient Oversight</h3>
+        <p>Unethical practices remain hidden due to lack of transparency and monitoring.</p>
+      </div>
+    </div>
+  </section>
 
-<!-- ================= CONSUMER AWARENESS ================= -->
-<section class="section section-light">
-  <h2>Why Consumer Awareness Matters</h2>
-  <p>
-    Many consumers are unaware that everyday products can be linked to forced labour or child exploitation. Increasing awareness helps create demand for transparency and ethical sourcing. When consumers ask questions and support responsible companies, businesses face greater pressure to improve labour practices.
-  </p>
-  <p>
-    <strong>Awareness is a critical step toward accountability and change.</strong>
-  </p>
-</section>
+  <!-- GLOBAL IMPACT -->
+  <section class="impact-banner">
+    <div class="impact-banner-inner">
+      <p class="impact-banner-eyebrow">The Scale of the Problem</p>
+      <h2 class="impact-banner-title">Global Impact</h2>
+      <p class="impact-banner-body">Millions of people worldwide are affected by forced labour and child exploitation. These practices generate significant illegal profits while denying workers and children their basic rights and opportunities — reinforcing cycles of poverty and inequality.</p>
+      <div class="impact-stats">
+        <div class="impact-stat">
+          <div class="impact-stat-num">160M+</div>
+          <div class="impact-stat-label">Children in child labour globally</div>
+        </div>
+        <div class="impact-stat">
+          <div class="impact-stat-num">$150B+</div>
+          <div class="impact-stat-label">Annual illegal profits generated</div>
+        </div>
+        <div class="impact-stat">
+          <div class="impact-stat-num blue">50M</div>
+          <div class="impact-stat-label">People in modern slavery today</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<!-- ================= HOW FORCED LABOUR SHOWS UP ================= -->
-<section class="section">
-  <h2>How Forced Labour Shows Up in Everyday Products</h2>
-  <p>Here are common product categories where forced labour or child labour risks are known to appear.</p>
+  <!-- CONSUMER AWARENESS -->
+  <section class="awareness-section">
+    <div class="awareness-inner">
+      <div class="awareness-text">
+        <p class="awareness-eyebrow">Your Role Matters</p>
+        <h2 class="awareness-title">Why Consumer Awareness Matters</h2>
+        <div class="awareness-body">
+          <p>Many consumers are unaware that everyday products can be linked to forced labour or child exploitation. Increasing awareness helps create demand for transparency and ethical sourcing.</p>
+          <p>When consumers ask questions and support responsible companies, businesses face greater pressure to improve labour practices.</p>
+        </div>
+      </div>
+      <div class="awareness-callout">
+        <div class="callout-card">
+          <span class="callout-quote-mark">"</span>
+          <p class="callout-text"><span>Awareness</span> is a critical first step toward accountability and change.</p>
+          <div class="callout-chain">
+            <div class="chain-step">
+              <div class="chain-dot"></div>
+              <span class="chain-label">Consumer becomes aware</span>
+            </div>
+            <div class="chain-connector"></div>
+            <div class="chain-step">
+              <div class="chain-dot"></div>
+              <span class="chain-label">Pressure on businesses grows</span>
+            </div>
+            <div class="chain-connector"></div>
+            <div class="chain-step">
+              <div class="chain-dot"></div>
+              <span class="chain-label">Accountability follows</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <div class="cards">
-    <div class="card">
-      <img src="undershirt.png" alt="Undershirt icon" class="card-icon">
-      <h3>Clothing &amp; Textiles</h3>
-      <p>Raw cotton and denim production often involves seasonal work and subcontracted farms where oversight is limited.</p>
-      <p><strong>Why this matters:</strong> Garment value chains are long and opaque, hiding labour risk upstream.</p>
+  <!-- HOW FORCED LABOUR SHOWS UP -->
+  <section class="showsup-section">
+    <div class="showsup-header">
+      <p class="showsup-eyebrow">Hidden in Plain Sight</p>
+      <h2 class="showsup-title">How Forced Labour Shows Up in Everyday Products</h2>
+      <p class="showsup-subtitle">Common product categories where forced labour or child labour risks are known to appear.</p>
     </div>
 
-    <div class="card">
-      <img src="circuit.png" alt="Circuit icon" class="card-icon">
-      <h3>Electronics</h3>
-      <p>Mining for minerals and battery production can involve hazardous conditions and informal labour arrangements.</p>
-      <p><strong>Why this matters:</strong> Small parts and components come from many suppliers, increasing risk.</p>
+    <div class="showsup-strip">
+
+      <div class="showsup-card">
+        <img src="undershirt.png" alt="Clothing" class="showsup-img">
+        <h3>Clothing &amp; Textiles</h3>
+        <p>Raw cotton and denim production often involves seasonal work and subcontracted farms where oversight is limited.</p>
+        <p class="showsup-matters">Garment value chains are long and opaque, hiding labour risk upstream.</p>
+      </div>
+
+      <div class="showsup-card">
+        <img src="circuit.png" alt="Electronics" class="showsup-img">
+        <h3>Electronics</h3>
+        <p>Mining for minerals and battery production can involve hazardous conditions and informal labour arrangements.</p>
+        <p class="showsup-matters">Small parts and components come from many suppliers, increasing risk.</p>
+      </div>
+
+      <div class="showsup-card">
+        <img src="shrimp.png" alt="Seafood" class="showsup-img">
+        <h3>Seafood</h3>
+        <p>Fishing fleets and processing plants sometimes rely on coerced or debt-bonded workers at sea.</p>
+        <p class="showsup-matters">Offshore work is hard to monitor and workers can be isolated.</p>
+      </div>
+
+      <div class="showsup-card">
+        <img src="chocolate.png" alt="Chocolate" class="showsup-img">
+        <h3>Chocolate &amp; Coffee</h3>
+        <p>Agricultural harvesting and smallholder farms are high-risk settings for child labour and exploitation.</p>
+        <p class="showsup-matters">Seasonal harvests and informal labour make protections inconsistent.</p>
+      </div>
+
+      <div class="showsup-card">
+        <img src="pickaxe.png" alt="Mining" class="showsup-img">
+        <h3>Mining &amp; Raw Materials</h3>
+        <p>Artisanal mining and subcontracted supply chains can involve children and forced labour for high-demand minerals.</p>
+        <p class="showsup-matters">Minerals feed many industries, making the problem widespread.</p>
+      </div>
+
     </div>
 
-    <div class="card">
-      <img src="shrimp.png" alt="Shrimp icon" class="card-icon">
-      <h3>Seafood</h3>
-      <p>Fishing fleets and processing plants sometimes rely on coerced or debt-bonded workers at sea.</p>
-      <p><strong>Why this matters:</strong> Offshore work is hard to monitor and workers can be isolated.</p>
+    <div class="showsup-hint">
+      <div class="scroll-arrow">
+        <span></span><span></span><span></span>
+      </div>
+      <span>Scroll to explore</span>
     </div>
+  </section>
 
-    <div class="card">
-      <img src="chocolate.png" alt="Chocolate icon" class="card-icon">
-      <h3>Chocolate &amp; Coffee</h3>
-      <p>Agricultural harvesting and smallholder farms are high-risk settings for child labour and exploitation.</p>
-      <p><strong>Why this matters:</strong> Seasonal harvests and informal labour make protections inconsistent.</p>
-    </div>
-
-    <div class="card">
-      <img src="pickaxe.png" alt="Pickaxe icon" class="card-icon">
-      <h3>Mining &amp; Raw Materials</h3>
-      <p>Artisanal mining and subcontracted supply chains can involve children and forced labour for high-demand minerals.</p>
-      <p><strong>Why this matters:</strong> Minerals feed many industries, making the problem widespread.</p>
-    </div>
-  </div>
-</section>
 
 <!-- ================= A PRODUCT'S JOURNEY ================= -->
-<section class="section section-light">
+<section class="section section-light journey animate-on-scroll" id="journey">
   <h2>A Product's Journey</h2>
   <p>Risks can enter products at multiple steps along the supply chain.</p>
 
-  <div class="cards">
-    <div class="card">
-      <h3>1. Raw Materials</h3>
-      <p>Forced labour is often hidden in agriculture and mining, far from consumer visibility.</p>
+  <div class="journey-flow">
+    <!-- STEP 1 -->
+    <div class="journey-step">
+      <div class="journey-node">
+        <span class="step-num">1</span>
+      </div>
+
+      <div class="journey-card">
+        <h3>Raw Materials</h3>
+        <p>Forced labour is often hidden in agriculture and mining, far from consumer visibility.</p>
+      </div>
+
+      <div class="journey-arrow" aria-hidden="true">
+        <span class="arrow-head">➜</span>
+      </div>
     </div>
 
-    <div class="card">
-      <h3>2. Manufacturing</h3>
-      <p>Subcontracting and informal factories can create gaps in oversight and worker protections.</p>
+    <!-- STEP 2 -->
+    <div class="journey-step">
+      <div class="journey-node">
+        <span class="step-num">2</span>
+      </div>
+
+      <div class="journey-card">
+        <h3>Manufacturing</h3>
+        <p>Subcontracting and informal factories can create gaps in oversight and worker protections.</p>
+      </div>
+
+      <div class="journey-arrow" aria-hidden="true">
+        <span class="arrow-head">➜</span>
+      </div>
     </div>
 
-    <div class="card">
-      <h3>3. Assembly</h3>
-      <p>Assembly plants may use temporary or agency labour with weak contracts and limited rights.</p>
+    <!-- STEP 3 -->
+    <div class="journey-step">
+      <div class="journey-node">
+        <span class="step-num">3</span>
+      </div>
+
+      <div class="journey-card">
+        <h3>Assembly</h3>
+        <p>Assembly plants may use temporary or agency labour with weak contracts and limited rights.</p>
+      </div>
+
+      <div class="journey-arrow" aria-hidden="true">
+        <span class="arrow-head">➜</span>
+      </div>
     </div>
 
-    <div class="card">
-      <h3>4. Shipping &amp; Retail</h3>
-      <p>Long logistics chains and multiple intermediaries make tracing labour conditions difficult.</p>
+    <!-- STEP 4 -->
+    <div class="journey-step last">
+      <div class="journey-node">
+        <span class="step-num">4</span>
+      </div>
+
+      <div class="journey-card">
+        <h3>Shipping &amp; Retail</h3>
+        <p>Long logistics chains and multiple intermediaries make tracing labour conditions difficult.</p>
+      </div>
     </div>
   </div>
-
-
 </section>
 
 <!-- ================= TRANSPARENCY GAP ================= -->
-<section class="section">
-  <h2>Why It's Hard to See</h2>
-  <p>Several structural issues make forced labour difficult to detect and address.</p>
+<section class="tgap-section">
 
-  <ul class="feature-list">
-    <li>Complex supply chains with many tiers</li>
-    <li>Outsourcing and subcontracting that hide true employers</li>
-    <li>Weak enforcement and uneven labour inspections</li>
-    <li>Lack of clear product labelling and supplier disclosure</li>
-  </ul>
+  <div class="tgap-header">
+    <p class="tgap-eyebrow">The Transparency Gap</p>
+    <h2 class="tgap-title">Why It's Hard to See</h2>
+    <p class="tgap-subtitle">Several structural issues keep forced labour hidden from view.</p>
+  </div>
+
+  <div class="tgap-grid">
+
+    <div class="tgap-card" style="--i:0">
+      <div class="tgap-fog"></div>
+      <div class="tgap-spotlight"></div>
+      <div class="tgap-card-inner">
+        <span class="tgap-icon">🕸️</span>
+        <h3 class="tgap-card-title">Complex Supply Chains</h3>
+        <p class="tgap-card-text">Products pass through many tiers of suppliers across multiple countries, making the full picture nearly impossible to trace.</p>
+      </div>
+      <p class="tgap-hover-hint">Hover to reveal</p>
+    </div>
+
+    <div class="tgap-card" style="--i:1">
+      <div class="tgap-fog"></div>
+      <div class="tgap-spotlight"></div>
+      <div class="tgap-card-inner">
+        <span class="tgap-icon">🎭</span>
+        <h3 class="tgap-card-title">Hidden Employers</h3>
+        <p class="tgap-card-text">Outsourcing and subcontracting obscure who truly employs workers, allowing exploitation to hide behind layers of intermediaries.</p>
+      </div>
+      <p class="tgap-hover-hint">Hover to reveal</p>
+    </div>
+
+    <div class="tgap-card" style="--i:2">
+      <div class="tgap-fog"></div>
+      <div class="tgap-spotlight"></div>
+      <div class="tgap-card-inner">
+        <span class="tgap-icon">🚧</span>
+        <h3 class="tgap-card-title">Weak Enforcement</h3>
+        <p class="tgap-card-text">Labour inspections are uneven and underfunded in many regions, leaving violations unchecked and workers unprotected.</p>
+      </div>
+      <p class="tgap-hover-hint">Hover to reveal</p>
+    </div>
+
+    <div class="tgap-card" style="--i:3">
+      <div class="tgap-fog"></div>
+      <div class="tgap-spotlight"></div>
+      <div class="tgap-card-inner">
+        <span class="tgap-icon">🏷️</span>
+        <h3 class="tgap-card-title">No Clear Labelling</h3>
+        <p class="tgap-card-text">Products rarely disclose where or by whom they were made, leaving consumers without the information needed to make ethical choices.</p>
+      </div>
+      <p class="tgap-hover-hint">Hover to reveal</p>
+    </div>
+
+  </div>
+
+  <p class="tgap-footer-note">Most exploitation stays hidden -> awareness is the first step to change.</p>
+
 </section>
-
 <!-- ================= WHAT THE NUMBERS TELL US ================= -->
 <section class="numbers-section animate-on-scroll">
-  <header class="main-header">
-    <h1 class="reveal-text">
-      <span class="word">What</span>
-      <span class="word">The</span>
-      <span class="word">Numbers</span>
-      <span class="word">Tell</span>
-      <span class="word">Us</span>
-    </h1>
-    <div class="header-line"></div>
-  </header>
 
-  <div class="impact-grid">
-    <div class="card" style="--accent: #e74c3c;">
-      <div class="visual-reveal">
-        <span class="number" data-text="160M">160M</span>
-      </div>
-      <div class="content">
-        <p class="label">Children affected by child labour worldwide.</p>
-        <p class="source">Source: ILO / UNICEF</p>
-      </div>
-      <div class="scan-line"></div>
-    </div>
+  <div class="ns-glitch-bar"></div>
 
-    <div class="card" style="--accent: #f1c40f;">
-      <div class="visual-reveal">
-        <span class="number glow" data-text="$100B+">$100B+</span>
-      </div>
-      <div class="content">
-        <p class="label">Estimated annual profits linked to forced labour.</p>
-        <p class="source">Source: ILO estimates</p>
-      </div>
-      <div class="scan-line"></div>
-    </div>
-
-    <div class="card" style="--accent: #3498db;">
-      <div class="visual-reveal">
-        <span class="number blur-in">Most</span>
-      </div>
-      <div class="content">
-        <p class="label">Consumers rarely see full supply chain details.</p>
-        <p class="source">Source: Public supply-chain studies</p>
-      </div>
-      <div class="scan-line"></div>
+  <div class="ns-ticker-wrap">
+    <span class="ns-ticker-label">● LIVE DATA</span>
+    <div class="ns-ticker-track">
+      <span>Agriculture</span><span class="ns-ticker-sep">///</span>
+      <span>Manufacturing</span><span class="ns-ticker-sep">///</span>
+      <span>Mining</span><span class="ns-ticker-sep">///</span>
+      <span>Textiles</span><span class="ns-ticker-sep">///</span>
+      <span>Seafood</span><span class="ns-ticker-sep">///</span>
+      <span>Electronics</span><span class="ns-ticker-sep">///</span>
+      <span>Construction</span><span class="ns-ticker-sep">///</span>
+      <span>Domestic Work</span><span class="ns-ticker-sep">///</span>
+      <span>Agriculture</span><span class="ns-ticker-sep">///</span>
+      <span>Manufacturing</span><span class="ns-ticker-sep">///</span>
+      <span>Mining</span><span class="ns-ticker-sep">///</span>
+      <span>Textiles</span><span class="ns-ticker-sep">///</span>
+      <span>Seafood</span><span class="ns-ticker-sep">///</span>
+      <span>Electronics</span><span class="ns-ticker-sep">///</span>
+      <span>Construction</span><span class="ns-ticker-sep">///</span>
+      <span>Domestic Work</span><span class="ns-ticker-sep">///</span>
     </div>
   </div>
+
+  <div class="ns-header">
+    <div class="ns-overline">
+      <span class="ns-overline-bar"></span>
+      <span class="ns-overline-text">The Scale of the Crisis</span>
+      <span class="ns-live-dot"></span>
+    </div>
+    <h2 class="ns-title">What The <span class="ns-title-accent" data-text="Numbers">Numbers</span><br>Tell Us</h2>
+  </div>
+
+  <div class="ns-grid">
+
+    <div class="ns-card">
+      <span class="ns-index">Stat 01 / Children</span>
+      <span class="ns-number" data-text="160M">160M</span>
+      <span class="ns-rule"></span>
+      <p class="ns-label">Children affected by child labour worldwide — robbed of childhood, education, and safety.</p>
+      <p class="ns-source">Source: ILO / UNICEF</p>
+    </div>
+
+    <div class="ns-card">
+      <span class="ns-index">Stat 02 / Profits</span>
+      <span class="ns-number" data-text="$150B+">$150B+</span>
+      <span class="ns-rule"></span>
+      <p class="ns-label">Estimated annual illegal profits generated through forced labour and exploitation.</p>
+      <p class="ns-source">Source: ILO Estimates</p>
+    </div>
+
+    <div class="ns-card">
+      <span class="ns-index">Stat 03 / Visibility</span>
+      <span class="ns-number" data-text="Most">Most</span>
+      <span class="ns-rule"></span>
+      <p class="ns-label">Consumers never see the full supply chain behind everyday products they purchase.</p>
+      <p class="ns-source">Source: Supply-Chain Studies</p>
+    </div>
+
+  </div>
+
+  <div class="ns-footer-band">
+    <span class="ns-footer-note">// Data sourced from peer-reviewed international reports</span>
+    <div class="ns-footer-ticker">
+      <span class="ns-ticker-item">Agriculture</span>
+      <span class="ns-ticker-item">Mining</span>
+      <span class="ns-ticker-item">Textiles</span>
+      <span class="ns-ticker-item">Seafood</span>
+      <span class="ns-ticker-item">Electronics</span>
+    </div>
+  </div>
+
 </section>
 
 <!-- ================= CONSUMERS CAN / CAN'T ================= -->
-<section class="control-section animate-on-scroll">  
-<h2 class="control-title">What Consumers <span class="highlight-can">Can</span> (and <span class="highlight-cant">Can't</span>) Control</h2>
-  
+<section class="control-section animate-on-scroll">
+
+  <div class="control-title-wrap">
+    <h2 class="control-title">
+      What Consumers <span class="highlight-can">Can</span>
+      (and <span class="highlight-cant">Can't</span>) Control
+    </h2>
+  </div>
+
   <div class="control-grid">
-    <!-- CAN COLUMN -->
+
     <div class="control-card can-card">
       <div class="card-header">
-        <span class="icon">✓</span>
+        <div class="cc-icon-wrap">✓</div>
         <h3>Consumers Can</h3>
       </div>
       <ul class="stagger-list">
@@ -309,10 +543,9 @@
       </ul>
     </div>
 
-    <!-- CAN'T COLUMN -->
     <div class="control-card cant-card">
       <div class="card-header">
-        <span class="icon">✕</span>
+        <div class="cc-icon-wrap">✕</div>
         <h3>Consumers Can't</h3>
       </div>
       <ul class="stagger-list">
@@ -321,82 +554,304 @@
         <li>Guarantee a product is 100% free of risk</li>
       </ul>
     </div>
+
   </div>
+
 </section>
 
 <!-- ================= HOW BEHIND THE LABEL FITS IN ================= -->
-<section class="section section-light">
-  <h2>How Behind The Label Fits In</h2>
-  <p>We provide awareness tools that point to risk and trusted sources so consumers can make informed choices, awareness comes before accountability.</p>
-</section>
+<section class="btl-fits-section">
 
-<!-- ================= FREQUENTLY ASKED QUESTIONS ================= -->
-<section class="section">
-  <h2>Frequently Asked Questions</h2>
-  <div class="cards">
-    <div class="card">
-      <h3>Is every product made with forced labour?</h3>
-      <p>No. Risk varies by product, supplier and region. Our tool highlights where risks have been reported so you can investigate further.</p>
-    </div>
-
-    <div class="card">
-      <h3>Does "ethical" mean perfect?</h3>
-      <p>Not necessarily. Ethical sourcing reduces risk but does not guarantee perfection. Transparency and continuous improvement matter.</p>
-    </div>
-
-    <div class="card">
-      <h3>Why don't companies disclose this information?</h3>
-      <p>Disclosure can be costly and complex. Many companies lack oversight of deeper supplier tiers or fear reputational risk.</p>
-    </div>
+  <div class="btl-header">
+    <p class="btl-eyebrow">Our Role</p>
+    <h2 class="btl-title">How <span class="highlight">Behind The Label</span> Fits In</h2>
   </div>
+
+  <div class="btl-pipeline">
+
+    <div class="btl-node">
+      <div class="node-icon">🔍</div>
+      <p class="node-label">Identify Risk</p>
+      <p class="node-desc">We surface known labour risks in supply chains so they're visible to you.</p>
+    </div>
+
+    <div class="btl-connector"><div class="flow-line"></div></div>
+
+    <div class="btl-node">
+      <div class="node-icon">💡</div>
+      <p class="node-label">Build Awareness</p>
+      <p class="node-desc">Awareness tools and trusted sources help consumers make informed choices.</p>
+    </div>
+
+    <div class="btl-connector"><div class="flow-line"></div></div>
+
+    <div class="btl-node">
+      <div class="node-icon">⚖️</div>
+      <p class="node-label">Enable Accountability</p>
+      <p class="node-desc">Informed consumers create pressure for companies to improve practices.</p>
+    </div>
+
+  </div>
+
+  <div class="btl-tagline">
+    <span class="tagline-pill">
+      <span class="tagline-dot"></span>
+      Awareness comes before accountability — we bridge that gap.
+    </span>
+  </div>
+
+</section>
+<!-- ================= FREQUENTLY ASKED QUESTIONS ================= -->
+<section class="faq-section">
+
+  <div class="faq-header">
+    <p class="faq-eyebrow">Got Questions?</p>
+    <h2 class="faq-title">Frequently Asked Questions</h2>
+  </div>
+
+  <div class="faq-list">
+
+    <div class="faq-item" id="faq-1">
+      <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-1" onclick="toggleFaq('faq-1')">
+        <span class="faq-question-left">
+          <span class="faq-num">01</span>
+          <span class="faq-question-text">Is every product made with forced labour?</span>
+        </span>
+        <span class="faq-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </span>
+      </button>
+      <div class="faq-divider"></div>
+      <div class="faq-answer" id="faq-answer-1" role="region">
+        <div class="faq-answer-inner">
+          <p class="faq-answer-content">No. Risk varies by product, supplier and region. Our tool highlights where risks have been reported so you can investigate further.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" id="faq-2">
+      <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-2" onclick="toggleFaq('faq-2')">
+        <span class="faq-question-left">
+          <span class="faq-num">02</span>
+          <span class="faq-question-text">Does "ethical" mean perfect?</span>
+        </span>
+        <span class="faq-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </span>
+      </button>
+      <div class="faq-divider"></div>
+      <div class="faq-answer" id="faq-answer-2" role="region">
+        <div class="faq-answer-inner">
+          <p class="faq-answer-content">Not necessarily. Ethical sourcing reduces risk but does not guarantee perfection. Transparency and continuous improvement matter.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item" id="faq-3">
+      <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-3" onclick="toggleFaq('faq-3')">
+        <span class="faq-question-left">
+          <span class="faq-num">03</span>
+          <span class="faq-question-text">Why don't companies disclose this information?</span>
+        </span>
+        <span class="faq-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </span>
+      </button>
+      <div class="faq-divider"></div>
+      <div class="faq-answer" id="faq-answer-3" role="region">
+        <div class="faq-answer-inner">
+          <p class="faq-answer-content">Disclosure can be costly and complex. Many companies lack oversight of deeper supplier tiers or fear reputational risk.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="faq-footer">
+    <p>Still have questions? <a href="index.html#tool">Explore our tool</a> or <a href="petition.html">sign the petition</a>.</p>
+  </div>
+
 </section>
 
 <!-- ================= WHAT CAN BE DONE ================= -->
-<section class="section">
-  <h2>What Can Be Done</h2>
-  <p>
-    Addressing forced labour and child slavery requires cooperation between governments, businesses, and consumers. Key actions include:
-  </p>
+<section class="wcd-section">
 
-  <ul class="feature-list">
-    <li>✔ Stronger labour laws and enforcement</li>
-    <li>✔ Greater supply chain transparency</li>
-    <li>✔ Independent monitoring and reporting</li>
-    <li>✔ Corporate accountability</li>
-    <li>✔ Informed consumer choices</li>
-  </ul>
+  <div class="wcd-header">
+    <p class="wcd-eyebrow">The Path Forward</p>
+    <h2 class="wcd-title">What Can Be Done</h2>
+    <p class="wcd-subtitle">Addressing forced labour and child slavery requires cooperation between governments, businesses, and consumers.</p>
+  </div>
+
+  <div class="wcd-grid">
+
+    <div class="wcd-card" style="--i:0">
+      <div class="wcd-icon-wrap">
+        <span class="wcd-icon">⚖️</span>
+        <div class="wcd-icon-ring"></div>
+      </div>
+      <div class="wcd-card-body">
+        <h3 class="wcd-card-title">Stronger Labour Laws</h3>
+        <p class="wcd-card-text">Governments must enforce and strengthen legal protections for workers and children globally.</p>
+      </div>
+      <div class="wcd-card-line"></div>
+    </div>
+
+    <div class="wcd-card" style="--i:1">
+      <div class="wcd-icon-wrap">
+        <span class="wcd-icon">🔗</span>
+        <div class="wcd-icon-ring"></div>
+      </div>
+      <div class="wcd-card-body">
+        <h3 class="wcd-card-title">Supply Chain Transparency</h3>
+        <p class="wcd-card-text">Companies must open their supply chains to scrutiny so risks can be identified and addressed.</p>
+      </div>
+      <div class="wcd-card-line"></div>
+    </div>
+
+    <div class="wcd-card" style="--i:2">
+      <div class="wcd-icon-wrap">
+        <span class="wcd-icon">🔍</span>
+        <div class="wcd-icon-ring"></div>
+      </div>
+      <div class="wcd-card-body">
+        <h3 class="wcd-card-title">Independent Monitoring</h3>
+        <p class="wcd-card-text">Third-party audits and reporting hold businesses accountable beyond self-regulation.</p>
+      </div>
+      <div class="wcd-card-line"></div>
+    </div>
+
+    <div class="wcd-card" style="--i:3">
+      <div class="wcd-icon-wrap">
+        <span class="wcd-icon">🏛️</span>
+        <div class="wcd-icon-ring"></div>
+      </div>
+      <div class="wcd-card-body">
+        <h3 class="wcd-card-title">Corporate Accountability</h3>
+        <p class="wcd-card-text">Businesses must take responsibility for the full extent of their supply chains.</p>
+      </div>
+      <div class="wcd-card-line"></div>
+    </div>
+
+    <div class="wcd-card" style="--i:4">
+      <div class="wcd-icon-wrap">
+        <span class="wcd-icon">🧠</span>
+        <div class="wcd-icon-ring"></div>
+      </div>
+      <div class="wcd-card-body">
+        <h3 class="wcd-card-title">Informed Consumer Choices</h3>
+        <p class="wcd-card-text">Consumers who ask questions and support ethical brands drive real market change.</p>
+      </div>
+      <div class="wcd-card-line"></div>
+    </div>
+
+  </div>
+
 </section>
 
 <!-- ================= RESOURCES ================= -->
-<section class="section section-light">
-  <h2>Sources and Further Reading</h2>
+<section class="resources-section">
 
-  <div class="cards">
-    <div class="card">
-      <h3>International Labour Organization (ILO)</h3>
-      <p>Global authority on labour standards and labour rights protection.</p>
-    </div>
+  <div class="res-string-canvas">
+    <svg viewBox="0 0 1200 500" preserveAspectRatio="none">
+      <path class="res-string" d="M120,80 Q340,40 560,100 Q780,155 960,90 Q1080,60 1160,110" style="animation-delay:1.2s"/>
+      <path class="res-string" d="M200,420 Q450,380 700,440 Q900,480 1100,400" style="animation-delay:1.5s; opacity:0.2;"/>
+      <path class="res-string" d="M80,200 Q300,320 600,250 Q850,180 1150,280" style="animation-delay:1.8s; opacity:0.15;"/>
+    </svg>
+  </div>
 
-    <div class="card">
-      <h3>Walk Free Foundation</h3>
-      <p>Tracks modern slavery through the Global Slavery Index.</p>
-    </div>
-
-    <div class="card">
-      <h3>International Justice Mission (IJM)</h3>
-      <p>Works globally to protect people from violence, forced labour, and modern slavery.</p>
-    </div>
-
-    <div class="card">
-      <h3>Government of Canada</h3>
-      <p>Resources on fighting forced labour and supply chain transparency.</p>
-    </div>
-
-    <div class="card">
-      <h3>United Nations Office on Drugs and Crime (UNODC)</h3>
-      <p>Provides research and resources on human trafficking and exploitation.</p>
+  <div class="res-header">
+    <div class="res-pin-title">
+      <div class="res-overline">Case File: BTL-2024</div>
+      <h2 class="res-title">Sources &amp;<br>Further Reading</h2>
+      <p class="res-title-sub">Verified international organizations &amp; research bodies</p>
+      <div class="res-case-number">REF // FORCED-LABOUR-EVIDENCE-BOARD</div>
     </div>
   </div>
+
+  <div class="res-board">
+
+    <div class="res-file">
+      <div class="res-thumbtack"><div class="res-thumbtack-head"></div><div class="res-thumbtack-pin"></div></div>
+      <div class="res-file-tab"><span class="res-file-tab-text">ILO</span></div>
+      <div class="res-file-body">
+        <div class="res-stamp">Int'l Body</div>
+        <h3 class="res-file-title">International Labour Organization (ILO)</h3>
+        <p class="res-file-desc">Global authority on labour standards and labour rights protection. Primary source for global forced labour statistics.</p>
+        <div class="res-file-footer">
+          <span class="res-file-ref">REF-001 / UN Agency</span>
+          <span class="res-file-link">View source <span class="res-link-arrow">→</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="res-file">
+      <div class="res-thumbtack"><div class="res-thumbtack-head"></div><div class="res-thumbtack-pin"></div></div>
+      <div class="res-file-tab"><span class="res-file-tab-text">WFF</span></div>
+      <div class="res-file-body">
+        <div class="res-stamp">NGO</div>
+        <h3 class="res-file-title">Walk Free Foundation</h3>
+        <p class="res-file-desc">Tracks modern slavery through the Global Slavery Index — the world's most comprehensive measure of modern slavery by nation.</p>
+        <div class="res-file-footer">
+          <span class="res-file-ref">REF-002 / Foundation</span>
+          <span class="res-file-link">View source <span class="res-link-arrow">→</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="res-file">
+      <div class="res-thumbtack"><div class="res-thumbtack-head"></div><div class="res-thumbtack-pin"></div></div>
+      <div class="res-file-tab"><span class="res-file-tab-text">IJM</span></div>
+      <div class="res-file-body">
+        <div class="res-stamp">Advocacy</div>
+        <h3 class="res-file-title">International Justice Mission (IJM)</h3>
+        <p class="res-file-desc">Works globally to protect people from violence, forced labour, and modern slavery through direct legal intervention.</p>
+        <div class="res-file-footer">
+          <span class="res-file-ref">REF-003 / Partner Org</span>
+          <span class="res-file-link">View source <span class="res-link-arrow">→</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="res-file">
+      <div class="res-thumbtack"><div class="res-thumbtack-head"></div><div class="res-thumbtack-pin"></div></div>
+      <div class="res-file-tab"><span class="res-file-tab-text">GOC</span></div>
+      <div class="res-file-body">
+        <div class="res-stamp">Government</div>
+        <h3 class="res-file-title">Government of Canada</h3>
+        <p class="res-file-desc">Resources on fighting forced labour and supply chain transparency under Canada's Fighting Against Forced Labour and Child Labour in Supply Chains Act.</p>
+        <div class="res-file-footer">
+          <span class="res-file-ref">REF-004 / Legislation</span>
+          <span class="res-file-link">View source <span class="res-link-arrow">→</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="res-file">
+      <div class="res-thumbtack"><div class="res-thumbtack-head"></div><div class="res-thumbtack-pin"></div></div>
+      <div class="res-file-tab"><span class="res-file-tab-text">UNODC</span></div>
+      <div class="res-file-body">
+        <div class="res-stamp">UN Agency</div>
+        <h3 class="res-file-title">United Nations Office on Drugs and Crime (UNODC)</h3>
+        <p class="res-file-desc">Provides research and resources on human trafficking and exploitation across global supply networks and criminal organizations.</p>
+        <div class="res-file-footer">
+          <span class="res-file-ref">REF-005 / UN Body</span>
+          <span class="res-file-link">View source <span class="res-link-arrow">→</span></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="res-footer">
+    <span class="res-footer-note">// All sources independently verified — last reviewed 2026 //</span>
+  </div>
+
 </section>
 
 <!-- ================= CALL TO ACTION ================= -->
