@@ -626,18 +626,112 @@
     }
 
     /* =========================================
-       RESPONSIVE
+       HAMBURGER BUTTON
+    ========================================= */
+    .menu-btn {
+      display: none;
+      flex-direction: column; justify-content: center; gap: 5px;
+      width: 40px; height: 40px;
+      background: none; border: none;
+      padding: 8px; z-index: 600; position: relative;
+    }
+    .menu-btn span {
+      display: block; width: 22px; height: 2px;
+      background: var(--cream); border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+      transform-origin: center;
+    }
+    .menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(8,8,8,0.98);
+      z-index: 550;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 0; padding: 6rem 2rem 2rem; overflow-y: auto;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--mist); text-decoration: none;
+      padding: 1.2rem 0; width: 100%; text-align: center;
+      border-bottom: 1px solid var(--ash); transition: color 0.2s;
+    }
+    .mobile-nav a:first-child { border-top: 1px solid var(--ash); }
+    .mobile-nav a:hover { color: var(--cream); }
+    .mobile-nav a.nav-btn {
+      margin-top: 1.5rem; border: 1px solid var(--red); color: var(--red-hot); padding: 1rem;
+    }
+
+    /* =========================================
+       RESPONSIVE — TABLET
     ========================================= */
     @media (max-width: 900px) {
+      body { cursor: auto; }
+      a, button, input, label { cursor: auto; }
+      .cursor-dot, .cursor-ring { display: none; }
+
+      .navbar { padding: 1rem 1.5rem; }
+      nav { display: none; }
+      .menu-btn { display: flex; }
+
+      main { padding: 100px 1.5rem 4rem; }
+
+      .petition-hero-title { font-size: clamp(2.8rem, 10vw, 5rem); }
+      .progress-wrap { max-width: 100%; }
+
       .petition-layout { grid-template-columns: 1fr; gap: 3rem; }
       .manifesto-section { grid-template-columns: 1fr; gap: 2rem; }
-      .navbar { padding: 1rem 1.5rem; }
-      nav { gap: 1.2rem; }
-      nav a { font-size: 0.6rem; }
+
+      .signature-list { max-height: 360px; }
+
+      footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem 1.5rem; }
     }
-    @media (max-width: 600px) {
-      nav { display: none; }
+
+    /* =========================================
+       RESPONSIVE — MOBILE
+    ========================================= */
+    @media (max-width: 480px) {
+      .navbar { padding: 0.9rem 1rem; }
+      .brand span { font-size: 0.85rem; }
+
+      main { padding: 90px 1rem 3rem; }
+
+      .petition-hero { margin-bottom: 2.5rem; }
+      .petition-hero-title { font-size: clamp(2.2rem, 12vw, 3.5rem); line-height: 0.98; }
+      .petition-hero-sub { font-size: 0.9rem; }
+
+      .progress-wrap { margin-bottom: 3rem; }
+      .progress-count { font-size: 1.5rem; }
+
+      .petition-layout { gap: 2.5rem; }
+
+      /* Form fields easier to tap */
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        font-size: 16px !important; /* prevents iOS zoom */
+        padding: 0.9rem 1rem;
+      }
+
+      .manifesto-section { margin-top: 3rem; padding-top: 3rem; }
+      .manifesto-title { font-size: 1.8rem; }
+
+      .signature-list { max-height: 280px; }
+
+      footer { padding: 1.5rem 1rem; }
     }
+
+    /* Keep hero layout from jumping during typewriter delete */
+.petition-hero-title em#typewriterTarget{
+  display: inline-block;      /* keep it measurable */
+  min-height: 1.2em;          /* reserves vertical space even when empty */
+  min-width: 6ch;             /* reserves width (adjust as needed) */
+}
   </style>
 </head>
 <body>
@@ -659,7 +753,7 @@
 </div>
 
 <!-- NAVBAR -->
-<header class="navbar">
+<header class="navbar" id="navbar">
   <a href="index.html" class="brand">
     <img src="logo.png" alt="Behind The Label" class="logo">
     <span>Behind The Label</span>
@@ -667,12 +761,15 @@
   <nav>
     <a href="index.html#about">About</a>
     <a href="index.html#why">Why It Matters</a>
-    <a href="forced-labour.html">Learn More</a>
     <a href="index.html#tool">Our Tool</a>
     <a href="index.html#team">Team</a>
     <a href="index.html#partner">Partner</a>
-    <a href="petition.html" class="nav-btn">Petition</a>
+    <a href="index.html#action" class="nav-btn">Take Action</a>
+    <a href="petition.html">Petition</a>
   </nav>
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
 </header>
 
 <main>
@@ -765,11 +862,11 @@
       <p>
         Every product purchased is a vote. When corporations hide behind complex supply chains,
         they count on our ignorance. This petition demands that Canada strengthen the
-        Fighting Against Forced Labour Act — closing loopholes and requiring independent audits.
+        Fighting Against Forced Labour Act, closing loopholes and requiring independent audits.
       </p>
       <p>
         160 million children are in labour. 40 million people live in modern slavery.
-        These are not statistics — they are people, and the products on your shelves
+        These are not statistics -> they are people, and the products on your shelves
         are connected to their suffering.
       </p>
       <p>
@@ -1052,5 +1149,26 @@ document.getElementById('closeSuccess').addEventListener('click', () => {
   document.getElementById('successOverlay').classList.remove('show');
 });
 </script>
+
+<script>
+// ── Mobile Menu ──────────────────────────────────
+const menuBtn = document.getElementById('menuBtn');
+const mobileNav = document.getElementById('mobileNav');
+function closeMobileNav() {
+  menuBtn && menuBtn.classList.remove('open');
+  mobileNav && mobileNav.classList.remove('open');
+  document.body.style.overflow = '';
+}
+if (menuBtn) {
+  menuBtn.addEventListener('click', () => {
+    const isOpen = mobileNav.classList.toggle('open');
+    menuBtn.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+}
+// Close on link tap
+document.querySelectorAll('.mobile-nav a').forEach(a =>
+  a.addEventListener('click', closeMobileNav)
+);
+</script>
 </body>
-</html>

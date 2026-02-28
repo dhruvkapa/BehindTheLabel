@@ -9,9 +9,198 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles_mobile_fixed.css" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
   
+
+  <style>
+    /* =========================================
+       MOBILE OPTIMISATION — forced-labour.html
+       Injected to complement styles.css
+    ========================================= */
+
+    /* Disable custom cursor on touch devices */
+    @media (hover: none), (max-width: 900px) {
+      body { cursor: auto !important; }
+      a, button { cursor: auto !important; }
+      .cursor-dot, .cursor-ring { display: none !important; }
+    }
+
+    /* ── Hamburger button ── */
+    .menu-btn {
+      display: none;
+      flex-direction: column; justify-content: center; gap: 5px;
+      width: 40px; height: 40px;
+      background: none; border: none;
+      padding: 8px; z-index: 600; position: relative;
+    }
+    .menu-btn span {
+      display: block; width: 22px; height: 2px;
+      background: #f0ebe0; border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+      transform-origin: center;
+    }
+    .menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Mobile nav drawer ── */
+    .mobile-nav {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(8,8,8,0.98);
+      z-index: 550;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 0; padding: 6rem 2rem 2rem; overflow-y: auto;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: #9a9a9a; text-decoration: none;
+      padding: 1.2rem 0; width: 100%; text-align: center;
+      border-bottom: 1px solid #2c2c2c; transition: color 0.2s;
+    }
+    .mobile-nav a:first-child { border-top: 1px solid #2c2c2c; }
+    .mobile-nav a:hover, .mobile-nav a:active { color: #f0ebe0; }
+    .mobile-nav a.nav-btn {
+      margin-top: 1.5rem; border: 1px solid #c0392b;
+      color: #e74c3c; padding: 1rem;
+    }
+
+    /* ── Tablet: 900px ── */
+    @media (max-width: 900px) {
+      .navbar { padding: 1rem 1.5rem !important; flex-wrap: nowrap; }
+      nav { display: none !important; }
+      .menu-btn { display: flex !important; }
+
+      /* General spacing */
+      section, .fl-section, .definitions-block,
+      .persist-section, .impact-banner, .awareness-section,
+      .showsup-section, .tgap-section, .numbers-section,
+      .faq-section, .wcd-section, .resources-section,
+      .journey-section, .control-section, .btl-fits-section,
+      .section { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+
+      /* Hero */
+      .hero { min-height: 80vh !important; padding: 6rem 1.5rem 4rem !important; }
+      .hero h1 { font-size: clamp(2.2rem, 9vw, 3.5rem) !important; }
+      .hero p { font-size: 0.95rem !important; }
+      .hero-content { text-align: center !important; }
+      .centered-logo-img { width: 60px !important; }
+
+      /* Two-column grids → single column */
+      .fl-inner, .fl-grid,
+      .awareness-grid, .awareness-inner,
+      .btl-pipeline,
+      .partner-inner,
+      .access-grid,
+      .tool-grid,
+      .about-grid,
+      .control-grid { 
+        display: block !important; 
+      }
+      .fl-inner > *, .fl-grid > *,
+      .awareness-grid > *, .control-grid > * {
+        margin-bottom: 2rem !important;
+        width: 100% !important;
+      }
+
+      /* Definitions split */
+      .definitions-block { 
+        display: flex !important; 
+        flex-direction: column !important; 
+      }
+      .def-panel { padding: 3rem 1.5rem !important; }
+
+      /* Card grids */
+      .persist-grid,
+      .tgap-grid,
+      .ns-grid,
+      .wcd-grid,
+      .res-board,
+      .showsup-strip { 
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+      }
+      .persist-card, .tgap-card, .ns-card,
+      .wcd-card, .showsup-card {
+        border-right: none !important;
+      }
+
+      /* Journey flow */
+      .journey-flow { 
+        display: flex !important; 
+        flex-direction: column !important; 
+        gap: 1.5rem !important; 
+      }
+      .journey-step::after { display: none !important; }
+      .journey-step { width: 100% !important; }
+
+      /* BTL pipeline */
+      .btl-pipeline { 
+        display: flex !important; 
+        flex-direction: column !important; 
+      }
+      .btl-node { border-right: none !important; border-bottom: 1px solid #2c2c2c !important; }
+
+      /* Impact stats */
+      .impact-stats { flex-direction: column !important; }
+      .impact-stat { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.2) !important; padding: 1.5rem !important; }
+
+      /* Resources grid */
+      .res-board { grid-template-columns: 1fr !important; }
+
+      /* Section titles */
+      .section-title { font-size: clamp(2rem, 7vw, 3rem) !important; }
+
+      /* Footer */
+      footer { flex-direction: column !important; gap: 1rem !important; text-align: center !important; padding: 2rem 1.5rem !important; }
+    }
+
+    /* ── Mobile: 480px ── */
+    @media (max-width: 480px) {
+      .navbar { padding: 0.9rem 1rem !important; }
+      .brand span { font-size: 0.82rem !important; }
+
+      section, .fl-section, .definitions-block,
+      .persist-section, .impact-banner, .awareness-section,
+      .showsup-section, .tgap-section, .numbers-section,
+      .faq-section, .wcd-section, .resources-section,
+      .journey-section, .control-section, .btl-fits-section,
+      .section { 
+        padding-left: 1rem !important; 
+        padding-right: 1rem !important; 
+        padding-top: 4rem !important;
+        padding-bottom: 4rem !important;
+      }
+
+      .hero h1 { font-size: clamp(1.9rem, 11vw, 2.6rem) !important; }
+
+      .persist-grid, .tgap-grid, .ns-grid,
+      .wcd-grid, .showsup-strip { 
+        grid-template-columns: 1fr !important; 
+      }
+
+      .section-title { font-size: clamp(1.7rem, 9vw, 2.3rem) !important; }
+
+      .def-heading { font-size: 1.8rem !important; }
+      .impact-stat-num { font-size: 2.2rem !important; }
+      .ns-number { font-size: 2.8rem !important; }
+
+      /* FAQ */
+      .faq-question-text { font-size: 0.95rem !important; }
+
+      /* CTA section */
+      .cta-section { padding: 4rem 1rem !important; }
+      .cta-section h2 { font-size: clamp(2rem, 10vw, 3rem) !important; }
+
+      footer { padding: 1.5rem 1rem !important; }
+
+      /* Prevent iOS font zoom on inputs */
+      input, select, textarea { font-size: 16px !important; }
+    }
+  </style>
 </head>
 <body>
 
@@ -32,9 +221,22 @@
     <a href="index.html#accessibility">Accessibility</a>
     <a href="index.html#action" class="nav-btn">Take Action</a>
     <a href="petition.html">Petition</a>
-
   </nav>
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
 </header>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html#about">About</a>
+  <a href="index.html#why">Why It Matters</a>
+  <a href="index.html#tool">Our Tool</a>
+  <a href="index.html#team">Team</a>
+  <a href="index.html#partner">Partner</a>
+  <a href="index.html#accessibility">Accessibility</a>
+  <a href="petition.html">Petition</a>
+  <a href="index.html#action" class="nav-btn">Take Action</a>
+</div>
 
 <!-- ================= HERO ================= -->
 <section id="home" class="hero">
@@ -874,6 +1076,27 @@
   <p>© 2026 Behind The Label • Built for ethical awareness</p>
 </footer>
 
+
 <script src="btl.js"></script>
+<script>
+// ── Mobile Menu ──
+const menuBtn = document.getElementById('menuBtn');
+const mobileNav = document.getElementById('mobileNav');
+function closeMobileNav() {
+  menuBtn && menuBtn.classList.remove('open');
+  mobileNav && mobileNav.classList.remove('open');
+  document.body.style.overflow = '';
+}
+if (menuBtn) {
+  menuBtn.addEventListener('click', () => {
+    const isOpen = mobileNav.classList.toggle('open');
+    menuBtn.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+}
+document.querySelectorAll('.mobile-nav a').forEach(a =>
+  a.addEventListener('click', closeMobileNav)
+);
+</script>
 </body>
 </html>

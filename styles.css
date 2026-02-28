@@ -5544,3 +5544,46 @@ footer {
 
 
 
+
+
+/* =========================
+   MOBILE POLISH (safe areas + better touch UX)
+========================= */
+@media (hover: none) and (pointer: coarse) {
+  /* Avoid sticky :hover on mobile */
+  .card:hover,
+  .team-card:hover,
+  .partner-card img:hover,
+  .res-file:hover {
+    transform: none !important;
+  }
+}
+
+/* Safe-area padding for notched phones */
+@supports (padding: max(0px)) {
+  @media (max-width: 768px) {
+    .navbar {
+      padding-top: max(16px, calc(16px + env(safe-area-inset-top)));
+      padding-left: calc(20px + env(safe-area-inset-left));
+      padding-right: calc(20px + env(safe-area-inset-right));
+    }
+
+    .floating-camera-btn {
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      right:  calc(20px + env(safe-area-inset-right));
+    }
+  }
+}
+
+/* Modern viewport unit support for modals */
+.camera-modal,
+.brand-search-modal {
+  height: 100dvh;
+}
+
+.camera-modal-content,
+.brand-search-modal-content {
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
