@@ -9,15 +9,101 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="styles_mobile_fixed.css" />
+  <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
   
 
   <style>
     /* =========================================
-       MOBILE OPTIMISATION — forced-labour.html
-       Injected to complement styles.css
+       PETITION ALERT BANNER
     ========================================= */
+    .petition-alert {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 490;
+      transform: translateY(100%);
+      background: #c0392b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 0.55rem 2.5rem 0.55rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      animation: bannerSlide 0.7s cubic-bezier(0.16,1,0.3,1) 1.8s forwards;
+      overflow: hidden;
+    }
+    @keyframes bannerSlide {
+      to { transform: translateY(var(--navbar-h, 62px)); }
+    }
+    .petition-alert::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+      animation: bannerShimmer 2.5s ease-in-out 2.5s infinite;
+    }
+    @keyframes bannerShimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .petition-alert-dot {
+      width: 7px; height: 7px;
+      background: #fff; border-radius: 50%;
+      flex-shrink: 0; position: relative; z-index: 1;
+      animation: petDotPulse 1.4s ease-in-out infinite;
+    }
+    @keyframes petDotPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.6); }
+      50%       { box-shadow: 0 0 0 5px rgba(255,255,255,0); }
+    }
+    .petition-alert-text {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: #f0ebe0;
+      position: relative; z-index: 1;
+    }
+    .petition-alert-text strong { color: #fff; font-weight: 700; }
+    .petition-alert-link {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: #fff;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.5);
+      padding: 0.3rem 0.85rem;
+      position: relative; z-index: 1;
+      white-space: nowrap; flex-shrink: 0;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .petition-alert-link:hover { background: rgba(255,255,255,0.15); border-color: #fff; }
+    .petition-alert-close {
+      position: absolute; right: 0.75rem; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: rgba(255,255,255,0.55); font-size: 1rem;
+      cursor: pointer; z-index: 1; padding: 6px;
+      transition: color 0.2s;
+    }
+    .petition-alert-close:hover { color: #fff; }
+    @media (max-width: 600px) {
+      .petition-alert {
+        flex-wrap: wrap; justify-content: center;
+        gap: 0.4rem; padding: 0.6rem 2.5rem 0.6rem 1rem;
+        text-align: center;
+      }
+      .petition-alert-text {
+        font-size: 0.58rem; letter-spacing: 0.1em;
+        width: 100%; text-align: center;
+      }
+      .petition-alert-link { font-size: 0.62rem; padding: 0.35rem 1rem; }
+    }
+
+    /* =========================================
+       MOBILE OPTIMISATION — forced-labour.html
+    ========================================= */
+
+    /* Global overflow guard */
+    html { overflow-x: hidden; }
+    *, *::before, *::after { box-sizing: border-box; }
+    img, video, iframe, canvas, svg { max-width: 100% !important; height: auto; }
 
     /* Disable custom cursor on touch devices */
     @media (hover: none), (max-width: 900px) {
@@ -203,6 +289,14 @@
   </style>
 </head>
 <body>
+
+<!-- PETITION ALERT BANNER -->
+<div class="petition-alert" id="petitionAlert" role="alert">
+  <span class="petition-alert-dot"></span>
+  <span class="petition-alert-text"><strong>Make your voice heard</strong> — sign our petition for supply-chain transparency</span>
+  <a href="petition.html" class="petition-alert-link">Sign Now →</a>
+  <button class="petition-alert-close" id="petitionAlertClose" aria-label="Dismiss">✕</button>
+</div>
 
 <!-- ================= NAVBAR ================= -->
     
@@ -1083,10 +1177,12 @@
 const menuBtn = document.getElementById('menuBtn');
 const mobileNav = document.getElementById('mobileNav');
 function closeMobileNav() {
-  menuBtn && menuBtn.classList.remove('open');
+  menuBtn  && menuBtn.classList.remove('open');
   mobileNav && mobileNav.classList.remove('open');
   document.body.style.overflow = '';
 }
+window.closeMobileNav = closeMobileNav;
+
 if (menuBtn) {
   menuBtn.addEventListener('click', () => {
     const isOpen = mobileNav.classList.toggle('open');
@@ -1097,6 +1193,39 @@ if (menuBtn) {
 document.querySelectorAll('.mobile-nav a').forEach(a =>
   a.addEventListener('click', closeMobileNav)
 );
+
+// bfcache fix: reset overflow/nav state on browser Back
+window.addEventListener('pageshow', (e) => {
+  closeMobileNav();
+  if (e.persisted) {
+    document.querySelectorAll('.reveal, .animate-on-scroll').forEach(el => el.classList.add('visible', 'active'));
+    requestAnimationFrame(() => {
+      document.body.style.overflow = '';
+      document.documentElement.classList.add('bfcache-restore');
+      requestAnimationFrame(() => document.documentElement.classList.remove('bfcache-restore'));
+    });
+  }
+});
+window.addEventListener('pagehide', closeMobileNav);
+
+// ── Petition alert banner ──────────────────────────────
+(function () {
+  const banner   = document.getElementById('petitionAlert');
+  const closeBtn = document.getElementById('petitionAlertClose');
+  const navbar   = document.querySelector('.navbar');
+  function updateOffset() {
+    if (navbar && banner) banner.style.setProperty('--navbar-h', navbar.offsetHeight + 'px');
+  }
+  updateOffset();
+  window.addEventListener('resize', updateOffset);
+  if (closeBtn && banner) {
+    closeBtn.addEventListener('click', () => {
+      banner.style.transition = 'opacity 0.3s ease';
+      banner.style.opacity = '0';
+      setTimeout(() => banner.remove(), 320);
+    });
+  }
+})();
 </script>
 </body>
 </html>
