@@ -1,585 +1,635 @@
 /**
- * Behind The Label — AI Guide "Ada"
- * A floating activist character that helps users navigate the site
- * and answers questions using Groq AI with site context.
- *
- * Usage: <script src="btl-guide.js"></script> at bottom of any page
+ * Behind The Label — Ada AI Guide
+ * Avatar: Isometric Ethics Gem
+ * Animations: floating bob + eye blink
+ * Position: bottom-right, above camera + search FABs
  */
-
-(function() {
+(function () {
   'use strict';
 
   const GROQ_KEY = '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';
   const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-  const SITE_CONTEXT = `You are Ada, the friendly AI guide for "Behind The Label" — a Canadian student-led awareness project fighting forced labour and child exploitation in global fashion supply chains.
+  const SYSTEM_PROMPT = `You are Ada, the friendly AI guide for "Behind The Label" — a Canadian student-led project fighting forced labour in global fashion supply chains.
 
-SITE PAGES & WHAT THEY DO:
-- Home (index.html): Main site with stats, how the browser extension works, team info, live map of forced labour hotspots, and a brand ethics search modal (🔍 button)
-- Ethical Swap (swap.html): AI tool — user types any brand, gets 3 ethical alternatives with ethics scores, certifications, and price comparisons
-- Rewards (rewards.html): Future program where ethical brands offer discounts to conscious shoppers. Has an interest registration form
-- Petition (petition.html): Open petition for users to sign and demand supply chain transparency from brands
-- Learn More (forced-labour.html): Deep dive into forced labour statistics, the ILO framework, Walk Free Foundation data, US DOL TVPRA list
+SITE PAGES:
+- Home (index.html): Stats, browser extension info, team, live forced-labour map, brand ethics search (🔍 button), camera brand scanner
+- Ethical Swap (swap.html): Type any brand → get 3 ethical alternatives with ethics scores, certifications, price comparisons
+- Rewards (rewards.html): Ethical brands offering discounts to conscious shoppers — interest registration form
+- Petition (petition.html): Sign and demand supply chain transparency from fashion brands
+- Learn More (forced-labour.html): Deep dive into ILO data, Walk Free Foundation stats, US DOL TVPRA list
 
-KEY FACTS ABOUT THE PROJECT:
-- 27.6 million people are in forced labour globally (ILO 2022)
-- 160 million children are in child labour worldwide
-- Fashion is one of the worst industries for forced labour
-- The BTL browser extension scans brands as you shop online and gives real-time ethics ratings
-- Users can sign the petition, use the Ethical Swap engine, or join the Rewards waitlist
-- The project uses AI to analyse brand supply chains against ILO standards, Walk Free Foundation data, and the US DOL TVPRA list
+KEY FACTS:
+- 27.6 million people in forced labour globally (ILO 2022)
+- 160 million children in child labour worldwide
+- Fashion is one of the worst offending industries
+- The BTL browser extension gives real-time ethics ratings while you shop online
 
-YOUR PERSONALITY:
-- Warm, passionate, and knowledgeable — like a smart friend who cares deeply about ethics
-- Concise — keep responses to 2-4 sentences max unless asked for detail
-- Action-oriented — always suggest what the user can DO next
-- Never preachy — inform, don't lecture
-- You can navigate users by saying things like "Head to our Ethical Swap page" or "Click the 🔍 button on the home page"
+PERSONALITY: Warm, concise (2–4 sentences), action-oriented. Never preachy. Always suggest what the user can DO next.
 
-NAVIGATION YOU CAN SUGGEST:
-- To search a brand: "click the 🔍 button floating on the home page"
-- To find ethical alternatives: "try our Ethical Swap tool at swap.html"
-- To sign the petition: "head to petition.html"
-- To learn more: "check out our Learn More page at forced-labour.html"
-- To join Rewards: "visit rewards.html and register your interest"
-
-Always be helpful, brief, and guide users toward taking action.`;
+NAVIGATION: Guide users to: 🔍 button for brand search, swap.html for alternatives, petition.html to sign, rewards.html to join, forced-labour.html to learn more.`;
 
   const QUICK_PROMPTS = [
-    "What is Behind The Label?",
-    "How do I find ethical brands?",
-    "Show me the petition",
-    "What's the Ethical Swap tool?",
-    "How bad is fast fashion?",
+    'What is Behind The Label?',
+    'How do I find ethical brands?',
+    'Show me the petition',
+    'What is the Ethical Swap?',
+    'How bad is fast fashion?',
   ];
 
   const GREETINGS = [
-    "Hi! I'm Ada 👋 I help you navigate Behind The Label. Want to scan a brand, find ethical alternatives, or learn about forced labour in fashion?",
-    "Hey there! I'm Ada, your guide here. Ask me anything — I can help you find ethical brands, sign the petition, or understand the issue. 👗",
-    "Hello! I'm Ada 👋 Behind The Label is fighting forced labour in fashion. Want me to show you around?",
+    "Hi! I'm Ada 💎 I help you navigate Behind The Label. Want to search a brand, find ethical alternatives, or learn about forced labour in fashion?",
+    "Hey! I'm Ada — your ethical guide. Ask me anything about the site, or let me find you ethical brands. 💎",
+    "Hello! I'm Ada 💎 Behind The Label fights forced labour in fashion. Want me to show you around?",
   ];
 
-  // ── Inject styles ──────────────────────────────────────────────
-  const style = document.createElement('style');
-  style.textContent = `
-    /* Ada avatar */
-    #btl-ada-wrap {
+  /* ── STYLES ─────────────────────────────────────────────────── */
+  const css = `
+    /* Wrap — sits above the two 50px FABs (bottom:2rem + 50px + 0.8rem gap + 50px + 1rem breathing room) */
+    #ada-wrap {
       position: fixed;
-      bottom: 2rem;
+      bottom: calc(2rem + 50px + 0.8rem + 50px + 1.2rem);
       right: 2rem;
       z-index: 8000;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 0.8rem;
+      gap: 0.6rem;
       pointer-events: none;
     }
 
-    /* Chat panel */
-    #btl-chat {
-      width: 320px;
-      background: #111;
-      border: 1px solid #2c2c2c;
-      border-top: 2px solid #e74c3c;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    /* ── Gem button ──────────────────────────────────────────── */
+    #ada-gem-btn {
+      width: 58px;
+      height: 58px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      pointer-events: all;
+      position: relative;
+      animation: adaBob 3s ease-in-out infinite;
+      filter: drop-shadow(0 6px 16px rgba(192,57,43,0.5));
+      transition: filter 0.25s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #ada-gem-btn:hover {
+      filter: drop-shadow(0 10px 28px rgba(231,76,60,0.85));
+      animation-play-state: paused;
+    }
+    #ada-gem-btn.chat-open {
+      filter: drop-shadow(0 10px 28px rgba(231,76,60,0.85));
+      animation-play-state: paused;
+    }
+    @keyframes adaBob {
+      0%,100% { transform: translateY(0px)   rotate(-1.5deg); }
+      50%      { transform: translateY(-9px)  rotate(1.5deg);  }
+    }
+
+    /* notification dot */
+    #ada-notif-dot {
       display: none;
-      flex-direction: column;
-      pointer-events: all;
-      max-height: 480px;
-      animation: adaChatIn 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards;
-    }
-    #btl-chat.open { display: flex; }
-    @keyframes adaChatIn {
-      from { opacity: 0; transform: translateY(16px) scale(0.95); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    #btl-chat-header {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      padding: 0.8rem 1rem;
-      background: #1a1a1a;
-      border-bottom: 1px solid #2c2c2c;
-      flex-shrink: 0;
-    }
-    #btl-chat-header .ada-mini {
-      width: 28px; height: 28px;
-      background: #e74c3c;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem; flex-shrink: 0;
-    }
-    #btl-chat-header .ada-name {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #f0ebe0;
-      flex: 1;
-    }
-    #btl-chat-header .ada-status {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.5rem;
-      letter-spacing: 0.1em;
-      color: #27ae60;
-      text-transform: uppercase;
-      display: flex; align-items: center; gap: 0.3rem;
-    }
-    #btl-chat-header .ada-status::before {
-      content: '';
-      width: 5px; height: 5px;
-      background: #27ae60;
-      border-radius: 50%;
-      animation: adaPulse 2s ease-in-out infinite;
-    }
-    @keyframes adaPulse {
-      0%,100% { opacity: 1; } 50% { opacity: 0.3; }
-    }
-    #btl-chat-close {
-      background: none; border: none;
-      color: #5a5a5a; font-size: 1rem;
-      padding: 0.2rem 0.4rem;
-      transition: color 0.2s; cursor: pointer;
-    }
-    #btl-chat-close:hover { color: #f0ebe0; }
-
-    #btl-chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-      scroll-behavior: smooth;
-    }
-    #btl-chat-messages::-webkit-scrollbar { width: 3px; }
-    #btl-chat-messages::-webkit-scrollbar-track { background: #111; }
-    #btl-chat-messages::-webkit-scrollbar-thumb { background: #2c2c2c; }
-
-    .ada-msg {
-      display: flex;
-      gap: 0.6rem;
-      align-items: flex-start;
-      animation: adaMsgIn 0.25s ease forwards;
-    }
-    @keyframes adaMsgIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .ada-msg.user { flex-direction: row-reverse; }
-
-    .ada-msg .bubble {
-      max-width: 80%;
-      padding: 0.65rem 0.85rem;
-      font-family: 'Libre Baskerville', Georgia, serif;
-      font-size: 0.78rem;
-      line-height: 1.65;
-      color: #d9d0bc;
-    }
-    .ada-msg.ada .bubble {
-      background: #1a1a1a;
-      border: 1px solid #2c2c2c;
-      border-radius: 0 8px 8px 8px;
-    }
-    .ada-msg.user .bubble {
-      background: #c0392b;
-      color: #f0ebe0;
-      border-radius: 8px 0 8px 8px;
-    }
-    .ada-msg .avatar {
-      width: 22px; height: 22px;
-      background: #e74c3c;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.65rem; flex-shrink: 0; margin-top: 2px;
-    }
-
-    /* Typing indicator */
-    .ada-typing .bubble {
-      display: flex; align-items: center; gap: 4px;
-      padding: 0.75rem 1rem;
-    }
-    .ada-typing .dot {
-      width: 5px; height: 5px;
-      background: #5a5a5a;
-      border-radius: 50%;
-      animation: adaDot 1.2s ease-in-out infinite;
-    }
-    .ada-typing .dot:nth-child(2) { animation-delay: 0.2s; }
-    .ada-typing .dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes adaDot {
-      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
-      30% { transform: translateY(-4px); opacity: 1; }
-    }
-
-    /* Quick prompts */
-    #btl-quick-prompts {
-      padding: 0.6rem 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      border-top: 1px solid #1a1a1a;
-      flex-shrink: 0;
-    }
-    .ada-chip {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.52rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #5a5a5a;
-      border: 1px solid #2c2c2c;
-      padding: 0.25rem 0.6rem;
-      background: none;
-      cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
-      white-space: nowrap;
-    }
-    .ada-chip:hover { border-color: #e74c3c; color: #f0ebe0; }
-
-    /* Input row */
-    #btl-chat-input-row {
-      display: flex;
-      border-top: 1px solid #2c2c2c;
-      flex-shrink: 0;
-    }
-    #btl-chat-input {
-      flex: 1;
-      background: #0d0d0d;
-      border: none;
-      padding: 0.75rem 1rem;
-      color: #f0ebe0;
-      font-family: 'Libre Baskerville', Georgia, serif;
-      font-size: 0.78rem;
-      outline: none;
-    }
-    #btl-chat-input::placeholder { color: #3a3a3a; }
-    #btl-chat-send {
-      background: #c0392b;
-      border: none;
-      color: #f0ebe0;
-      padding: 0 1rem;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.2s;
-      flex-shrink: 0;
-    }
-    #btl-chat-send:hover { background: #e74c3c; }
-
-    /* Speech bubble teaser */
-    #btl-ada-teaser {
-      background: #111;
-      border: 1px solid #2c2c2c;
-      border-radius: 12px 12px 0 12px;
-      padding: 0.7rem 1rem;
-      font-family: 'Libre Baskerville', Georgia, serif;
-      font-size: 0.75rem;
-      color: #d9d0bc;
-      line-height: 1.5;
-      max-width: 220px;
-      pointer-events: all;
-      cursor: pointer;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-      animation: adaTeaserIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
-      position: relative;
-    }
-    #btl-ada-teaser::after {
-      content: '';
-      position: absolute;
-      bottom: -8px; right: 14px;
-      width: 0; height: 0;
-      border-left: 8px solid transparent;
-      border-right: 0px solid transparent;
-      border-top: 8px solid #2c2c2c;
-    }
-    #btl-ada-teaser:hover { border-color: #e74c3c; }
-    @keyframes adaTeaserIn {
-      from { opacity: 0; transform: translateY(10px) scale(0.9); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    #btl-ada-teaser-dismiss {
-      position: absolute; top: 4px; right: 8px;
-      background: none; border: none; color: #5a5a5a;
-      font-size: 0.7rem; cursor: pointer; padding: 2px;
-      line-height: 1;
-    }
-    #btl-ada-teaser-dismiss:hover { color: #f0ebe0; }
-
-    /* The character button */
-    #btl-ada-btn {
-      width: 56px; height: 56px;
-      background: #1a1a1a;
-      border: 2px solid #c0392b;
-      border-radius: 50%;
-      cursor: pointer;
-      pointer-events: all;
-      position: relative;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px rgba(192,57,43,0.3);
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    #btl-ada-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 28px rgba(231,76,60,0.5);
-    }
-    #btl-ada-btn.open {
-      border-color: #e74c3c;
-      box-shadow: 0 6px 28px rgba(231,76,60,0.5);
-    }
-    #btl-ada-btn svg {
-      width: 100%; height: 100%;
-    }
-
-    /* Notification dot */
-    #btl-ada-notif {
       position: absolute;
       top: -2px; right: -2px;
-      width: 14px; height: 14px;
+      width: 12px; height: 12px;
       background: #e74c3c;
       border: 2px solid #080808;
       border-radius: 50%;
-      animation: adaNotif 2s ease-in-out infinite;
+      animation: adaNotifPop 1.8s ease-in-out infinite;
+      pointer-events: none;
     }
-    @keyframes adaNotif {
-      0%,100% { transform: scale(1); }
-      50% { transform: scale(1.3); }
+    @keyframes adaNotifPop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.5)} }
+
+    /* ── Teaser bubble ───────────────────────────────────────── */
+    #ada-teaser {
+      background: #111;
+      border: 1px solid #2c2c2c;
+      border-top: 2px solid #c0392b;
+      padding: 0.65rem 1.9rem 0.65rem 0.9rem;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 0.74rem;
+      color: #d9d0bc;
+      line-height: 1.55;
+      max-width: 210px;
+      pointer-events: all;
+      cursor: pointer;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.75);
+      position: relative;
+      /* enter animation */
+      animation: adaTeaserIn 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    /* speech-bubble tail */
+    #ada-teaser::after {
+      content: '';
+      position: absolute;
+      bottom: -8px; right: 18px;
+      border-left: 8px solid transparent;
+      border-top: 8px solid #2c2c2c;
+    }
+    #ada-teaser:hover { border-color: #c0392b; }
+    #ada-teaser:hover::after { border-top-color: #c0392b; }
+
+    /* progress bar that drains over 30 s */
+    #ada-teaser-bar {
+      position: absolute;
+      bottom: 0; left: 0;
+      height: 2px;
+      background: #c0392b;
+      width: 100%;
+      transform-origin: left center;
+      animation: adaBarDrain 30s linear forwards;
+    }
+    @keyframes adaBarDrain { to { transform: scaleX(0); } }
+
+    /* subtle attention-wiggle that runs every ~4 s */
+    #ada-teaser.wiggle {
+      animation: adaTeaserWiggle 0.5s ease;
+    }
+    @keyframes adaTeaserWiggle {
+      0%,100% { transform: rotate(0deg); }
+      20%      { transform: rotate(-3deg); }
+      40%      { transform: rotate(3deg); }
+      60%      { transform: rotate(-2deg); }
+      80%      { transform: rotate(2deg); }
     }
 
-    /* Idle bob animation on character */
-    #btl-ada-btn:not(.open) svg {
-      animation: adaBob 3s ease-in-out infinite;
+    @keyframes adaTeaserIn {
+      from { opacity:0; transform:translateY(10px) scale(0.88); }
+      to   { opacity:1; transform:translateY(0)    scale(1);    }
     }
-    @keyframes adaBob {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-3px); }
+    /* fade-out before removal */
+    #ada-teaser.fade-out {
+      animation: adaTeaserOut 0.35s ease forwards;
+    }
+    @keyframes adaTeaserOut {
+      to { opacity:0; transform:translateY(6px) scale(0.92); }
     }
 
-    @media (max-width: 480px) {
-      #btl-ada-wrap { bottom: 1rem; right: 1rem; }
-      #btl-chat { width: calc(100vw - 2rem); }
+    #ada-teaser-close {
+      position: absolute; top: 5px; right: 8px;
+      background: none; border: none;
+      color: #5a5a5a; font-size: 0.65rem;
+      cursor: pointer; padding: 2px; line-height:1;
+    }
+    #ada-teaser-close:hover { color: #f0ebe0; }
+
+    /* ── Chat panel ──────────────────────────────────────────── */
+    #ada-chat {
+      width: 300px;
+      background: #111;
+      border: 1px solid #2c2c2c;
+      border-top: 2px solid #c0392b;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+      display: none;
+      flex-direction: column;
+      max-height: 440px;
+      pointer-events: all;
+    }
+    #ada-chat.open {
+      display: flex;
+      animation: adaChatIn 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes adaChatIn {
+      from { opacity:0; transform:scale(0.9) translateY(10px); }
+      to   { opacity:1; transform:scale(1)   translateY(0);    }
+    }
+
+    /* header */
+    #ada-chat-header {
+      display:flex; align-items:center; gap:0.55rem;
+      padding: 0.65rem 0.9rem;
+      background: #191919;
+      border-bottom: 1px solid #222;
+      flex-shrink:0;
+    }
+    .ada-hdr-gem { width:22px; height:22px; flex-shrink:0; }
+    .ada-hdr-name {
+      font-family:'DM Mono',monospace;
+      font-size:0.58rem; letter-spacing:0.2em;
+      text-transform:uppercase; color:#f0ebe0; flex:1;
+    }
+    .ada-hdr-status {
+      font-family:'DM Mono',monospace;
+      font-size:0.48rem; letter-spacing:0.1em;
+      text-transform:uppercase; color:#c0392b;
+      display:flex; align-items:center; gap:0.3rem;
+    }
+    .ada-hdr-status::before {
+      content:''; width:5px; height:5px;
+      background:#c0392b; border-radius:50%;
+      animation: adaPulse 2s ease-in-out infinite;
+    }
+    @keyframes adaPulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+    #ada-chat-x {
+      background:none; border:none; color:#5a5a5a;
+      font-size:1rem; cursor:pointer; padding:0 0.2rem;
+      transition:color 0.2s;
+    }
+    #ada-chat-x:hover { color:#f0ebe0; }
+
+    /* messages */
+    #ada-messages {
+      flex:1; overflow-y:auto;
+      padding: 0.9rem; display:flex;
+      flex-direction:column; gap:0.75rem;
+      scroll-behavior:smooth;
+    }
+    #ada-messages::-webkit-scrollbar { width:3px; }
+    #ada-messages::-webkit-scrollbar-thumb { background:#2a2a2a; }
+
+    .ada-row { display:flex; gap:0.45rem; align-items:flex-start; animation:adaMsgIn 0.2s ease forwards; }
+    @keyframes adaMsgIn { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
+    .ada-row.user-row { flex-direction:row-reverse; }
+    .ada-bubble {
+      max-width:84%; padding:0.55rem 0.75rem;
+      font-family:'Libre Baskerville',Georgia,serif;
+      font-size:0.76rem; line-height:1.65; color:#d9d0bc;
+    }
+    .ada-row .ada-bubble { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:0 8px 8px 8px; }
+    .ada-row.user-row .ada-bubble { background:#c0392b; color:#f0ebe0; border:none; border-radius:8px 0 8px 8px; }
+    .ada-row-icon { width:18px; height:18px; flex-shrink:0; margin-top:3px; }
+
+    .ada-typing-row .ada-bubble { display:flex; gap:4px; align-items:center; padding:0.7rem 0.9rem; }
+    .ada-dot { width:5px; height:5px; background:#5a5a5a; border-radius:50%; animation:adaDot 1.2s infinite; }
+    .ada-dot:nth-child(2){animation-delay:.2s}
+    .ada-dot:nth-child(3){animation-delay:.4s}
+    @keyframes adaDot { 0%,60%,100%{transform:translateY(0);opacity:0.35} 30%{transform:translateY(-5px);opacity:1} }
+
+    /* quick chips */
+    #ada-chips {
+      padding:0.45rem 0.7rem; display:flex; flex-wrap:wrap; gap:0.3rem;
+      border-top:1px solid #1c1c1c; flex-shrink:0;
+    }
+    .ada-chip {
+      font-family:'DM Mono',monospace; font-size:0.48rem;
+      letter-spacing:0.08em; text-transform:uppercase;
+      color:#5a5a5a; border:1px solid #2a2a2a;
+      padding:0.2rem 0.5rem; background:none; cursor:pointer;
+      transition:border-color 0.2s, color 0.2s; white-space:nowrap;
+    }
+    .ada-chip:hover { border-color:#c0392b; color:#f0ebe0; }
+
+    /* input */
+    #ada-input-row { display:flex; border-top:1px solid #222; flex-shrink:0; }
+    #ada-input {
+      flex:1; background:#0d0d0d; border:none;
+      padding:0.65rem 0.8rem; color:#f0ebe0;
+      font-family:'Libre Baskerville',Georgia,serif;
+      font-size:0.76rem; outline:none;
+    }
+    #ada-input::placeholder { color:#333; }
+    #ada-send {
+      background:#c0392b; border:none; color:#f0ebe0;
+      padding:0 1rem; font-size:1rem; cursor:pointer;
+      transition:background 0.2s; flex-shrink:0;
+    }
+    #ada-send:hover { background:#e74c3c; }
+
+    @media(max-width:480px){
+      #ada-wrap {
+        bottom: calc(1rem + 44px + 0.8rem + 44px + 1rem);
+        right:1rem;
+      }
+      #ada-chat { width:calc(100vw - 2.2rem); }
     }
   `;
-  document.head.appendChild(style);
+  const styleEl = document.createElement('style');
+  styleEl.textContent = css;
+  document.head.appendChild(styleEl);
 
-  // ── Build HTML ─────────────────────────────────────────────────
+  /* ── GEM SVG ─────────────────────────────────────────────────
+     Two states: eyes open vs closed (blink)
+     Left-eye and right-eye <g> tags have stable IDs so we can
+     swap their content without re-rendering the whole SVG.
+  ─────────────────────────────────────────────────────────────── */
+  const GEM_OPEN = `
+<svg id="ada-gem-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" width="58" height="58">
+  <!-- bottom tip -->
+  <path d="M50 95 L26 66 L50 76 Z" fill="#7b1e14"/>
+  <path d="M50 95 L50 76 L74 66 Z" fill="#a52a1e"/>
+  <!-- mid left -->
+  <path d="M26 66 L18 42 L50 54 L50 76 Z" fill="#c0392b"/>
+  <!-- mid right -->
+  <path d="M50 76 L50 54 L82 42 L74 66 Z" fill="#9b2c1e"/>
+  <!-- upper left -->
+  <path d="M18 42 L36 20 L50 54 Z" fill="#e74c3c"/>
+  <!-- upper right -->
+  <path d="M50 54 L64 20 L82 42 Z" fill="#b03020"/>
+  <!-- top-left facet -->
+  <path d="M36 20 L50 11 L50 54 Z" fill="#f05040"/>
+  <!-- top-right facet -->
+  <path d="M50 11 L64 20 L50 54 Z" fill="#d04030"/>
+  <!-- crown -->
+  <path d="M36 20 L50 11 L64 20 L50 15 Z" fill="#ff7060"/>
+  <!-- inner glints -->
+  <path d="M50 54 L36 20 L44 37 Z" fill="white" opacity="0.07"/>
+  <path d="M50 54 L50 11 L54 33 Z" fill="white" opacity="0.05"/>
+  <!-- FACE on mid-left facet -->
+  <!-- left eye open -->
+  <g id="gem-eye-L">
+    <ellipse cx="34" cy="66" rx="4.5" ry="3.8" fill="white" opacity="0.92"/>
+    <ellipse cx="34" cy="66" rx="2.6" ry="2.4" fill="#c0392b"/>
+    <circle  cx="34" cy="66" r="1.3"  fill="#0a0000"/>
+    <circle  cx="35" cy="64.8" r="0.7" fill="white"/>
+  </g>
+  <!-- right eye open -->
+  <g id="gem-eye-R">
+    <ellipse cx="48" cy="72" rx="4.5" ry="3.8" fill="white" opacity="0.92"/>
+    <ellipse cx="48" cy="72" rx="2.6" ry="2.4" fill="#c0392b"/>
+    <circle  cx="48" cy="72" r="1.3"  fill="#0a0000"/>
+    <circle  cx="49" cy="70.8" r="0.7" fill="white"/>
+  </g>
+  <!-- smile -->
+  <path d="M30 78 Q41 84.5 52 79" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.85"/>
+  <!-- sparkles -->
+  <path d="M82 28 L84 22 L86 28 L84 34 Z" fill="#e74c3c" opacity="0.85"/>
+  <path d="M79 26 L84 22 L89 26 L84 30 Z" fill="#e74c3c" opacity="0.85"/>
+  <path d="M10 40 L12 34 L14 40 L12 46 Z" fill="#b8923a" opacity="0.75"/>
+  <path d="M7 38 L12 34 L17 38 L12 42 Z" fill="#b8923a" opacity="0.75"/>
+</svg>`;
+
+  /* closed-eye replacement HTML (just the two <g> contents) */
+  const EYE_CLOSED_L = `<path d="M30 65.5 Q34 62.5 38 65.5" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.9"/>`;
+  const EYE_CLOSED_R = `<path d="M44 71.5 Q48 68.5 52 71.5" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.9"/>`;
+
+  /* tiny gem for chat header / message icon */
+  const GEM_MINI = `
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+  <path d="M50 95 L26 66 L50 76 Z" fill="#7b1e14"/>
+  <path d="M50 95 L50 76 L74 66 Z" fill="#a52a1e"/>
+  <path d="M26 66 L18 42 L50 54 L50 76 Z" fill="#c0392b"/>
+  <path d="M50 76 L50 54 L82 42 L74 66 Z" fill="#9b2c1e"/>
+  <path d="M18 42 L36 20 L50 54 Z" fill="#e74c3c"/>
+  <path d="M50 54 L64 20 L82 42 Z" fill="#b03020"/>
+  <path d="M36 20 L50 11 L50 54 Z" fill="#f05040"/>
+  <path d="M50 11 L64 20 L50 54 Z" fill="#d04030"/>
+  <path d="M36 20 L50 11 L64 20 L50 15 Z" fill="#ff7060"/>
+</svg>`;
+
+  /* ── BUILD DOM ───────────────────────────────────────────────── */
   const wrap = document.createElement('div');
-  wrap.id = 'btl-ada-wrap';
+  wrap.id = 'ada-wrap';
   wrap.innerHTML = `
     <!-- Chat panel -->
-    <div id="btl-chat">
-      <div id="btl-chat-header">
-        <div class="ada-mini">🏷</div>
-        <div class="ada-name">Ada — BTL Guide</div>
-        <div class="ada-status">Online</div>
-        <button id="btl-chat-close">✕</button>
+    <div id="ada-chat">
+      <div id="ada-chat-header">
+        <div class="ada-hdr-gem">${GEM_MINI}</div>
+        <span class="ada-hdr-name">Ada — BTL Guide</span>
+        <span class="ada-hdr-status">Online</span>
+        <button id="ada-chat-x">✕</button>
       </div>
-      <div id="btl-chat-messages"></div>
-      <div id="btl-quick-prompts"></div>
-      <div id="btl-chat-input-row">
-        <input id="btl-chat-input" type="text" placeholder="Ask me anything…" autocomplete="off">
-        <button id="btl-chat-send">→</button>
+      <div id="ada-messages"></div>
+      <div id="ada-chips"></div>
+      <div id="ada-input-row">
+        <input id="ada-input" type="text" placeholder="Ask me anything…" autocomplete="off"/>
+        <button id="ada-send">→</button>
       </div>
     </div>
 
-    <!-- Avatar button -->
-    <div style="position:relative; pointer-events:all;">
-      <button id="btl-ada-btn" aria-label="Chat with Ada, your BTL guide">
-        <!-- Character SVG — small activist with label tag -->
-        <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Body -->
-          <circle cx="28" cy="28" r="28" fill="#1a1a1a"/>
-          <!-- Coat -->
-          <path d="M16 36 C16 30 20 28 28 28 C36 28 40 30 40 36 L40 46 L16 46 Z" fill="#c0392b"/>
-          <!-- Collar detail -->
-          <path d="M24 28 L28 34 L32 28" fill="#e74c3c" opacity="0.6"/>
-          <!-- Head -->
-          <circle cx="28" cy="20" r="8" fill="#f0d5a0"/>
-          <!-- Hair -->
-          <path d="M20 18 Q20 11 28 11 Q36 11 36 18" fill="#2c1810"/>
-          <!-- Eyes -->
-          <circle cx="25" cy="20" r="1.2" fill="#2c1810"/>
-          <circle cx="31" cy="20" r="1.2" fill="#2c1810"/>
-          <!-- Smile -->
-          <path d="M25 23 Q28 25.5 31 23" stroke="#c0392b" stroke-width="1" fill="none" stroke-linecap="round"/>
-          <!-- Label tag hanging from neck -->
-          <rect x="24" y="29" width="8" height="6" rx="1" fill="#f0ebe0" stroke="#9a9a9a" stroke-width="0.5"/>
-          <line x1="28" y1="28" x2="28" y2="29" stroke="#9a9a9a" stroke-width="0.8"/>
-          <line x1="25.5" y1="31" x2="30.5" y2="31" stroke="#c0392b" stroke-width="0.8"/>
-          <line x1="25.5" y1="33" x2="29" y2="33" stroke="#9a9a9a" stroke-width="0.6"/>
-        </svg>
-      </button>
-      <div id="btl-ada-notif"></div>
+    <!-- Gem avatar button -->
+    <div style="position:relative;pointer-events:all;align-self:flex-end;">
+      <button id="ada-gem-btn" aria-label="Chat with Ada">${GEM_OPEN}</button>
+      <div id="ada-notif-dot"></div>
     </div>
   `;
   document.body.appendChild(wrap);
 
-  // ── State ──────────────────────────────────────────────────────
-  const chatEl      = document.getElementById('btl-chat');
-  const messagesEl  = document.getElementById('btl-chat-messages');
-  const inputEl     = document.getElementById('btl-chat-input');
-  const sendBtn     = document.getElementById('btl-chat-send');
-  const closeBtn    = document.getElementById('btl-chat-close');
-  const adaBtn      = document.getElementById('btl-ada-btn');
-  const notifDot    = document.getElementById('btl-ada-notif');
-  const quickEl     = document.getElementById('btl-quick-prompts');
+  /* ── REFS ────────────────────────────────────────────────────── */
+  const chatEl   = wrap.querySelector('#ada-chat');
+  const msgsEl   = wrap.querySelector('#ada-messages');
+  const inputEl  = wrap.querySelector('#ada-input');
+  const sendBtn  = wrap.querySelector('#ada-send');
+  const closeBtn = wrap.querySelector('#ada-chat-x');
+  const gemBtn   = wrap.querySelector('#ada-gem-btn');
+  const notifDot = wrap.querySelector('#ada-notif-dot');
+  const chipsEl  = wrap.querySelector('#ada-chips');
 
-  let isOpen        = false;
-  let isTyping      = false;
-  let greeted       = false;
-  let conversationHistory = [];
+  let isOpen   = false;
+  let isBusy   = false;
+  let greeted  = false;
+  let history  = [];
 
-  // ── Quick prompt chips ─────────────────────────────────────────
+  /* ── BLINK ───────────────────────────────────────────────────── */
+  function blink () {
+    const svg  = document.getElementById('ada-gem-svg');
+    if (!svg) return;
+    const eyeL = svg.querySelector('#gem-eye-L');
+    const eyeR = svg.querySelector('#gem-eye-R');
+    if (!eyeL || !eyeR) return;
+    // close eyes
+    eyeL.innerHTML = EYE_CLOSED_L;
+    eyeR.innerHTML = EYE_CLOSED_R;
+    // reopen after 150 ms
+    setTimeout(() => {
+      const s2 = document.getElementById('ada-gem-svg');
+      if (!s2) return;
+      const l2 = s2.querySelector('#gem-eye-L');
+      const r2 = s2.querySelector('#gem-eye-R');
+      if (l2) l2.innerHTML = `
+        <ellipse cx="34" cy="66" rx="4.5" ry="3.8" fill="white" opacity="0.92"/>
+        <ellipse cx="34" cy="66" rx="2.6" ry="2.4" fill="#c0392b"/>
+        <circle  cx="34" cy="66" r="1.3"  fill="#0a0000"/>
+        <circle  cx="35" cy="64.8" r="0.7" fill="white"/>`;
+      if (r2) r2.innerHTML = `
+        <ellipse cx="48" cy="72" rx="4.5" ry="3.8" fill="white" opacity="0.92"/>
+        <ellipse cx="48" cy="72" rx="2.6" ry="2.4" fill="#c0392b"/>
+        <circle  cx="48" cy="72" r="1.3"  fill="#0a0000"/>
+        <circle  cx="49" cy="70.8" r="0.7" fill="white"/>`;
+    }, 150);
+  }
+
+  function scheduleBlink () {
+    setTimeout(() => { blink(); scheduleBlink(); }, 2800 + Math.random() * 3400);
+  }
+  scheduleBlink();
+
+  /* ── QUICK CHIPS ─────────────────────────────────────────────── */
   QUICK_PROMPTS.forEach(q => {
-    const chip = document.createElement('button');
-    chip.className = 'ada-chip';
-    chip.textContent = q;
-    chip.addEventListener('click', () => sendMessage(q));
-    quickEl.appendChild(chip);
+    const btn = document.createElement('button');
+    btn.className = 'ada-chip';
+    btn.textContent = q;
+    btn.addEventListener('click', () => send(q));
+    chipsEl.appendChild(btn);
   });
 
-  // ── Toggle chat ────────────────────────────────────────────────
-  function openChat() {
+  /* ── OPEN / CLOSE ────────────────────────────────────────────── */
+  function open () {
     isOpen = true;
     chatEl.classList.add('open');
-    adaBtn.classList.add('open');
+    gemBtn.classList.add('chat-open');
     notifDot.style.display = 'none';
-    // Remove teaser if present
-    const teaser = document.getElementById('btl-ada-teaser');
-    if (teaser) teaser.remove();
+    removeTeaserEl();
     if (!greeted) {
       greeted = true;
-      const greeting = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
-      setTimeout(() => addMessage('ada', greeting), 300);
+      const g = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+      setTimeout(() => addMsg('ada', g), 260);
     }
-    setTimeout(() => inputEl.focus(), 400);
+    setTimeout(() => inputEl.focus(), 360);
   }
 
-  function closeChat() {
+  function close () {
     isOpen = false;
     chatEl.classList.remove('open');
-    adaBtn.classList.remove('open');
+    gemBtn.classList.remove('chat-open');
   }
 
-  adaBtn.addEventListener('click', () => isOpen ? closeChat() : openChat());
-  closeBtn.addEventListener('click', closeChat);
+  gemBtn.addEventListener('click', () => isOpen ? close() : open());
+  closeBtn.addEventListener('click', close);
 
-  // ── Teaser bubble ──────────────────────────────────────────────
+  /* ── TEASER (shows immediately, lives for 30 s) ─────────────── */
+  const TEASER_MSGS = [
+    "👋 Click me — I can help you find ethical brands!",
+    "💎 Hi! Ask me anything about fashion & forced labour.",
+    "🔍 Want to know if your brand is ethical? Ask Ada!",
+    "💬 Tap me — I'm Ada, your ethical shopping guide.",
+    "⚡ I can find ethical swaps for any brand — click me!",
+  ];
+  let teaserMsgIndex = 0;
+  let teaserWiggleTimer = null;
+  let teaserAutoClose = null;
+
+  function removeTeaserEl () {
+    const t = document.getElementById('ada-teaser');
+    if (!t) return;
+    clearInterval(teaserWiggleTimer);
+    clearTimeout(teaserAutoClose);
+    t.classList.add('fade-out');
+    setTimeout(() => t.remove(), 360);
+    notifDot.style.display = 'none';
+  }
+
   setTimeout(() => {
     if (isOpen || greeted) return;
-    const teaser = document.createElement('div');
-    teaser.id = 'btl-ada-teaser';
-    teaser.innerHTML = `
-      <button id="btl-ada-teaser-dismiss">✕</button>
-      Hi! I'm Ada 👋 I can help you navigate Behind The Label — ask me anything!
-    `;
-    teaser.addEventListener('click', (e) => {
-      if (e.target.id === 'btl-ada-teaser-dismiss') {
-        teaser.remove();
-        return;
-      }
-      teaser.remove();
-      openChat();
+
+    const t = document.createElement('div');
+    t.id = 'ada-teaser';
+
+    const msgSpan = document.createElement('span');
+    msgSpan.id = 'ada-teaser-msg';
+    msgSpan.textContent = TEASER_MSGS[0];
+
+    const closeX = document.createElement('button');
+    closeX.id = 'ada-teaser-close';
+    closeX.setAttribute('aria-label', 'Dismiss');
+    closeX.textContent = '✕';
+
+    const bar = document.createElement('div');
+    bar.id = 'ada-teaser-bar';
+
+    t.appendChild(closeX);
+    t.appendChild(msgSpan);
+    t.appendChild(bar);
+
+    // click bubble → open chat
+    t.addEventListener('click', e => {
+      if (e.target === closeX) { removeTeaserEl(); return; }
+      removeTeaserEl();
+      open();
     });
-    // Insert before the avatar button
-    wrap.insertBefore(teaser, wrap.children[1]);
+
+    wrap.insertBefore(t, wrap.children[1]);
     notifDot.style.display = 'block';
-  }, 4000);
 
-  // ── Add message to chat ────────────────────────────────────────
-  function addMessage(role, text) {
-    const msg = document.createElement('div');
-    msg.className = `ada-msg ${role}`;
+    // Rotate message text every 6 s
+    const msgTimer = setInterval(() => {
+      if (!document.getElementById('ada-teaser')) { clearInterval(msgTimer); return; }
+      teaserMsgIndex = (teaserMsgIndex + 1) % TEASER_MSGS.length;
+      const span = document.getElementById('ada-teaser-msg');
+      if (span) {
+        span.style.opacity = '0';
+        span.style.transition = 'opacity 0.25s';
+        setTimeout(() => {
+          if (span) { span.textContent = TEASER_MSGS[teaserMsgIndex]; span.style.opacity = '1'; }
+        }, 260);
+      }
+    }, 6000);
 
+    // Wiggle every ~5 s to draw attention
+    teaserWiggleTimer = setInterval(() => {
+      const el = document.getElementById('ada-teaser');
+      if (!el) { clearInterval(teaserWiggleTimer); return; }
+      el.classList.remove('wiggle');
+      void el.offsetWidth; // reflow to restart animation
+      el.classList.add('wiggle');
+    }, 5000);
+
+    // Auto-dismiss after 30 s
+    teaserAutoClose = setTimeout(() => removeTeaserEl(), 30000);
+
+  }, 1200); // show quickly — 1.2 s after page load
+
+  /* ── MESSAGES ────────────────────────────────────────────────── */
+  function addMsg (role, text) {
+    const row = document.createElement('div');
+    row.className = `ada-row ${role === 'user' ? 'user-row' : ''}`;
     if (role === 'ada') {
-      msg.innerHTML = `
-        <div class="avatar">🏷</div>
-        <div class="bubble">${text}</div>`;
+      row.innerHTML = `<div class="ada-row-icon">${GEM_MINI}</div><div class="ada-bubble">${text}</div>`;
     } else {
-      msg.innerHTML = `<div class="bubble">${text}</div>`;
+      row.innerHTML = `<div class="ada-bubble">${text}</div>`;
     }
-
-    messagesEl.appendChild(msg);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-    return msg;
+    msgsEl.appendChild(row);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
   }
 
-  function addTyping() {
-    const msg = document.createElement('div');
-    msg.className = 'ada-msg ada ada-typing';
-    msg.id = 'btl-typing-indicator';
-    msg.innerHTML = `
-      <div class="avatar">🏷</div>
-      <div class="bubble">
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
+  function showTyping () {
+    const row = document.createElement('div');
+    row.className = 'ada-row ada-typing-row';
+    row.id = 'ada-typing';
+    row.innerHTML = `<div class="ada-row-icon">${GEM_MINI}</div>
+      <div class="ada-bubble">
+        <span class="ada-dot"></span>
+        <span class="ada-dot"></span>
+        <span class="ada-dot"></span>
       </div>`;
-    messagesEl.appendChild(msg);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
+    msgsEl.appendChild(row);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
   }
 
-  function removeTyping() {
-    const t = document.getElementById('btl-typing-indicator');
+  function hideTyping () {
+    const t = document.getElementById('ada-typing');
     if (t) t.remove();
   }
 
-  // ── Send message ───────────────────────────────────────────────
-  async function sendMessage(text) {
-    if (!text || !text.trim() || isTyping) return;
-    text = text.trim();
-
-    addMessage('user', text);
+  /* ── SEND ────────────────────────────────────────────────────── */
+  async function send (text) {
+    text = (text || inputEl.value).trim();
+    if (!text || isBusy) return;
     inputEl.value = '';
-
-    conversationHistory.push({ role: 'user', content: text });
-
-    isTyping = true;
+    addMsg('user', text);
+    history.push({ role: 'user', content: text });
+    isBusy = true;
     sendBtn.disabled = true;
-    addTyping();
+    showTyping();
 
     try {
-      const response = await fetch(GROQ_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${GROQ_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: SITE_CONTEXT },
-            ...conversationHistory
-          ],
+      const res  = await fetch(GROQ_URL, {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
+        body   : JSON.stringify({
+          model      : 'llama-3.3-70b-versatile',
+          max_tokens : 300,
           temperature: 0.7,
-          max_tokens: 300
-        })
+          messages   : [{ role: 'system', content: SYSTEM_PROMPT }, ...history],
+        }),
       });
-
-      const data = await response.json();
+      const data  = await res.json();
       if (data.error) throw new Error(data.error.message);
-
-      const reply = data.choices?.[0]?.message?.content || "Sorry, I didn't catch that. Try again?";
-      conversationHistory.push({ role: 'assistant', content: reply });
-
-      removeTyping();
-      addMessage('ada', reply);
-
+      const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't connect. Try again!";
+      history.push({ role: 'assistant', content: reply });
+      hideTyping();
+      addMsg('ada', reply);
     } catch (err) {
-      removeTyping();
-      addMessage('ada', "Hmm, I'm having trouble connecting. Try refreshing the page!");
-      console.error('Ada error:', err);
+      hideTyping();
+      addMsg('ada', "Hmm, I'm having trouble connecting right now. Please try again!");
+      console.warn('[Ada]', err);
     }
 
-    isTyping = false;
+    isBusy = false;
     sendBtn.disabled = false;
     inputEl.focus();
   }
 
-  // ── Input listeners ────────────────────────────────────────────
-  sendBtn.addEventListener('click', () => sendMessage(inputEl.value));
-  inputEl.addEventListener('keydown', e => {
-    if (e.key === 'Enter') sendMessage(inputEl.value);
-  });
+  sendBtn.addEventListener('click', () => send());
+  inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
 
 })();
