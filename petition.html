@@ -736,6 +736,14 @@
       gap: 0; padding: 6rem 2rem 2rem; overflow-y: auto;
     }
     .mobile-nav.open { display: flex; }
+    .mobile-nav-close {
+      position: absolute; top: 1.2rem; right: 1.2rem;
+      background: none; border: 1px solid var(--ash);
+      color: var(--mist); width: 40px; height: 40px;
+      font-size: 1rem; display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .mobile-nav-close:hover { border-color: var(--red); color: var(--cream); }
     .mobile-nav a {
       font-family: 'DM Mono', monospace;
       font-size: 0.8rem; letter-spacing: 0.25em; text-transform: uppercase;
@@ -1044,6 +1052,7 @@
 
 <!-- MOBILE NAV DRAWER -->
 <div class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">✕</button>
   <a href="index.html#about">About</a>
   <a href="index.html#why">Why It Matters</a>
   <a href="forced-labour.html">Learn More</a>
@@ -1797,6 +1806,7 @@ if (menuBtn) {
     menuBtn.classList.toggle('open', isOpen);
     document.body.style.overflow = isOpen ? 'hidden' : '';
   });
+  document.getElementById('mobileNavClose').addEventListener('click', closeMobileNav);
 }
 
 // Close on any link tap (all links on this page go to index.html or are hash-less)

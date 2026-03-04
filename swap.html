@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ethical Swap Engine — Behind The Label</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:    #080808;
+      --ink:      #111111;
+      --charcoal: #1a1a1a;
+      --ash:      #2c2c2c;
+      --smoke:    #5a5a5a;
+      --mist:     #9a9a9a;
+      --cream:    #f0ebe0;
+      --parchment:#d9d0bc;
+      --red:      #c0392b;
+      --red-hot:  #e74c3c;
+      --gold:     #b8923a;
+      --gold-light:#d4a84b;
+      --green:    #27ae60;
+      --green-dim: rgba(39,174,96,0.1);
+    }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body {
+      background: var(--black);
+      color: var(--cream);
+      font-family: 'Libre Baskerville', Georgia, serif;
+      cursor: none;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* CURSOR */
+    .cursor-dot {
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      width: 8px; height: 8px; background: var(--green);
+      border-radius: 50%; pointer-events: none;
+      transform: translate(-50%, -50%); transition: transform 0.05s;
+    }
+    .cursor-ring {
+      position: fixed; top: 0; left: 0; z-index: 9998;
+      width: 36px; height: 36px;
+      border: 1px solid rgba(39,174,96,0.5);
+      border-radius: 50%; pointer-events: none;
+      transform: translate(-50%, -50%); transition: all 0.18s ease;
+    }
+    a, button { cursor: none; }
+
+    /* NOISE */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 9990;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; opacity: 0.35;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: rgba(8,8,8,0.97);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(39,174,96,0.2);
+    }
+    .brand { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; }
+    .brand .logo { width: 36px; height: 36px; object-fit: contain; filter: brightness(0) invert(1); }
+    .brand span {
+      font-family: 'Playfair Display', serif; font-size: 1.1rem;
+      font-weight: 700; letter-spacing: 0.08em; color: var(--cream); text-transform: uppercase;
+    }
+    nav { display: flex; align-items: center; gap: 2rem; }
+    nav a {
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--mist); text-decoration: none; transition: color 0.2s; position: relative;
+    }
+    nav a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 100%;
+      height: 1px; background: var(--green); transition: right 0.3s;
+    }
+    nav a:hover { color: var(--cream); }
+    nav a:hover::after { right: 0; }
+    nav a.nav-active { color: var(--green); }
+    nav a.nav-active::after { right: 0; }
+    nav a.nav-btn { padding: 0.45rem 1.1rem; border: 1px solid var(--red); color: var(--red-hot); }
+    nav a.nav-btn::after { display: none; }
+    nav a.nav-btn:hover { background: var(--red); color: var(--cream); }
+
+    .menu-btn {
+      display: none; flex-direction: column; justify-content: center; gap: 5px;
+      width: 40px; height: 40px; background: none; border: none; padding: 8px; z-index: 600;
+    }
+    .menu-btn span {
+      display: block; width: 22px; height: 2px;
+      background: var(--cream); border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s; transform-origin: center;
+    }
+    .menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-btn.open span:nth-child(2) { opacity: 0; }
+    .menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-nav {
+      display: none; position: fixed; inset: 0;
+      background: rgba(8,8,8,0.98); z-index: 550;
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 6rem 2rem 2rem;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav-close {
+      position: absolute; top: 1.2rem; right: 1.2rem;
+      background: none; border: 1px solid var(--ash);
+      color: var(--mist); width: 40px; height: 40px;
+      font-size: 1rem; display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .mobile-nav-close:hover { border-color: var(--red); color: var(--cream); }
+    .mobile-nav a {
+      font-family: 'DM Mono', monospace; font-size: 0.8rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--mist); text-decoration: none;
+      padding: 1.2rem 0; width: 100%; text-align: center;
+      border-bottom: 1px solid var(--ash); transition: color 0.2s;
+    }
+    .mobile-nav a:first-child { border-top: 1px solid var(--ash); }
+    .mobile-nav a:hover { color: var(--cream); }
+    .mobile-nav a.nav-btn { margin-top: 1.5rem; border: 1px solid var(--red); color: var(--red-hot); padding: 1rem; }
+
+    /* ── HERO ── */
+    .swap-hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 120px 2rem 4rem;
+      position: relative; overflow: hidden;
+      background: var(--ink);
+      text-align: center;
+    }
+
+    /* Animated background arrows */
+    .swap-hero::before {
+      content: '→';
+      position: absolute;
+      font-size: 40vw; font-weight: 900;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(39,174,96,0.04);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none; user-select: none;
+      animation: arrowPulse 4s ease-in-out infinite;
+    }
+    @keyframes arrowPulse {
+      0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+      50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.03); }
+    }
+
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.3em; text-transform: uppercase; color: var(--green);
+      margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 1rem;
+      opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: ''; display: inline-block; width: 30px; height: 1px; background: var(--green);
+    }
+
+    .swap-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 6.5rem); font-weight: 900;
+      line-height: 1.0; margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp 1s 0.4s forwards;
+    }
+    .swap-hero h1 .strike {
+      position: relative; color: var(--mist);
+      display: inline-block;
+    }
+    .swap-hero h1 .strike::after {
+      content: '';
+      position: absolute; left: 0; right: 0; top: 55%;
+      height: 3px; background: var(--red-hot);
+      transform: rotate(-2deg);
+    }
+    .swap-hero h1 em { font-style: italic; color: var(--green); display: block; }
+
+    .swap-hero-sub {
+      font-size: 1rem; line-height: 1.9; color: var(--parchment);
+      max-width: 500px; margin: 0 auto 3.5rem;
+      opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
+    }
+
+    /* ── MAIN INPUT BOX ── */
+    .swap-input-wrap {
+      width: 100%; max-width: 680px;
+      opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+      position: relative; z-index: 2;
+    }
+
+    .swap-input-box {
+      background: var(--charcoal);
+      border: 1px solid var(--ash);
+      border-top: 2px solid var(--green);
+      padding: 2rem;
+    }
+
+    .swap-input-label {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.25em; text-transform: uppercase; color: var(--green);
+      display: block; margin-bottom: 0.8rem;
+    }
+
+    .swap-input-row {
+      display: flex; gap: 0;
+    }
+
+    .swap-input {
+      flex: 1;
+      background: var(--ink); border: 1px solid var(--ash);
+      border-right: none;
+      padding: 1rem 1.2rem; color: var(--cream);
+      font-family: 'Libre Baskerville', serif; font-size: 1rem;
+      outline: none; transition: border-color 0.2s;
+    }
+    .swap-input:focus { border-color: var(--green); }
+    .swap-input::placeholder { color: var(--smoke); }
+
+    .swap-btn {
+      font-family: 'DM Mono', monospace; font-size: 0.72rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 1rem 1.8rem;
+      background: var(--green); color: var(--black);
+      border: none; font-weight: 500;
+      position: relative; overflow: hidden;
+      transition: transform 0.2s; white-space: nowrap;
+    }
+    .swap-btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: #2ecc71;
+      transform: translateX(-101%); transition: transform 0.3s;
+    }
+    .swap-btn:hover::after { transform: translateX(0); }
+    .swap-btn span { position: relative; z-index: 1; }
+    .swap-btn:hover { transform: translateY(-2px); }
+
+    .swap-hint {
+      font-family: 'DM Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.15em; color: var(--smoke);
+      margin-top: 0.8rem; text-align: center;
+    }
+    .swap-hint span {
+      color: var(--mist); text-decoration: underline;
+      text-underline-offset: 3px; cursor: pointer; transition: color 0.2s;
+    }
+    .swap-hint span:hover { color: var(--cream); }
+
+    /* ── LOADING STATE ── */
+    .swap-loading {
+      display: none; text-align: center; padding: 4rem 2rem;
+      max-width: 680px; width: 100%; margin: 0 auto;
+    }
+    .swap-loading.show { display: block; }
+
+    .loading-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem; font-weight: 900;
+      color: var(--mist); margin-bottom: 1.5rem;
+      position: relative; display: inline-block;
+    }
+    .loading-brand-name::after {
+      content: '';
+      position: absolute; left: 0; right: 0; top: 55%;
+      height: 3px; background: var(--red-hot);
+      transform: rotate(-1deg);
+      animation: strikeGrow 0.6s 0.3s ease forwards;
+      transform-origin: left;
+      scale: 0 1;
+    }
+    @keyframes strikeGrow {
+      to { scale: 1 1; }
+    }
+
+    .loading-arrow {
+      font-size: 2rem; color: var(--green);
+      animation: arrowBounce 0.8s ease-in-out infinite;
+      display: block; margin: 1rem auto;
+    }
+    @keyframes arrowBounce {
+      0%, 100% { transform: translateX(0); opacity: 0.5; }
+      50%       { transform: translateX(8px); opacity: 1; }
+    }
+
+    .loading-msg {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--smoke);
+      animation: msgPulse 1.4s ease-in-out infinite;
+    }
+    @keyframes msgPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+    /* ── RESULTS ── */
+    #swapResults {
+      width: 100%; max-width: 1000px;
+      margin: 0 auto; padding: 0 2rem 6rem;
+      display: none;
+    }
+    #swapResults.show { display: block; }
+
+    /* Original brand card */
+    .original-brand-card {
+      background: var(--charcoal); border: 1px solid var(--ash);
+      border-left: 3px solid var(--red-hot);
+      padding: 1.5rem 2rem; margin-bottom: 2rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+      flex-wrap: wrap;
+      animation: fadeUp 0.5s ease forwards;
+    }
+    .original-brand-left { display: flex; align-items: center; gap: 1.5rem; }
+    .original-risk-badge {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      width: 60px; height: 60px; flex-shrink: 0;
+      border: 1px solid currentColor;
+    }
+    .original-risk-score {
+      font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900;
+    }
+    .original-risk-label {
+      font-family: 'DM Mono', monospace; font-size: 0.42rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+    }
+    .original-brand-name {
+      font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900;
+    }
+    .original-brand-verdict {
+      font-size: 0.88rem; color: var(--smoke); margin-top: 0.3rem; font-style: italic;
+    }
+    .original-risk-pill {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.35rem 0.9rem; border: 1px solid currentColor;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+
+    /* Arrow divider */
+    .swap-divider {
+      text-align: center; padding: 1.5rem 0;
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.3em; text-transform: uppercase; color: var(--green);
+      display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .swap-divider::before, .swap-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--ash);
+      max-width: 200px;
+    }
+    .swap-arrow-icon { font-size: 1.5rem; color: var(--green); }
+
+    /* Swap cards grid */
+    .swap-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2px; background: var(--ash);
+      margin-bottom: 2rem;
+    }
+
+    .swap-card {
+      background: var(--charcoal); padding: 2.5rem 2rem;
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column;
+      opacity: 0; transform: translateY(20px);
+      transition: background 0.3s;
+    }
+    .swap-card.visible { animation: cardReveal 0.5s ease forwards; }
+    @keyframes cardReveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .swap-card:hover { background: var(--ash); }
+    .swap-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 100%;
+      height: 2px; background: var(--green); transition: right 0.5s ease;
+    }
+    .swap-card:hover::before { right: 0; }
+
+    .swap-card-rank {
+      font-family: 'DM Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.3em; text-transform: uppercase; color: var(--green);
+      margin-bottom: 1rem;
+    }
+    .swap-card-name {
+      font-family: 'Playfair Display', serif; font-size: 1.4rem;
+      font-weight: 900; margin-bottom: 0.3rem; line-height: 1.1;
+    }
+    .swap-card-category {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--green);
+      margin-bottom: 1rem;
+    }
+
+    /* Score bar */
+    .score-bar-wrap {
+      margin-bottom: 1.2rem;
+    }
+    .score-bar-label {
+      display: flex; justify-content: space-between;
+      font-family: 'DM Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--smoke);
+      margin-bottom: 0.4rem;
+    }
+    .score-bar-track {
+      height: 3px; background: var(--ash); overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%; background: var(--green);
+      width: 0; transition: width 1.2s ease;
+    }
+    .score-bar-fill.animate { width: var(--score-w); }
+
+    .swap-card-why {
+      font-size: 0.85rem; color: var(--parchment);
+      line-height: 1.7; flex: 1; margin-bottom: 1.2rem;
+    }
+
+    .swap-card-certifications {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.2rem;
+    }
+    .cert-badge {
+      font-family: 'DM Mono', monospace; font-size: 0.5rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--green); border: 1px solid rgba(39,174,96,0.3);
+      padding: 0.2rem 0.5rem;
+    }
+
+    .swap-card-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid var(--ash); padding-top: 1rem; margin-top: auto;
+    }
+    .swap-card-price {
+      font-family: 'Playfair Display', serif; font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .price-label {
+      font-family: 'DM Mono', monospace; font-size: 0.5rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--smoke);
+      display: block; margin-bottom: 0.15rem;
+    }
+    .swap-card-savings {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--gold); text-align: right;
+    }
+
+    /* Key issues comparison */
+    .comparison-table {
+      background: var(--ink); border: 1px solid var(--ash);
+      margin-bottom: 2rem; overflow: hidden;
+      animation: fadeUp 0.5s 0.4s ease both;
+    }
+    .comparison-header {
+      display: grid; grid-template-columns: 2fr repeat(3, 1fr);
+      background: var(--charcoal); border-bottom: 1px solid var(--ash);
+      padding: 0.8rem 1.5rem;
+    }
+    .comparison-header span {
+      font-family: 'DM Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--smoke);
+    }
+    .comparison-header span:first-child { color: var(--mist); }
+    .comparison-row {
+      display: grid; grid-template-columns: 2fr repeat(3, 1fr);
+      padding: 0.9rem 1.5rem; border-bottom: 1px solid rgba(44,44,44,0.5);
+      align-items: center;
+    }
+    .comparison-row:last-child { border-bottom: none; }
+    .comparison-row:hover { background: rgba(255,255,255,0.02); }
+    .comparison-criterion {
+      font-size: 0.82rem; color: var(--parchment);
+    }
+    .comparison-cell {
+      text-align: center;
+      font-family: 'DM Mono', monospace; font-size: 0.75rem;
+    }
+    .cell-good  { color: var(--green); }
+    .cell-bad   { color: var(--red-hot); }
+    .cell-mid   { color: var(--gold); }
+    .cell-unknown { color: var(--smoke); }
+
+    /* Try another CTA */
+    .try-another {
+      text-align: center; padding: 3rem 0 1rem;
+      animation: fadeUp 0.5s 0.6s ease both;
+    }
+    .try-another p {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--smoke);
+      margin-bottom: 1rem;
+    }
+    .try-another-btn {
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.9rem 2rem; border: 1px solid var(--ash);
+      background: none; color: var(--mist);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .try-another-btn:hover { border-color: var(--green); color: var(--cream); }
+
+    /* Quick suggestions */
+    .quick-suggestions {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem;
+      margin-top: 1.2rem;
+    }
+    .suggestion-chip {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--smoke); border: 1px solid var(--ash);
+      padding: 0.35rem 0.8rem; background: none;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .suggestion-chip:hover {
+      border-color: var(--green); color: var(--cream);
+      background: rgba(39,174,96,0.05);
+    }
+
+    /* PETITION BANNER */
+    .petition-banner { background: var(--red); text-align: center; padding: 1.5rem; }
+    .petition-banner a {
+      font-family: 'DM Mono', monospace; font-size: 0.75rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--cream);
+      text-decoration: none; display: inline-flex; align-items: center; gap: 0.8rem;
+      transition: gap 0.2s;
+    }
+    .petition-banner a:hover { gap: 1.5rem; }
+    .petition-banner a::after { content: '→'; }
+
+    /* FOOTER */
+    footer {
+      background: var(--black); padding: 2.5rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid var(--ash);
+    }
+    footer p { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em; color: var(--smoke); }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-links a {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.15em; color: var(--smoke); text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--cream); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(25px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      body { cursor: auto; }
+      a, button { cursor: auto; }
+      .cursor-dot, .cursor-ring { display: none; }
+      .navbar { padding: 1rem 1.5rem; }
+      nav { display: none; }
+      .menu-btn { display: flex; }
+      .swap-hero { padding: 100px 1.5rem 3rem; }
+      .swap-cards { grid-template-columns: 1fr; }
+      .comparison-header, .comparison-row { grid-template-columns: 1.5fr repeat(3, 1fr); font-size: 0.75rem; padding: 0.7rem 1rem; }
+      .original-brand-card { flex-direction: column; gap: 1rem; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem 1.5rem; }
+      .footer-links { justify-content: center; flex-wrap: wrap; }
+      #swapResults { padding: 0 1.5rem 4rem; }
+    }
+    @media (max-width: 480px) {
+      .swap-input-row { flex-direction: column; }
+      .swap-input { border-right: 1px solid var(--ash); border-bottom: none; }
+      .swap-btn { width: 100%; }
+      .comparison-header, .comparison-row { grid-template-columns: 1fr repeat(3, 0.8fr); }
+      .comparison-criterion { font-size: 0.75rem; }
+    }
+    @media (hover: none) and (pointer: coarse) {
+      body { cursor: auto; }
+      a, button { cursor: auto; }
+      .cursor-dot, .cursor-ring { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAVBAR -->
+<header class="navbar" id="navbar">
+  <a href="index.html" class="brand">
+    <img src="logo.png" alt="Behind The Label" class="logo">
+    <span>Behind The Label</span>
+  </a>
+  <nav>
+    <a href="index.html#about">About</a>
+    <a href="index.html#why">Why It Matters</a>
+    <a href="forced-labour.html">Learn More</a>
+    <a href="index.html#tool">Our Tool</a>
+    <a href="index.html#team">Team</a>
+    <a href="index.html#partner">Partner</a>
+    <a href="rewards.html">Rewards</a>
+    <a href="swap.html" class="nav-active">Ethical Swap</a>
+    <a href="index.html#action" class="nav-btn">Take Action</a>
+    <a href="petition.html">Petition</a>
+  </nav>
+  <button class="menu-btn" id="menuBtn"><span></span><span></span><span></span></button>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">✕</button>
+  <a href="index.html#about">About</a>
+  <a href="index.html#why">Why It Matters</a>
+  <a href="forced-labour.html">Learn More</a>
+  <a href="index.html#tool">Our Tool</a>
+  <a href="index.html#team">Team</a>
+  <a href="index.html#partner">Partner</a>
+  <a href="rewards.html">Rewards</a>
+  <a href="swap.html">Ethical Swap</a>
+  <a href="petition.html">Petition</a>
+  <a href="index.html#action" class="nav-btn">Take Action</a>
+</div>
+
+<!-- HERO + INPUT -->
+<section class="swap-hero" id="heroSection">
+  <p class="hero-eyebrow">AI-Powered</p>
+  <h1>
+    Stop buying from<br>
+    <span class="strike">unethical brands.</span><br>
+    <em>Here's what to buy instead.</em>
+  </h1>
+  <p class="swap-hero-sub">
+    Enter any brand and our AI instantly finds you three ethical alternatives —
+    verified supply chains, fair labour, comparable prices.
+  </p>
+
+  <div class="swap-input-wrap">
+    <div class="swap-input-box">
+      <label class="swap-input-label" for="swapInput">Enter a brand to swap</label>
+      <div class="swap-input-row">
+        <input type="text" id="swapInput" class="swap-input" placeholder="e.g. H&M, Nike, Shein, Zara…" autocomplete="off">
+        <button class="swap-btn" id="swapBtn"><span>Find Swaps →</span></button>
+      </div>
+      <p class="swap-hint">
+        Try:
+        <span onclick="quickSearch('Shein')">Shein</span> ·
+        <span onclick="quickSearch('H&M')">H&M</span> ·
+        <span onclick="quickSearch('Nike')">Nike</span> ·
+        <span onclick="quickSearch('Zara')">Zara</span> ·
+        <span onclick="quickSearch('Amazon')">Amazon</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- LOADING -->
+<div class="swap-loading" id="swapLoading">
+  <div class="loading-brand-name" id="loadingBrandName">—</div>
+  <span class="loading-arrow">→</span>
+  <div class="loading-msg" id="swapLoadingMsg">Finding ethical alternatives…</div>
+</div>
+
+<!-- RESULTS -->
+<div id="swapResults">
+
+  <!-- Original brand summary -->
+  <div class="original-brand-card" id="originalCard"></div>
+
+  <!-- Divider -->
+  <div class="swap-divider">
+    <span class="swap-arrow-icon">↓</span>
+    Ethical Alternatives
+    <span class="swap-arrow-icon">↓</span>
+  </div>
+
+  <!-- 3 swap cards -->
+  <div class="swap-cards" id="swapCards"></div>
+
+  <!-- Comparison table -->
+  <div class="comparison-table" id="comparisonTable"></div>
+
+  <!-- Try another -->
+  <div class="try-another">
+    <p>Want to check another brand?</p>
+    <button class="try-another-btn" id="tryAnotherBtn">↺ Try Another Brand</button>
+    <div class="quick-suggestions" id="quickSuggestions"></div>
+  </div>
+
+</div>
+
+<div class="petition-banner">
+  <a href="petition.html">Sign Our Petition — Make your voice heard</a>
+</div>
+
+<footer>
+  <p>© 2026 Behind The Label · Built for ethical awareness</p>
+  <div class="footer-links">
+    <a href="forced-labour.html">Learn More</a>
+    <a href="petition.html">Petition</a>
+    <a href="rewards.html">Rewards</a>
+    <a href="swap.html">Ethical Swap</a>
+    <a href="index.html#accessibility">Accessibility</a>
+  </div>
+</footer>
+
+<script>
+// ── Cursor ─────────────────────────────────────────
+const dot  = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+if (dot && ring) {
+  document.addEventListener('mousemove', e => {
+    dot.style.left  = e.clientX + 'px'; dot.style.top  = e.clientY + 'px';
+    ring.style.left = e.clientX + 'px'; ring.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.transform = 'translate(-50%,-50%) scale(1.6)';
+      ring.style.borderColor = 'rgba(39,174,96,0.8)';
+      dot.style.opacity = '0';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.transform = 'translate(-50%,-50%) scale(1)';
+      ring.style.borderColor = 'rgba(39,174,96,0.5)';
+      dot.style.opacity = '1';
+    });
+  });
+}
+
+// ── Mobile nav ─────────────────────────────────────
+const menuBtn  = document.getElementById('menuBtn');
+const mobileNav = document.getElementById('mobileNav');
+function closeMobileNav() {
+  mobileNav.classList.remove('open');
+  menuBtn.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+menuBtn.addEventListener('click', () => {
+  const open = mobileNav.classList.toggle('open');
+  menuBtn.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+});
+
+document.getElementById('mobileNavClose').addEventListener('click', closeMobileNav);
+
+document.querySelectorAll('.mobile-nav a').forEach(a => {
+  a.addEventListener('click', closeMobileNav);
+});
+
+// ── Loading messages ────────────────────────────────
+const SWAP_MSGS = [
+  'Scanning supply chain records…',
+  'Cross-referencing ILO watchlists…',
+  'Finding ethical alternatives…',
+  'Comparing labour certifications…',
+  'Checking fair-trade registries…',
+  'Calculating ethics scores…',
+  'Building your swap report…'
+];
+
+// ── Risk colours ────────────────────────────────────
+function riskColor(r) {
+  return { HIGH:'#e74c3c', MEDIUM:'#e67e22', LOW:'#27ae60', UNKNOWN:'#9a9a9a' }[r] || '#9a9a9a';
+}
+function riskBg(r) {
+  return { HIGH:'rgba(231,76,60,0.1)', MEDIUM:'rgba(230,126,34,0.1)', LOW:'rgba(39,174,96,0.1)', UNKNOWN:'rgba(154,154,154,0.1)' }[r] || 'rgba(154,154,154,0.1)';
+}
+
+// ── Main swap function ──────────────────────────────
+async function runSwap(brandName) {
+  if (!brandName.trim()) return;
+
+  // Show loading
+  document.getElementById('heroSection').style.display = 'none';
+  document.getElementById('swapResults').classList.remove('show');
+  const loading = document.getElementById('swapLoading');
+  loading.classList.add('show');
+  document.getElementById('loadingBrandName').textContent = brandName;
+
+  let msgIdx = 0;
+  const msgEl = document.getElementById('swapLoadingMsg');
+  msgEl.textContent = SWAP_MSGS[0];
+  const msgInterval = setInterval(() => {
+    msgIdx = (msgIdx + 1) % SWAP_MSGS.length;
+    msgEl.textContent = SWAP_MSGS[msgIdx];
+  }, 1300);
+
+  // Scroll to loading
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const prompt = `You are an ethical supply chain analyst for "Behind The Label", a Canadian project fighting forced labour and child exploitation.
+
+A user wants to swap away from: "${brandName}"
+
+Respond ONLY with a valid JSON object. No markdown fences, no backticks, no explanation before or after — just the raw JSON.
+
+The JSON must have exactly this shape (fill in ALL three swaps fully — do not use "..." or placeholders):
+{
+  "original": {
+    "brand": "Official brand name here",
+    "parent_company": "Parent company name or null",
+    "overall_risk": "HIGH",
+    "risk_score": 72,
+    "verdict": "One punchy sentence about their ethics record."
+  },
+  "swaps": [
+    {
+      "rank": 1,
+      "name": "First ethical alternative brand",
+      "category": "Apparel",
+      "ethics_score": 85,
+      "price_range": "$$",
+      "price_vs_original": "Similar price",
+      "why": "Two to three sentences explaining why this brand is a better ethical choice with specific reasons.",
+      "certifications": ["B-Corp", "Fair Trade"],
+      "supply_chain_strength": "Transparent",
+      "labour_rating": "Excellent"
+    },
+    {
+      "rank": 2,
+      "name": "Second ethical alternative brand",
+      "category": "Apparel",
+      "ethics_score": 78,
+      "price_range": "$$$",
+      "price_vs_original": "10-20% more",
+      "why": "Two to three sentences explaining why this brand is a better ethical choice with specific reasons.",
+      "certifications": ["GOTS Certified"],
+      "supply_chain_strength": "Transparent",
+      "labour_rating": "Good"
+    },
+    {
+      "rank": 3,
+      "name": "Third ethical alternative brand",
+      "category": "Apparel",
+      "ethics_score": 70,
+      "price_range": "$",
+      "price_vs_original": "Slightly cheaper",
+      "why": "Two to three sentences explaining why this brand is a better ethical choice with specific reasons.",
+      "certifications": ["Fair Labor Association"],
+      "supply_chain_strength": "Partially Transparent",
+      "labour_rating": "Good"
+    }
+  ],
+  "comparison": [
+    { "criterion": "Child Labour Risk", "original": "bad", "swap1": "good", "swap2": "good", "swap3": "mid" },
+    { "criterion": "Supply Chain Transparency", "original": "bad", "swap1": "good", "swap2": "good", "swap3": "mid" },
+    { "criterion": "Living Wage Policy", "original": "bad", "swap1": "good", "swap2": "mid", "swap3": "mid" },
+    { "criterion": "Environmental Record", "original": "mid", "swap1": "good", "swap2": "good", "swap3": "mid" },
+    { "criterion": "Forced Labour Risk", "original": "bad", "swap1": "good", "swap2": "good", "swap3": "good" }
+  ],
+  "suggested_next": ["Brand A", "Brand B", "Brand C"]
+}
+
+Now produce the same structure but with real data for the brand: "${brandName}"`;
+
+  try {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer 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' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.2,
+        max_tokens: 4000
+      })
+    });
+
+    const data = await response.json();
+    console.log('Gemini response:', JSON.stringify(data, null, 2));
+
+    if (data.error) {
+      throw new Error('API error: ' + data.error.message);
+    }
+
+    const text = data.choices?.[0]?.message?.content || '';
+    console.log('Raw text:', text);
+
+    const clean = text.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(clean);
+
+    clearInterval(msgInterval);
+    loading.classList.remove('show');
+    renderSwapResult(result);
+
+  } catch (err) {
+    clearInterval(msgInterval);
+    loading.classList.remove('show');
+    console.error('Swap error:', err);
+    // Show error in results area instead of silently reverting
+    document.getElementById('swapResults').innerHTML = `
+      <div style="text-align:center;padding:4rem 2rem;max-width:600px;margin:0 auto;">
+        <div style="font-size:2rem;margin-bottom:1rem;">⚠</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-bottom:0.8rem;">Something went wrong</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--smoke);margin-bottom:1.5rem;">${err.message}</div>
+        <button class="try-another-btn" onclick="location.reload()">↺ Try Again</button>
+      </div>`;
+    document.getElementById('swapResults').classList.add('show');
+  }
+}
+
+// ── Render results ──────────────────────────────────
+function renderSwapResult(r) {
+  const orig = r.original;
+  const color = riskColor(orig.overall_risk);
+  const bg    = riskBg(orig.overall_risk);
+
+  // Original brand card
+  document.getElementById('originalCard').innerHTML = `
+    <div class="original-brand-left">
+      <div class="original-risk-badge" style="color:${color};background:${bg};">
+        <div class="original-risk-score" style="color:${color};">${orig.risk_score}</div>
+        <div class="original-risk-label" style="color:${color};">/ 100</div>
+      </div>
+      <div>
+        <div class="original-brand-name">${orig.brand}</div>
+        ${orig.parent_company ? `<div style="font-family:'DM Mono',monospace;font-size:0.55rem;text-transform:uppercase;color:var(--smoke);margin-top:0.2rem;">Part of ${orig.parent_company}</div>` : ''}
+        <div class="original-brand-verdict">"${orig.verdict}"</div>
+      </div>
+    </div>
+    <div class="original-risk-pill" style="color:${color};border-color:${color};">
+      <span style="width:7px;height:7px;background:${color};border-radius:50%;"></span>
+      ${orig.overall_risk} RISK
+    </div>`;
+
+  // Swap cards
+  const cardsEl = document.getElementById('swapCards');
+  cardsEl.innerHTML = '';
+  (r.swaps || []).forEach((s, i) => {
+    const scoreW = s.ethics_score + '%';
+    const card = document.createElement('div');
+    card.className = 'swap-card';
+    card.innerHTML = `
+      <div class="swap-card-rank">Alternative 0${s.rank}</div>
+      <div class="swap-card-name">${s.name}</div>
+      <div class="swap-card-category">${s.category}</div>
+      <div class="score-bar-wrap">
+        <div class="score-bar-label">
+          <span>Ethics Score</span>
+          <span style="color:var(--green);">${s.ethics_score}/100</span>
+        </div>
+        <div class="score-bar-track">
+          <div class="score-bar-fill" style="--score-w:${scoreW};"></div>
+        </div>
+      </div>
+      <p class="swap-card-why">${s.why}</p>
+      <div class="swap-card-certifications">
+        ${(s.certifications || []).map(c => `<span class="cert-badge">${c}</span>`).join('')}
+      </div>
+      <div class="swap-card-footer">
+        <div class="swap-card-price">
+          <span class="price-label">Price Range</span>
+          ${s.price_range}
+        </div>
+        <div class="swap-card-savings">
+          ${s.price_vs_original}<br>
+          <span style="color:var(--smoke);font-size:0.5rem;">vs original</span>
+        </div>
+      </div>`;
+    cardsEl.appendChild(card);
+
+    // Stagger card reveal
+    setTimeout(() => {
+      card.classList.add('visible');
+      // Animate score bar after card appears
+      setTimeout(() => {
+        card.querySelector('.score-bar-fill').classList.add('animate');
+      }, 300);
+    }, i * 150);
+  });
+
+  // Comparison table
+  const names = (r.swaps || []).map(s => s.name);
+  const cellIcon = (val) => {
+    if (!val) return `<span class="cell-unknown">—</span>`;
+    const v = val.toLowerCase();
+    if (v === 'good')    return `<span class="cell-good">✓</span>`;
+    if (v === 'bad')     return `<span class="cell-bad">✕</span>`;
+    if (v === 'mid')     return `<span class="cell-mid">~</span>`;
+    return `<span class="cell-unknown">—</span>`;
+  };
+
+  const tableEl = document.getElementById('comparisonTable');
+  tableEl.innerHTML = `
+    <div class="comparison-header">
+      <span>Criterion</span>
+      <span style="color:var(--red-hot);">${orig.brand}</span>
+      ${names.map(n => `<span style="color:var(--green);">${n}</span>`).join('')}
+    </div>
+    ${(r.comparison || []).map(row => `
+      <div class="comparison-row">
+        <div class="comparison-criterion">${row.criterion}</div>
+        <div class="comparison-cell">${cellIcon(row.original)}</div>
+        <div class="comparison-cell">${cellIcon(row.swap1)}</div>
+        <div class="comparison-cell">${cellIcon(row.swap2)}</div>
+        <div class="comparison-cell">${cellIcon(row.swap3)}</div>
+      </div>`).join('')}`;
+
+  // Suggested next brands
+  const suggestEl = document.getElementById('quickSuggestions');
+  suggestEl.innerHTML = (r.suggested_next || []).map(b =>
+    `<button class="suggestion-chip" onclick="quickSearch('${b}')">${b}</button>`
+  ).join('');
+
+  // Show results
+  document.getElementById('swapResults').classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Helpers ─────────────────────────────────────────
+function quickSearch(brand) {
+  document.getElementById('swapInput').value = brand;
+  runSwap(brand);
+}
+
+document.getElementById('swapBtn').addEventListener('click', () => {
+  runSwap(document.getElementById('swapInput').value.trim());
+});
+document.getElementById('swapInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') runSwap(document.getElementById('swapInput').value.trim());
+});
+document.getElementById('tryAnotherBtn').addEventListener('click', () => {
+  document.getElementById('swapResults').classList.remove('show');
+  document.getElementById('heroSection').style.display = 'flex';
+  document.getElementById('swapInput').value = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Pre-fill from URL param e.g. swap.html?brand=Nike
+const urlBrand = new URLSearchParams(window.location.search).get('brand');
+if (urlBrand) {
+  document.getElementById('swapInput').value = urlBrand;
+  runSwap(urlBrand);
+}
+</script>
+</body>
+</html>

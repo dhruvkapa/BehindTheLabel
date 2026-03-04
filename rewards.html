@@ -133,6 +133,14 @@
       padding: 6rem 2rem 2rem; overflow-y: auto;
     }
     .mobile-nav.open { display: flex; }
+    .mobile-nav-close {
+      position: absolute; top: 1.2rem; right: 1.2rem;
+      background: none; border: 1px solid var(--ash);
+      color: var(--mist); width: 40px; height: 40px;
+      font-size: 1rem; display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .mobile-nav-close:hover { border-color: var(--red); color: var(--cream); }
     .mobile-nav a {
       font-family: 'DM Mono', monospace;
       font-size: 0.8rem; letter-spacing: 0.25em; text-transform: uppercase;
@@ -703,6 +711,7 @@
 
 <!-- Mobile Nav -->
 <div class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">✕</button>
   <a href="index.html#about">About</a>
   <a href="index.html#why">Why It Matters</a>
   <a href="forced-labour.html">Learn More</a>
@@ -835,8 +844,8 @@
         <h2 class="section-title">Earn More,<br>Save More</h2>
       </div>
       <p>
-        The more you engage with our platform - scanning brands, signing petitions,
-        sharing awareness - the higher your reward tier and the bigger your discounts.
+        The more you engage with our platform — scanning brands, signing petitions,
+        sharing awareness — the higher your reward tier and the bigger your discounts.
       </p>
     </div>
     <div class="tiers-grid reveal">
@@ -1063,18 +1072,21 @@ counterObs.observe(counterEl);
 // Mobile menu
 const menuBtn = document.getElementById('menuBtn');
 const mobileNav = document.getElementById('mobileNav');
+function closeMobileNav() {
+  mobileNav.classList.remove('open');
+  menuBtn.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 if (menuBtn) {
   menuBtn.addEventListener('click', () => {
     const isOpen = mobileNav.classList.toggle('open');
     menuBtn.classList.toggle('open', isOpen);
     document.body.style.overflow = isOpen ? 'hidden' : '';
   });
+  document.getElementById('mobileNavClose').addEventListener('click', closeMobileNav);
   document.querySelectorAll('.mobile-nav a').forEach(link => {
-    link.addEventListener('click', () => {
-      mobileNav.classList.remove('open');
-      menuBtn.classList.remove('open');
-      document.body.style.overflow = '';
-    });
+    link.addEventListener('click', closeMobileNav);
   });
 }
 
