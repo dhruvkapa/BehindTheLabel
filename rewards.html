@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rewards — Behind The Label</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:    #080808;
+      --ink:      #111111;
+      --charcoal: #1a1a1a;
+      --ash:      #2c2c2c;
+      --smoke:    #5a5a5a;
+      --mist:     #9a9a9a;
+      --cream:    #f0ebe0;
+      --parchment:#d9d0bc;
+      --red:      #c0392b;
+      --red-hot:  #e74c3c;
+      --red-dim:  #7b1e14;
+      --gold:     #b8923a;
+      --gold-light: #d4a84b;
+    }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+
+    body {
+      background: var(--black);
+      color: var(--cream);
+      font-family: 'Libre Baskerville', Georgia, serif;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    /* CURSOR */
+    .cursor-dot {
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      width: 8px; height: 8px;
+      background: var(--red-hot);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.05s;
+    }
+    .cursor-ring {
+      position: fixed; top: 0; left: 0; z-index: 9998;
+      width: 36px; height: 36px;
+      border: 1px solid rgba(231,76,60,0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: all 0.18s ease;
+    }
+    a, button { cursor: none; }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 9990;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: rgba(8,8,8,0.97);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(192,57,43,0.25);
+      transition: border-bottom-color 0.4s;
+    }
+    .navbar.scrolled { border-bottom-color: rgba(192,57,43,0.4); }
+
+    .brand {
+      display: flex; align-items: center; gap: 0.7rem;
+      text-decoration: none;
+    }
+    .brand .logo { width: 36px; height: 36px; object-fit: contain; filter: brightness(0) invert(1); }
+    .brand span {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 700;
+      letter-spacing: 0.08em; color: var(--cream); text-transform: uppercase;
+    }
+
+    nav { display: flex; align-items: center; gap: 2rem; }
+    nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--mist); text-decoration: none;
+      transition: color 0.2s; position: relative;
+    }
+    nav a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 100%;
+      height: 1px; background: var(--red); transition: right 0.3s;
+    }
+    nav a:hover { color: var(--cream); }
+    nav a:hover::after { right: 0; }
+    nav a.nav-active { color: var(--gold); }
+    nav a.nav-active::after { right: 0; background: var(--gold); }
+    nav a.nav-btn {
+      padding: 0.45rem 1.1rem;
+      border: 1px solid var(--red); color: var(--red-hot);
+    }
+    nav a.nav-btn::after { display: none; }
+    nav a.nav-btn:hover { background: var(--red); color: var(--cream); }
+
+    .menu-btn {
+      display: none;
+      flex-direction: column; justify-content: center; gap: 5px;
+      width: 40px; height: 40px;
+      background: none; border: none; padding: 8px; cursor: pointer; z-index: 600;
+    }
+    .menu-btn span {
+      display: block; width: 22px; height: 2px;
+      background: var(--cream); border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s; transform-origin: center;
+    }
+    .menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-nav {
+      display: none;
+      position: fixed; inset: 0; background: rgba(8,8,8,0.98);
+      z-index: 550; flex-direction: column; align-items: center; justify-content: center;
+      padding: 6rem 2rem 2rem; overflow-y: auto;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--mist); text-decoration: none;
+      padding: 1.2rem 0; width: 100%; text-align: center;
+      border-bottom: 1px solid var(--ash); transition: color 0.2s;
+    }
+    .mobile-nav a:first-child { border-top: 1px solid var(--ash); }
+    .mobile-nav a:hover { color: var(--cream); }
+    .mobile-nav a.nav-btn {
+      margin-top: 1.5rem; border: 1px solid var(--red);
+      color: var(--red-hot); padding: 1rem;
+    }
+
+    /* HERO */
+    .rewards-hero {
+      position: relative;
+      min-height: 70vh;
+      display: flex; align-items: center;
+      padding-top: 80px;
+      overflow: hidden;
+      background: var(--ink);
+    }
+
+    .rewards-hero::before {
+      content: 'REWARDS';
+      position: absolute;
+      font-family: 'Playfair Display', serif;
+      font-size: 22vw; font-weight: 900;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(184,146,58,0.06);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap; pointer-events: none;
+      user-select: none;
+    }
+
+    .hero-gold-line {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .rewards-hero-content {
+      position: relative; z-index: 2;
+      max-width: 1100px; margin: 0 auto; padding: 5rem 3rem;
+    }
+
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+      opacity: 0; transform: translateY(20px);
+      animation: fadeUp 0.8s 0.3s forwards;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: inline-block;
+      width: 40px; height: 1px; background: var(--gold);
+    }
+
+    .rewards-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 7vw, 6rem); font-weight: 900;
+      line-height: 1.05; margin-bottom: 2rem;
+      opacity: 0; transform: translateY(30px);
+      animation: fadeUp 1s 0.5s forwards;
+    }
+    .rewards-hero h1 em {
+      font-style: italic; color: var(--gold); display: block;
+    }
+
+    .rewards-hero-sub {
+      font-size: 1.1rem; line-height: 1.9;
+      color: var(--parchment); max-width: 560px;
+      opacity: 0; transform: translateY(20px);
+      animation: fadeUp 0.8s 0.8s forwards;
+    }
+
+    /* MARQUEE */
+    .marquee-strip {
+      background: var(--gold);
+      padding: 0.6rem 0; overflow: hidden; white-space: nowrap;
+    }
+    .marquee-track {
+      display: inline-flex; gap: 0;
+      animation: marquee 30s linear infinite;
+    }
+    .marquee-item {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--black); padding: 0 3rem;
+    }
+    .marquee-item::before { content: '⬥'; margin-right: 3rem; opacity: 0.5; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* SECTION DEFAULTS */
+    .section { padding: 8rem 0; position: relative; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 3rem; }
+
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.2rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .section-label::before {
+      content: ''; display: inline-block;
+      width: 40px; height: 1px; background: var(--gold);
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 900; line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+
+    /* REVEAL */
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* HOW IT WORKS */
+    #how { background: var(--black); }
+
+    .how-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0; border: 1px solid var(--ash); margin-top: 4rem;
+    }
+
+    .how-step {
+      padding: 3.5rem 2.5rem;
+      border-right: 1px solid var(--ash);
+      position: relative; overflow: hidden;
+      transition: background 0.4s;
+    }
+    .how-step:last-child { border-right: none; }
+    .how-step::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 100%;
+      height: 2px; background: var(--gold); transition: right 0.5s ease;
+    }
+    .how-step:hover::before { right: 0; }
+    .how-step:hover { background: var(--charcoal); }
+
+    .step-number {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.3em; color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+    .how-step h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.2;
+    }
+    .how-step p {
+      color: var(--smoke); font-size: 0.9rem; line-height: 1.8;
+    }
+
+    .step-icon {
+      font-size: 2rem; margin-bottom: 1.2rem; display: block;
+    }
+
+    /* COMING SOON / PARTNER CALLOUT */
+    #partner-callout { background: var(--ink); }
+
+    .callout-grid {
+      display: grid; grid-template-columns: 1.2fr 1fr;
+      gap: 6rem; align-items: center;
+    }
+
+    .callout-copy .section-title { margin-bottom: 1rem; }
+    .callout-copy p {
+      color: var(--smoke); line-height: 1.9; font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .callout-badge {
+      display: inline-flex; align-items: center; gap: 0.7rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(184,146,58,0.4);
+      padding: 0.6rem 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .callout-badge-dot {
+      width: 7px; height: 7px;
+      background: var(--gold); border-radius: 50%;
+      animation: goldPulse 2s ease-in-out infinite;
+    }
+    @keyframes goldPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(184,146,58,0.6); }
+      50%       { box-shadow: 0 0 0 6px rgba(184,146,58,0); }
+    }
+
+    .partner-slot {
+      position: relative;
+      background: var(--charcoal);
+      border: 1px solid var(--ash);
+      padding: 3.5rem 2.5rem;
+      text-align: center;
+      overflow: hidden;
+    }
+    .partner-slot::before {
+      content: ''; position: absolute; top: -1px; left: 2rem; right: 2rem;
+      height: 2px; background: var(--gold);
+    }
+
+    .partner-slot-inner {
+      border: 2px dashed rgba(184,146,58,0.2);
+      padding: 3rem 2rem;
+      display: flex; flex-direction: column; align-items: center; gap: 1.2rem;
+    }
+
+    .partner-slot-icon {
+      width: 60px; height: 60px;
+      border: 1px solid rgba(184,146,58,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      color: var(--gold);
+    }
+
+    .partner-slot h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; font-weight: 700; color: var(--parchment);
+    }
+    .partner-slot p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--smoke);
+    }
+
+    /* DISCOUNT TIERS */
+    #tiers { background: var(--black); }
+
+    .tiers-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 5rem; gap: 3rem;
+    }
+    .tiers-header p {
+      max-width: 360px; color: var(--smoke); font-size: 0.95rem; line-height: 1.8;
+    }
+
+    .tiers-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2px; background: var(--ash);
+    }
+
+    .tier-card {
+      background: var(--charcoal);
+      padding: 3rem 2.5rem;
+      position: relative; overflow: hidden;
+      transition: background 0.3s;
+      display: flex; flex-direction: column;
+    }
+    .tier-card:hover { background: var(--ash); }
+    .tier-card.featured {
+      background: var(--ink);
+      border-top: 2px solid var(--gold);
+    }
+    .tier-card.featured:hover { background: var(--charcoal); }
+
+    .tier-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--mist); margin-bottom: 0.8rem;
+    }
+    .tier-label.gold { color: var(--gold); }
+
+    .tier-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem; font-weight: 900;
+      margin-bottom: 0.4rem;
+    }
+
+    .tier-discount {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem; font-weight: 900;
+      color: var(--gold-light); line-height: 1;
+      margin-bottom: 1.5rem;
+    }
+    .tier-discount sup {
+      font-size: 1.5rem; vertical-align: top; margin-top: 0.5rem;
+    }
+
+    .tier-desc {
+      color: var(--smoke); font-size: 0.88rem; line-height: 1.8;
+      margin-bottom: 2rem; flex: 1;
+    }
+
+    .tier-perks {
+      list-style: none; display: flex; flex-direction: column; gap: 0.7rem;
+      border-top: 1px solid var(--ash); padding-top: 1.5rem;
+    }
+    .tier-perk {
+      display: flex; align-items: flex-start; gap: 0.7rem;
+      font-size: 0.85rem; color: var(--parchment);
+    }
+    .tier-perk-check {
+      width: 16px; height: 16px; flex-shrink: 0;
+      border: 1px solid var(--gold); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.5rem; color: var(--gold); margin-top: 2px;
+    }
+
+    .coming-soon-badge {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--black); background: var(--gold);
+      padding: 0.25rem 0.6rem;
+      margin-top: 1.5rem;
+    }
+
+    /* INTEREST FORM */
+    #interest { background: var(--ink); }
+
+    .interest-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6rem; align-items: start;
+    }
+
+    .interest-copy p {
+      color: var(--smoke); line-height: 1.9; font-size: 0.95rem; margin-bottom: 1.5rem;
+    }
+
+    .interest-stat-row {
+      display: flex; gap: 3rem; margin-top: 2.5rem;
+    }
+    .interest-stat h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 900; color: var(--gold);
+    }
+    .interest-stat p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--smoke); margin: 0;
+    }
+
+    .interest-form {
+      background: var(--charcoal);
+      border: 1px solid var(--ash);
+      padding: 2.5rem;
+      position: relative;
+    }
+    .interest-form::before {
+      content: ''; position: absolute; top: -1px; left: 2rem; right: 2rem;
+      height: 2px; background: var(--gold);
+    }
+
+    .form-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;
+    }
+    .form-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--smoke); margin-bottom: 2rem;
+    }
+
+    .form-group { margin-bottom: 1.2rem; }
+    .form-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--mist); display: block; margin-bottom: 0.5rem;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: var(--ink); border: 1px solid var(--ash);
+      padding: 0.85rem 1rem; color: var(--cream);
+      font-family: 'Libre Baskerville', serif; font-size: 0.9rem;
+      outline: none; transition: border-color 0.2s;
+      appearance: none;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--gold);
+    }
+    .form-textarea { resize: vertical; min-height: 100px; }
+    .form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a9a9a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .btn-gold {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 1rem 2.2rem;
+      background: var(--gold); color: var(--black);
+      border: none; cursor: none; width: 100%; margin-top: 0.5rem;
+      position: relative; overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .btn-gold::after {
+      content: ''; position: absolute; inset: 0;
+      background: var(--gold-light);
+      transform: translateX(-101%); transition: transform 0.3s;
+    }
+    .btn-gold:hover::after { transform: translateX(0); }
+    .btn-gold span { position: relative; z-index: 1; font-weight: 500; }
+    .btn-gold:hover { transform: translateY(-2px); }
+
+    .form-success {
+      display: none;
+      text-align: center; padding: 2rem;
+    }
+    .form-success.show { display: block; }
+    .form-success-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .form-success h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;
+    }
+    .form-success p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.12em;
+      color: var(--smoke); text-transform: uppercase;
+    }
+
+    /* COUNTER SECTION */
+    .counter-strip {
+      background: var(--gold);
+      padding: 5rem 0; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .counter-strip::before {
+      content: 'ETHICAL';
+      position: absolute;
+      font-family: 'Playfair Display', serif;
+      font-size: 20vw; font-weight: 900;
+      color: rgba(0,0,0,0.07);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap; pointer-events: none;
+    }
+    .counter-strip-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase;
+      color: rgba(8,8,8,0.6); margin-bottom: 1rem; position: relative; z-index: 1;
+    }
+    .counter-strip-number {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 10vw, 7rem); font-weight: 900;
+      color: var(--black); line-height: 1; position: relative; z-index: 1;
+    }
+    .counter-strip-caption {
+      font-size: 0.95rem; color: rgba(8,8,8,0.65);
+      margin-top: 1rem; position: relative; z-index: 1;
+    }
+
+    /* PETITION BANNER */
+    .petition-banner {
+      background: var(--red); text-align: center; padding: 1.5rem;
+    }
+    .petition-banner a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--cream); text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.8rem;
+      transition: gap 0.2s;
+    }
+    .petition-banner a:hover { gap: 1.5rem; }
+    .petition-banner a::after { content: '→'; }
+
+    /* FOOTER */
+    footer {
+      background: var(--black); padding: 2.5rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid var(--ash);
+    }
+    footer p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.15em; color: var(--smoke);
+    }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.15em;
+      color: var(--smoke); text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--cream); }
+
+    /* KEYFRAMES */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      body { cursor: auto; }
+      a, button { cursor: auto; }
+      .cursor-dot, .cursor-ring { display: none; }
+      .navbar { padding: 1rem 1.5rem; }
+      .container { padding: 0 1.5rem; }
+      .section { padding: 5rem 0; }
+      nav { display: none; }
+      .menu-btn { display: flex; }
+
+      .rewards-hero-content { padding: 3rem 1.5rem; text-align: center; }
+      .hero-eyebrow { justify-content: center; }
+      .rewards-hero-sub { margin: 0 auto; }
+
+      .how-grid { grid-template-columns: 1fr; }
+      .how-step { border-right: none; border-bottom: 1px solid var(--ash); text-align: center; }
+      .how-step:last-child { border-bottom: none; }
+
+      .callout-grid { grid-template-columns: 1fr; gap: 3rem; text-align: center; }
+      .callout-copy .section-label { justify-content: center; }
+      .callout-badge { margin: 0 auto 2rem; }
+
+      .tiers-header { flex-direction: column; text-align: center; gap: 1rem; margin-bottom: 2.5rem; }
+      .tiers-grid { grid-template-columns: 1fr; }
+
+      .interest-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .interest-copy .section-label { justify-content: center; }
+      .interest-copy .section-title, .interest-copy p { text-align: center; }
+      .interest-stat-row { justify-content: center; }
+
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem 1.5rem; }
+      .footer-links { justify-content: center; flex-wrap: wrap; }
+    }
+
+    @media (max-width: 480px) {
+      .navbar { padding: 0.9rem 1rem; }
+      .brand span { font-size: 0.85rem; }
+      .container { padding: 0 1rem; }
+      .tier-discount { font-size: 2.5rem; }
+      .interest-stat-row { gap: 1.5rem; flex-wrap: wrap; }
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      body { cursor: auto; }
+      a, button { cursor: auto; }
+      .cursor-dot, .cursor-ring { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAVBAR -->
+<header class="navbar" id="navbar">
+  <a href="index.html" class="brand">
+    <img src="logo.png" alt="Behind The Label" class="logo">
+    <span>Behind The Label</span>
+  </a>
+  <nav>
+    <a href="index.html#about">About</a>
+    <a href="index.html#why">Why It Matters</a>
+    <a href="forced-labour.html">Learn More</a>
+    <a href="index.html#tool">Our Tool</a>
+    <a href="index.html#team">Team</a>
+    <a href="index.html#partner">Partner</a>
+    <a href="rewards.html" class="nav-active">Rewards</a>
+    <a href="index.html#action" class="nav-btn">Take Action</a>
+    <a href="petition.html">Petition</a>
+  </nav>
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html#about">About</a>
+  <a href="index.html#why">Why It Matters</a>
+  <a href="forced-labour.html">Learn More</a>
+  <a href="index.html#tool">Our Tool</a>
+  <a href="index.html#team">Team</a>
+  <a href="index.html#partner">Partner</a>
+  <a href="rewards.html">Rewards</a>
+  <a href="petition.html">Petition</a>
+  <a href="index.html#action" class="nav-btn">Take Action</a>
+</div>
+
+<!-- HERO -->
+<section class="rewards-hero">
+  <div class="hero-gold-line"></div>
+  <div class="rewards-hero-content">
+    <p class="hero-eyebrow">Ethical Shopping, Rewarded</p>
+    <h1>
+      Shop with Purpose.<br>
+      <em>Earn the Difference.</em>
+    </h1>
+    <p class="rewards-hero-sub">
+      We're building partnerships with ethical brands to offer exclusive discounts to people
+      who choose to shop consciously. When you use our tool, your awareness earns real rewards.
+    </p>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="marquee-item">Ethical Discounts</span>
+    <span class="marquee-item">Conscious Choices</span>
+    <span class="marquee-item">Fair Trade Partners</span>
+    <span class="marquee-item">Verified Brands</span>
+    <span class="marquee-item">Transparent Supply Chains</span>
+    <span class="marquee-item">Rewards for Good</span>
+    <span class="marquee-item">Shop Ethically</span>
+    <span class="marquee-item">Ethical Discounts</span>
+    <span class="marquee-item">Conscious Choices</span>
+    <span class="marquee-item">Fair Trade Partners</span>
+    <span class="marquee-item">Verified Brands</span>
+    <span class="marquee-item">Transparent Supply Chains</span>
+    <span class="marquee-item">Rewards for Good</span>
+    <span class="marquee-item">Shop Ethically</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="section">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom: 1rem;">
+      <p class="section-label" style="justify-content:center;">The Programme</p>
+      <h2 class="section-title">How Rewards Will Work</h2>
+    </div>
+    <div class="how-grid reveal">
+      <div class="how-step">
+        <span class="step-icon">🔍</span>
+        <p class="step-number">01 —</p>
+        <h3>Use the Tool</h3>
+        <p>Install our browser extension and scan brands while you shop online. Our extension flags supply chain risks and highlights ethical alternatives in real time.</p>
+      </div>
+      <div class="how-step">
+        <span class="step-icon">✅</span>
+        <p class="step-number">02 —</p>
+        <h3>Choose Ethical Brands</h3>
+        <p>When you choose a brand with a verified clean supply chain, our extension recognises your decision and unlocks exclusive discount codes from our partner network.</p>
+      </div>
+      <div class="how-step">
+        <span class="step-icon">🎁</span>
+        <p class="step-number">03 —</p>
+        <h3>Redeem Your Reward</h3>
+        <p>Apply your discount at checkout. Every purchase through a partner brand helps fund our research, keeps our data up to date, and directly supports supply chain transparency.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERSHIP CALLOUT -->
+<section id="partner-callout" class="section">
+  <div class="container">
+    <div class="callout-grid">
+      <div class="callout-copy reveal">
+        <p class="section-label">Partnership Opportunity</p>
+        <h2 class="section-title">Partner<br>With Purpose</h2>
+        <div class="callout-badge">
+          <span class="callout-badge-dot"></span>
+          Accepting Applications — 2026
+        </div>
+        <p>
+          We're actively seeking ethical brands, certified fair-trade retailers, and
+          B-Corp companies who want to reach an audience that genuinely cares about
+          where products come from.
+        </p>
+        <p>
+          In exchange for offering exclusive discounts to our community, partner brands
+          receive verified placement in our extension, a trust badge on our platform,
+          and direct exposure to conscious consumers across Canada and beyond.
+        </p>
+        <p style="color: var(--mist); font-size: 0.85rem;">
+          All partners are independently vetted against ILO standards, the Walk Free
+          Foundation's Global Slavery Index, and the US DOL's TVPRA list before listing.
+        </p>
+      </div>
+      <div class="reveal">
+        <div class="partner-slot">
+          <div class="partner-slot-inner">
+            <div class="partner-slot-icon">⬡</div>
+            <h4>Your Brand Here</h4>
+            <p>Ethical partner slot — coming 2026</p>
+          </div>
+        </div>
+        <div class="partner-slot" style="margin-top: 2px;">
+          <div class="partner-slot-inner">
+            <div class="partner-slot-icon">⬡</div>
+            <h4>Your Brand Here</h4>
+            <p>Ethical partner slot — coming 2026</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISCOUNT TIERS -->
+<section id="tiers" class="section">
+  <div class="container">
+    <div class="tiers-header reveal">
+      <div>
+        <p class="section-label">Reward Tiers</p>
+        <h2 class="section-title">Earn More,<br>Save More</h2>
+      </div>
+      <p>
+        The more you engage with our platform - scanning brands, signing petitions,
+        sharing awareness - the higher your reward tier and the bigger your discounts.
+      </p>
+    </div>
+    <div class="tiers-grid reveal">
+
+      <div class="tier-card">
+        <p class="tier-label">Tier 01</p>
+        <h3 class="tier-name">Aware</h3>
+        <div class="tier-discount"><sup>Up to </sup>5%</div>
+        <p class="tier-desc">For new members who've installed the extension and completed their first brand scan.</p>
+        <ul class="tier-perks">
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Extension installed</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> 1+ brand scans</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Discount at 1 partner brand</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Newsletter access</li>
+        </ul>
+        <span class="coming-soon-badge">Coming Soon</span>
+      </div>
+
+      <div class="tier-card featured">
+        <p class="tier-label gold">Tier 02 · Most Popular</p>
+        <h3 class="tier-name">Advocate</h3>
+        <div class="tier-discount"><sup>Up to </sup>15%</div>
+        <p class="tier-desc">For members who actively scan brands, share our mission, and help grow ethical awareness.</p>
+        <ul class="tier-perks">
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> 10+ brand scans</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Petition signed</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Discount at all partner brands</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Early partner access</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Impact report badge</li>
+        </ul>
+        <span class="coming-soon-badge">Coming Soon</span>
+      </div>
+
+      <div class="tier-card">
+        <p class="tier-label">Tier 03</p>
+        <h3 class="tier-name">Champion</h3>
+        <div class="tier-discount"><sup>Up to </sup>25%</div>
+        <p class="tier-desc">For our most committed community members driving real change in ethical consumer behaviour.</p>
+        <ul class="tier-perks">
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> 50+ brand scans</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Referred 3+ friends</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Maximum partner discounts</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Champion profile badge</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Direct team access</li>
+          <li class="tier-perk"><span class="tier-perk-check">✓</span> Listed in our annual impact report</li>
+        </ul>
+        <span class="coming-soon-badge">Coming Soon</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- STAT STRIP -->
+<div class="counter-strip">
+  <p class="counter-strip-label">Why ethical shopping matters</p>
+  <div class="counter-strip-number" id="ethicalCounter">0</div>
+  <p class="counter-strip-caption">consumers globally say they'd pay more for ethical products</p>
+</div>
+
+<!-- INTEREST FORM -->
+<section id="interest" class="section">
+  <div class="container">
+    <div class="interest-inner">
+      <div class="interest-copy reveal">
+        <p class="section-label">Get Involved</p>
+        <h2 class="section-title">Be the First<br>to Know</h2>
+        <p>
+          Our Rewards programme is currently in development. Register your interest below
+          and we'll notify you the moment our first partner discounts go live.
+        </p>
+        <p>
+          Are you a brand? Use the same form to enquire about becoming a verified
+          ethical partner — our team reviews every submission.
+        </p>
+        <div class="interest-stat-row">
+          <div class="interest-stat">
+            <h4>2026</h4>
+            <p>Target launch</p>
+          </div>
+          <div class="interest-stat">
+            <h4>3+</h4>
+            <p>Partner brands<br>in talks</p>
+          </div>
+          <div class="interest-stat">
+            <h4>25%</h4>
+            <p>Max discount<br>planned</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="interest-form">
+          <div id="formContent">
+            <h3 class="form-heading">Register Interest</h3>
+            <p class="form-sub">No commitment · We'll reach out when ready</p>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="firstName">First Name</label>
+                <input type="text" id="firstName" class="form-input" placeholder="Jane">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="lastName">Last Name</label>
+                <input type="text" id="lastName" class="form-input" placeholder="Smith">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email">Email Address</label>
+              <input type="email" id="email" class="form-input" placeholder="jane@example.com">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="role">I am a…</label>
+              <select id="role" class="form-select">
+                <option value="">Select one</option>
+                <option value="consumer">Conscious Consumer</option>
+                <option value="brand">Brand / Retailer</option>
+                <option value="ngo">NGO / Non-profit</option>
+                <option value="press">Press / Media</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="message">Message (optional)</label>
+              <textarea id="message" class="form-textarea" placeholder="Tell us about your brand or why you're interested…"></textarea>
+            </div>
+
+            <button class="btn-gold" id="submitBtn"><span>Register My Interest →</span></button>
+          </div>
+
+          <div class="form-success" id="formSuccess">
+            <div class="form-success-icon">✦</div>
+            <h3>You're on the list.</h3>
+            <p>We'll be in touch when Rewards launches</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="petition-banner">
+  <a href="petition.html">Sign Our Petition — Make your voice heard</a>
+</div>
+
+<footer>
+  <p>© 2026 Behind The Label · Built for ethical awareness</p>
+  <div class="footer-links">
+    <a href="forced-labour.html">Learn More</a>
+    <a href="petition.html">Petition</a>
+    <a href="rewards.html">Rewards</a>
+    <a href="index.html#accessibility">Accessibility</a>
+  </div>
+</footer>
+
+<script>
+// Cursor
+const dot = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+if (dot && ring) {
+  document.addEventListener('mousemove', e => {
+    dot.style.left = e.clientX + 'px';
+    dot.style.top = e.clientY + 'px';
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.transform = 'translate(-50%, -50%) scale(1.6)';
+      ring.style.borderColor = 'rgba(184,146,58,0.8)';
+      dot.style.opacity = '0';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.transform = 'translate(-50%, -50%) scale(1)';
+      ring.style.borderColor = 'rgba(231,76,60,0.5)';
+      dot.style.opacity = '1';
+    });
+  });
+}
+
+// Navbar scroll
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(el => observer.observe(el));
+
+// Counter animation
+function animateCounter(el, target, suffix, duration = 2000) {
+  const start = Date.now();
+  const tick = () => {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 4);
+    const current = Math.round(ease * target);
+    el.textContent = current.toLocaleString() + suffix;
+    if (progress < 1) requestAnimationFrame(tick);
+  };
+  tick();
+}
+
+const counterEl = document.getElementById('ethicalCounter');
+const counterObs = new IntersectionObserver((entries) => {
+  if (entries[0].isIntersecting) {
+    animateCounter(counterEl, 66, '%');
+    counterObs.disconnect();
+  }
+}, { threshold: 0.4 });
+counterObs.observe(counterEl);
+
+// Mobile menu
+const menuBtn = document.getElementById('menuBtn');
+const mobileNav = document.getElementById('mobileNav');
+if (menuBtn) {
+  menuBtn.addEventListener('click', () => {
+    const isOpen = mobileNav.classList.toggle('open');
+    menuBtn.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+  document.querySelectorAll('.mobile-nav a').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileNav.classList.remove('open');
+      menuBtn.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+}
+
+// Form submission
+document.getElementById('submitBtn').addEventListener('click', () => {
+  const email = document.getElementById('email').value.trim();
+  if (!email) {
+    document.getElementById('email').style.borderColor = 'var(--red)';
+    return;
+  }
+  document.getElementById('formContent').style.opacity = '0';
+  document.getElementById('formContent').style.transition = 'opacity 0.3s';
+  setTimeout(() => {
+    document.getElementById('formContent').style.display = 'none';
+    document.getElementById('formSuccess').classList.add('show');
+  }, 300);
+});
+</script>
+</body>
+</html>

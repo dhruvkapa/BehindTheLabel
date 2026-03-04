@@ -815,6 +815,125 @@
       a, button, input, label { cursor: auto !important; }
     }
 
+    /* =========================================
+       SHAREABLE BADGE MODAL
+    ========================================= */
+    .badge-modal {
+      position: fixed; inset: 0; z-index: 9000;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(4,4,4,0.94);
+      backdrop-filter: blur(12px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+      padding: 1.5rem;
+    }
+    .badge-modal.show { opacity: 1; pointer-events: all; }
+
+    .badge-modal-inner {
+      width: 100%; max-width: 700px;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-top: 2px solid var(--red);
+      padding: 2.5rem 2rem 2rem;
+      position: relative;
+      animation: fadeUp 0.45s ease;
+      max-height: 90dvh;
+      overflow-y: auto;
+    }
+
+    .badge-modal-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: none; border: 1px solid #2a2a2a;
+      color: var(--mist); width: 36px; height: 36px;
+      font-size: 1rem; display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .badge-modal-close:hover { border-color: var(--red); color: var(--cream); }
+
+    .badge-modal-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--red-hot);
+      margin-bottom: 0.6rem;
+    }
+
+    .badge-modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; font-weight: 900;
+      margin-bottom: 0.4rem; line-height: 1.15;
+    }
+
+    .badge-modal-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.12em;
+      color: var(--mist); margin-bottom: 2rem;
+    }
+
+    /* Badge selector tabs */
+    .badge-tabs {
+      display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .badge-tab {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.45rem 1rem;
+      background: none; border: 1px solid #2a2a2a;
+      color: var(--mist); transition: all 0.2s;
+    }
+    .badge-tab.active, .badge-tab:hover {
+      border-color: var(--red); color: var(--cream);
+      background: rgba(192,57,43,0.1);
+    }
+
+    /* Canvas preview */
+    .badge-preview-wrap {
+      display: flex; justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    #badgeCanvas {
+      border: 1px solid #2a2a2a;
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Action buttons */
+    .badge-actions {
+      display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .badge-download-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.7rem 1.4rem;
+      background: var(--red); border: none; color: #fff;
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: background 0.2s; flex-shrink: 0;
+    }
+    .badge-download-btn:hover { background: var(--red-hot); }
+
+    .badge-share-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.7rem 1.2rem;
+      background: none; border: 1px solid #2a2a2a; color: var(--mist);
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .badge-share-btn:hover { border-color: var(--red); color: var(--cream); }
+
+    /* Share tip */
+    .badge-tip {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.1em;
+      color: #555; text-align: center; line-height: 1.7;
+    }
+    .badge-tip strong { color: var(--mist); }
+
     /* Keep hero layout from jumping during typewriter delete */
     .petition-hero-title em#typewriterTarget {
       display: inline-block;
@@ -845,7 +964,59 @@
     <div class="big-check">✍</div>
     <h2>Your Voice<br><em style="color:var(--red-hot);font-style:italic;">Has Been Heard</em></h2>
     <p>Signature added to the petition</p>
-    <button id="closeSuccess">Continue Reading</button>
+    <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-top:0.5rem;">
+      <button id="openBadgeBtn" style="
+        font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;
+        text-transform:uppercase;padding:0.8rem 1.6rem;
+        background:var(--red);border:none;color:#fff;transition:background 0.2s;
+      ">🎖 Get Your Badge</button>
+      <button id="closeSuccess" style="
+        font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;
+        text-transform:uppercase;padding:0.8rem 1.6rem;
+        background:transparent;border:1px solid var(--ash);color:var(--mist);
+        transition:border-color 0.2s,color 0.2s;
+      ">Continue Reading</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHAREABLE BADGE MODAL -->
+<div class="badge-modal" id="badgeModal">
+  <div class="badge-modal-inner">
+    <button class="badge-modal-close" id="badgeModalClose">✕</button>
+    <p class="badge-modal-eyebrow">🎖 Share Your Stand</p>
+    <h2 class="badge-modal-title">Download Your Badge</h2>
+    <p class="badge-modal-sub">Choose a style and share it on social media to spread the word.</p>
+
+    <div class="badge-tabs">
+      <button class="badge-tab active" data-badge="0">Bold</button>
+      <button class="badge-tab" data-badge="1">Minimal</button>
+      <button class="badge-tab" data-badge="2">Dark Grid</button>
+    </div>
+
+    <div class="badge-preview-wrap">
+      <canvas id="badgeCanvas" width="1080" height="1080" style="width:340px;height:340px;"></canvas>
+    </div>
+
+    <div class="badge-actions">
+      <button class="badge-download-btn" id="badgeDownloadBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download PNG
+      </button>
+      <button class="badge-share-btn" id="badgeShareTwitter">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        Post on X
+      </button>
+      <button class="badge-share-btn" id="badgeShareIG">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        Copy for IG
+      </button>
+    </div>
+
+    <p class="badge-tip">
+      <strong>Tip:</strong> Download the PNG and post it to Instagram, X, TikTok, or LinkedIn.<br>
+      Tag <strong>#BehindTheLabel</strong> to join the movement.
+    </p>
   </div>
 </div>
 
@@ -858,9 +1029,11 @@
   <nav>
     <a href="index.html#about">About</a>
     <a href="index.html#why">Why It Matters</a>
+    <a href="forced-labour.html">Learn More</a>
     <a href="index.html#tool">Our Tool</a>
     <a href="index.html#team">Team</a>
     <a href="index.html#partner">Partner</a>
+    <a href="rewards.html">Rewards</a>
     <a href="index.html#action" class="nav-btn">Take Action</a>
     <a href="petition.html">Petition</a>
   </nav>
@@ -873,9 +1046,11 @@
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html#about">About</a>
   <a href="index.html#why">Why It Matters</a>
+  <a href="forced-labour.html">Learn More</a>
   <a href="index.html#tool">Our Tool</a>
   <a href="index.html#team">Team</a>
   <a href="index.html#partner">Partner</a>
+  <a href="rewards.html">Rewards</a>
   <a href="petition.html">Petition</a>
   <a href="index.html#action" class="nav-btn">Take Action</a>
 </div>
@@ -1247,12 +1422,341 @@ window.setSubmitLoading = function(loading) {
 };
 
 /* Success overlay */
-window.showSuccessOverlay = function() {
+window.showSuccessOverlay = function(name) {
+  window._lastSignerName = name || '';
   document.getElementById('successOverlay').classList.add('show');
 };
 
 document.getElementById('closeSuccess').addEventListener('click', () => {
   document.getElementById('successOverlay').classList.remove('show');
+});
+
+document.getElementById('openBadgeBtn').addEventListener('click', () => {
+  document.getElementById('successOverlay').classList.remove('show');
+  openBadgeModal();
+});
+
+/* =============================================
+   SHAREABLE BADGE SYSTEM
+============================================= */
+let currentBadge = 0;
+let signerName = '';
+
+// Three badge styles rendered on canvas (1080×1080)
+const BADGE_STYLES = [
+  { id: 0, label: 'Bold',      render: renderBadgeBold },
+  { id: 1, label: 'Minimal',   render: renderBadgeMinimal },
+  { id: 2, label: 'Dark Grid', render: renderBadgeGrid },
+];
+
+function openBadgeModal(name) {
+  signerName = name || window._lastSignerName || '';
+  document.getElementById('badgeModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderBadge(0);
+}
+window.openBadgeModal = openBadgeModal;
+
+document.getElementById('badgeModalClose').addEventListener('click', () => {
+  document.getElementById('badgeModal').classList.remove('show');
+  document.body.style.overflow = '';
+});
+
+// Tab switching
+document.querySelectorAll('.badge-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.badge-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    renderBadge(parseInt(tab.dataset.badge));
+  });
+});
+
+function renderBadge(idx) {
+  currentBadge = idx;
+  BADGE_STYLES[idx].render(document.getElementById('badgeCanvas'), signerName);
+}
+
+// ── Badge 0: Bold ──────────────────────────────────────────────
+function renderBadgeBold(canvas, name) {
+  const ctx = canvas.getContext('2d');
+  const S = 1080;
+  ctx.clearRect(0, 0, S, S);
+
+  // Background
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(0, 0, S, S);
+
+  // Red top bar
+  ctx.fillStyle = '#c0392b';
+  ctx.fillRect(0, 0, S, 12);
+
+  // Red accent diagonal block
+  ctx.save();
+  ctx.fillStyle = 'rgba(192,57,43,0.08)';
+  ctx.beginPath();
+  ctx.moveTo(0, S);
+  ctx.lineTo(S * 0.65, S);
+  ctx.lineTo(S, S * 0.35);
+  ctx.lineTo(S, S);
+  ctx.fill();
+  ctx.restore();
+
+  // Noise-grain texture (subtle dots)
+  ctx.fillStyle = 'rgba(255,255,255,0.015)';
+  for (let i = 0; i < 4000; i++) {
+    ctx.fillRect(Math.random() * S, Math.random() * S, 1.5, 1.5);
+  }
+
+  // Large ghost text
+  ctx.save();
+  ctx.font = 'bold 280px serif';
+  ctx.fillStyle = 'rgba(192,57,43,0.05)';
+  ctx.textAlign = 'center';
+  ctx.fillText('BTL', S / 2, S * 0.72);
+  ctx.restore();
+
+  // Eyebrow label
+  ctx.font = '600 36px "Courier New", monospace';
+  ctx.fillStyle = '#c0392b';
+  ctx.letterSpacing = '8px';
+  ctx.textAlign = 'left';
+  ctx.fillText('I SIGNED THE PETITION', 80, 140);
+
+  // Divider line
+  ctx.strokeStyle = '#c0392b';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(80, 165); ctx.lineTo(S - 80, 165); ctx.stroke();
+
+  // Main headline
+  ctx.font = 'bold 112px "Georgia", serif';
+  ctx.fillStyle = '#f0ebe0';
+  ctx.textAlign = 'left';
+  wrapText(ctx, 'Behind The Label', 80, 310, S - 160, 130);
+
+  // Sub
+  ctx.font = '48px "Georgia", serif';
+  ctx.fillStyle = '#c0392b';
+  ctx.fillText('For Supply-Chain', 80, 570);
+  ctx.fillText('Transparency', 80, 630);
+
+  // Signer name
+  if (name) {
+    ctx.font = 'italic 38px "Georgia", serif';
+    ctx.fillStyle = '#888';
+    ctx.fillText('Signed by ' + name, 80, 730);
+  }
+
+  // Domain
+  ctx.font = '32px "Courier New", monospace';
+  ctx.fillStyle = '#444';
+  ctx.textAlign = 'right';
+  ctx.fillText('behindthelabel.ca', S - 80, S - 60);
+
+  // Bottom red bar
+  ctx.fillStyle = '#c0392b';
+  ctx.fillRect(0, S - 12, S, 12);
+}
+
+// ── Badge 1: Minimal ───────────────────────────────────────────
+function renderBadgeMinimal(canvas, name) {
+  const ctx = canvas.getContext('2d');
+  const S = 1080;
+  ctx.clearRect(0, 0, S, S);
+
+  // Off-white background
+  ctx.fillStyle = '#f5f0e8';
+  ctx.fillRect(0, 0, S, S);
+
+  // Black border inset
+  ctx.strokeStyle = '#0a0a0a';
+  ctx.lineWidth = 24;
+  ctx.strokeRect(36, 36, S - 72, S - 72);
+
+  // Inner red hairline
+  ctx.strokeStyle = '#c0392b';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(60, 60, S - 120, S - 120);
+
+  // Large circle
+  ctx.beginPath();
+  ctx.arc(S / 2, S / 2 - 40, 340, 0, Math.PI * 2);
+  ctx.strokeStyle = '#0a0a0a';
+  ctx.lineWidth = 6;
+  ctx.stroke();
+
+  // Icon pen stroke
+  ctx.font = '160px serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#c0392b';
+  ctx.fillText('✍', S / 2, S / 2 + 60);
+
+  // Eyebrow
+  ctx.font = 'bold 34px "Courier New", monospace';
+  ctx.fillStyle = '#0a0a0a';
+  ctx.letterSpacing = '6px';
+  ctx.fillText('BEHIND THE LABEL', S / 2, 180);
+
+  // Main text
+  ctx.font = 'bold 70px "Georgia", serif';
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillText('I SIGNED', S / 2, S - 260);
+
+  // Red line
+  ctx.fillStyle = '#c0392b';
+  ctx.fillRect(S / 2 - 180, S - 230, 360, 4);
+
+  // Signer name
+  if (name) {
+    ctx.font = 'italic 36px "Georgia", serif';
+    ctx.fillStyle = '#555';
+    ctx.fillText(name, S / 2, S - 180);
+  }
+
+  // Domain
+  ctx.font = '28px "Courier New", monospace';
+  ctx.fillStyle = '#999';
+  ctx.fillText('behindthelabel.ca', S / 2, S - 90);
+}
+
+// ── Badge 2: Dark Grid ─────────────────────────────────────────
+function renderBadgeGrid(canvas, name) {
+  const ctx = canvas.getContext('2d');
+  const S = 1080;
+  ctx.clearRect(0, 0, S, S);
+
+  // Deep dark background
+  ctx.fillStyle = '#060608';
+  ctx.fillRect(0, 0, S, S);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 1;
+  const cell = 54;
+  for (let x = 0; x <= S; x += cell) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, S); ctx.stroke();
+  }
+  for (let y = 0; y <= S; y += cell) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(S, y); ctx.stroke();
+  }
+
+  // Glowing red circle
+  const grd = ctx.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, 420);
+  grd.addColorStop(0, 'rgba(192,57,43,0.18)');
+  grd.addColorStop(1, 'rgba(192,57,43,0)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, S, S);
+
+  // Outer ring
+  ctx.beginPath();
+  ctx.arc(S / 2, S / 2, 400, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(192,57,43,0.4)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Inner ring
+  ctx.beginPath();
+  ctx.arc(S / 2, S / 2, 360, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(192,57,43,0.15)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Curved text around top arc
+  drawArcText(ctx, '— BEHIND THE LABEL —', S / 2, S / 2, 390, -Math.PI * 0.8, '#c0392b', 'bold 32px "Courier New", monospace');
+
+  // Central icon
+  ctx.font = '130px serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#f0ebe0';
+  ctx.fillText('✍', S / 2, S / 2 + 48);
+
+  // Main label
+  ctx.font = 'bold 68px "Georgia", serif';
+  ctx.fillStyle = '#f0ebe0';
+  ctx.fillText('I SIGNED', S / 2, S / 2 + 180);
+
+  // Red underline
+  ctx.fillStyle = '#c0392b';
+  ctx.fillRect(S / 2 - 140, S / 2 + 200, 280, 3);
+
+  // Sub-label
+  ctx.font = '30px "Courier New", monospace';
+  ctx.fillStyle = '#666';
+  ctx.letterSpacing = '4px';
+  ctx.fillText('THE PETITION', S / 2, S / 2 + 255);
+
+  // Signer name
+  if (name) {
+    ctx.font = 'italic 34px "Georgia", serif';
+    ctx.fillStyle = '#555';
+    ctx.fillText(name, S / 2, S / 2 + 310);
+  }
+
+  // Bottom arc text
+  drawArcText(ctx, 'behindthelabel.ca  •  2026', S / 2, S / 2, 390, Math.PI * 0.17, '#444', '28px "Courier New", monospace');
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ');
+  let line = '';
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+      ctx.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    } else { line = testLine; }
+  }
+  ctx.fillText(line, x, y);
+}
+
+function drawArcText(ctx, text, cx, cy, r, startAngle, color, font) {
+  ctx.save();
+  ctx.font = font;
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const totalAngle = (text.length * 0.062);
+  let angle = startAngle - totalAngle / 2;
+  for (const char of text) {
+    ctx.save();
+    ctx.translate(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+    ctx.rotate(angle + Math.PI / 2);
+    ctx.fillText(char, 0, 0);
+    ctx.restore();
+    angle += 0.062;
+  }
+  ctx.restore();
+}
+
+// ── Download ───────────────────────────────────────────────────
+document.getElementById('badgeDownloadBtn').addEventListener('click', () => {
+  const canvas = document.getElementById('badgeCanvas');
+  const link = document.createElement('a');
+  link.download = `behind-the-label-badge-${BADGE_STYLES[currentBadge].label.toLowerCase().replace(/\s+/g, '-')}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+// ── Share: X/Twitter ───────────────────────────────────────────
+document.getElementById('badgeShareTwitter').addEventListener('click', () => {
+  const text = encodeURIComponent('I signed the Behind The Label petition demanding supply-chain transparency. Join me. 🏷️ #BehindTheLabel #ForcedLabour #EthicalConsumer');
+  const url = encodeURIComponent('https://behindthelabel.ca/petition.html');
+  window.open(`https://x.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+});
+
+// ── Share: Copy for IG ─────────────────────────────────────────
+document.getElementById('badgeShareIG').addEventListener('click', async (e) => {
+  const caption = `I signed the Behind The Label petition 🏷️\n\nDemanding supply-chain transparency and real accountability for forced labour. Download your badge and join the movement.\n\n#BehindTheLabel #ForcedLabour #EthicalConsumer #SupplyChain #HumanRights`;
+  try {
+    await navigator.clipboard.writeText(caption);
+    const btn = e.currentTarget;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ Copied!';
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  } catch {
+    alert('Caption:\n\n' + caption);
+  }
 });
 </script>
 
