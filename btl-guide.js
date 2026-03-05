@@ -10,14 +10,16 @@
   const GROQ_KEY = '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';
   const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
+  const SITE_BASE = 'https://behindthelabel.page.gd';
+
   const SYSTEM_PROMPT = `You are Ada, the friendly AI guide for "Behind The Label" — a Canadian student-led project fighting forced labour in global fashion supply chains.
 
-SITE PAGES:
-- Home (index.html): Stats, browser extension info, team, live forced-labour map, brand ethics search (🔍 button), camera brand scanner
-- Ethical Swap (swap.html): Type any brand → get 3 ethical alternatives with ethics scores, certifications, price comparisons
-- Rewards (rewards.html): Ethical brands offering discounts to conscious shoppers — interest registration form
-- Petition (petition.html): Sign and demand supply chain transparency from fashion brands
-- Learn More (forced-labour.html): Deep dive into ILO data, Walk Free Foundation stats, US DOL TVPRA list
+SITE PAGES (always use the full URL when linking):
+- Home: ${SITE_BASE}/index.html — Stats, browser extension info, team, live forced-labour map, brand ethics search (🔍 button), camera brand scanner
+- Ethical Swap: ${SITE_BASE}/swap.html — Type any brand → get 3 ethical alternatives with ethics scores, certifications, price comparisons
+- Rewards: ${SITE_BASE}/rewards.html — Ethical brands offering discounts to conscious shoppers — interest registration form
+- Petition: ${SITE_BASE}/petition.html — Sign and demand supply chain transparency from fashion brands
+- Learn More: ${SITE_BASE}/forced-labour.html — Deep dive into ILO data, Walk Free Foundation stats, US DOL TVPRA list
 
 KEY FACTS:
 - 27.6 million people in forced labour globally (ILO 2022)
@@ -27,7 +29,7 @@ KEY FACTS:
 
 PERSONALITY: Warm, concise (2–4 sentences), action-oriented. Never preachy. Always suggest what the user can DO next.
 
-NAVIGATION: Guide users to: 🔍 button for brand search, swap.html for alternatives, petition.html to sign, rewards.html to join, forced-labour.html to learn more.`;
+NAVIGATION: When directing users to a page, ALWAYS format links as markdown: [Page Name](full_url). For example: [Petition page](https://behindthelabel.page.gd/petition.html) or [Learn More](https://behindthelabel.page.gd/forced-labour.html). Never write out a raw URL on its own. Always wrap every link in markdown format so it becomes a clickable hyperlink.`;
 
   const QUICK_PROMPTS = [
     'What is Behind The Label?',
@@ -324,7 +326,6 @@ NAVIGATION: Guide users to: 🔍 button for brand search, swap.html for alternat
   <!-- inner glints -->
   <path d="M50 54 L36 20 L44 37 Z" fill="white" opacity="0.07"/>
   <path d="M50 54 L50 11 L54 33 Z" fill="white" opacity="0.05"/>
-  <!-- FACE on mid-left facet -->
   <!-- left eye open -->
   <g id="gem-eye-L">
     <ellipse cx="34" cy="66" rx="4.5" ry="3.8" fill="white" opacity="0.92"/>
@@ -559,13 +560,24 @@ NAVIGATION: Guide users to: 🔍 button for brand search, swap.html for alternat
   }, 1200); // show quickly — 1.2 s after page load
 
   /* ── MESSAGES ────────────────────────────────────────────────── */
+  function parseMarkdown (text) {
+    // 1. Convert markdown [label](url) → clickable <a>
+    let html = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:underline;font-weight:600;">$1</a>');
+    // 2. Convert any remaining bare https:// URLs → clickable <a> (fallback)
+    html = html.replace(/(?<!['"=])(https?:\/\/[^\s<)"]+)/g,
+      '<a href="$1" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:underline;font-weight:600;">$1</a>');
+    return html;
+  }
+
   function addMsg (role, text) {
     const row = document.createElement('div');
     row.className = `ada-row ${role === 'user' ? 'user-row' : ''}`;
+    const html = role === 'ada' ? parseMarkdown(text) : text;
     if (role === 'ada') {
-      row.innerHTML = `<div class="ada-row-icon">${GEM_MINI}</div><div class="ada-bubble">${text}</div>`;
+      row.innerHTML = `<div class="ada-row-icon">${GEM_MINI}</div><div class="ada-bubble">${html}</div>`;
     } else {
-      row.innerHTML = `<div class="ada-bubble">${text}</div>`;
+      row.innerHTML = `<div class="ada-bubble">${html}</div>`;
     }
     msgsEl.appendChild(row);
     msgsEl.scrollTop = msgsEl.scrollHeight;

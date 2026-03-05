@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Child Slavery and Forced Labour - Behind The Label</title>
 
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=2" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
   
 
@@ -245,7 +248,839 @@
     }
 
     /* ── Mobile: 480px ── */
+    /* =========================================
+       GAME HUB SECTION
+    ========================================= */
+
+    /* Design tokens */
+    /* ── Navbar CSS variables & styles (matching index.html) ── */
+    :root {
+      --black:   #080808;
+      --ink:     #111111;
+      --ash:     #2c2c2c;
+      --mist:    #9a9a9a;
+      --cream:   #f0ebe0;
+      --red:     #c0392b;
+      --red-hot: #e74c3c;
+    }
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: rgba(8,8,8,0.97);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(192,57,43,0.25);
+      transition: border-bottom-color 0.4s;
+    }
+    .navbar.scrolled { border-bottom-color: rgba(192,57,43,0.4); }
+    .brand { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; }
+    .brand .logo { width: 36px; height: 36px; object-fit: contain; filter: brightness(0) invert(1); }
+    .brand span {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 700; letter-spacing: 0.08em;
+      color: var(--cream); text-transform: uppercase;
+    }
+    nav { display: flex; align-items: center; gap: 2rem; }
+    nav a {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--mist); text-decoration: none; transition: color 0.2s; position: relative;
+    }
+    nav a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 100%;
+      height: 1px; background: var(--red); transition: right 0.3s;
+    }
+    nav a:hover { color: var(--cream); }
+    nav a:hover::after { right: 0; }
+    nav a.nav-btn { padding: 0.45rem 1.1rem; border: 1px solid var(--red); color: var(--red-hot); }
+    nav a.nav-btn::after { display: none; }
+    nav a.nav-btn:hover { background: var(--red); color: var(--cream); }
+    .live-tab {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--red-hot); background: none; border: 1px solid rgba(231,76,60,0.4);
+      padding: 0.35rem 0.85rem; cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .live-tab:hover { background: rgba(231,76,60,0.1); border-color: var(--red-hot); color: var(--cream); }
+    .live-dot {
+      width: 7px; height: 7px; background: var(--red-hot); border-radius: 50%; flex-shrink: 0;
+      animation: livePulse 1.4s ease-in-out infinite;
+    }
+    @keyframes livePulse {
+      0%,100% { opacity:1; transform:scale(1); box-shadow:0 0 0 0 rgba(231,76,60,0.7); }
+      50% { opacity:0.85; transform:scale(1.15); box-shadow:0 0 0 5px rgba(231,76,60,0); }
+    }
+    .live-tab--mobile {
+      margin-top: 1.5rem; width: 100%; justify-content: center;
+      font-size: 0.8rem; padding: 1rem; border-color: var(--red);
+    }
+    .menu-btn {
+      display: none; flex-direction: column; justify-content: center; gap: 5px;
+      width: 40px; height: 40px; background: none; border: none;
+      padding: 8px; cursor: pointer; z-index: 600; position: relative;
+    }
+    .menu-btn span {
+      display: block; width: 22px; height: 2px;
+      background: var(--cream); border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s; transform-origin: center;
+    }
+    .menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-nav {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(8,8,8,0.98); z-index: 550;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 0; padding: 6rem 2rem 2rem; overflow-y: auto;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--mist); text-decoration: none;
+      padding: 1.2rem 0; width: 100%; text-align: center;
+      border-bottom: 1px solid var(--ash); transition: color 0.2s;
+    }
+    .mobile-nav a:first-child { border-top: 1px solid var(--ash); }
+    .mobile-nav a:hover, .mobile-nav a:active { color: var(--cream); }
+    .mobile-nav a.nav-btn { margin-top: 1.5rem; border: 1px solid var(--red); color: var(--red-hot); padding: 1rem; }
+    @media (max-width: 900px) {
+      .navbar { padding: 1rem 1.5rem !important; }
+      nav { display: none !important; }
+      .menu-btn { display: flex !important; }
+    }
     @media (max-width: 480px) {
+      .navbar { padding: 0.9rem 1rem !important; }
+    }
+
+    :root {
+      --gh-bg:      #08090a;
+      --gh-surface: #101215;
+      --gh-border:  rgba(255,255,255,0.07);
+      --gh-red:     #c0392b;
+      --gh-red-glow:rgba(192,57,43,0.22);
+      --gh-gold:    #c9a030;
+      --gh-cream:   #f0ebe0;
+      --gh-muted:   #6b6560;
+      --gh-accent:  #c0392b;
+      --gh-mono:    'IBM Plex Mono', monospace;
+    }
+
+    /* ── Section wrapper ── */
+    .game-hub-section {
+      background: var(--gh-bg);
+      padding: 7rem 2rem 5rem;
+      position: relative;
+      overflow: hidden;
+      border-top: 1px solid rgba(192,57,43,0.25);
+    }
+
+    /* ── Ambient particles ── */
+    .gh-particles {
+      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+    }
+    .gh-particles span {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--gh-red);
+      filter: blur(80px);
+      opacity: 0;
+      animation: ghDrift var(--d,18s) ease-in-out var(--dl,0s) infinite alternate;
+    }
+    .gh-particles span:nth-child(1) { width:500px;height:500px; top:-10%; left:-5%; --d:20s; --dl:0s; opacity:0.04; }
+    .gh-particles span:nth-child(2) { width:300px;height:300px; top:40%; right:5%; --d:25s; --dl:3s; opacity:0.03; background:var(--gh-gold); }
+    .gh-particles span:nth-child(3) { width:400px;height:400px; bottom:-15%; left:40%; --d:22s; --dl:6s; opacity:0.04; }
+    .gh-particles span:nth-child(4) { width:200px;height:200px; top:20%; left:60%; --d:18s; --dl:2s; opacity:0.025; background:var(--gh-gold); }
+    .gh-particles span:nth-child(5) { width:350px;height:350px; top:60%; left:15%; --d:28s; --dl:8s; opacity:0.03; }
+    .gh-particles span:nth-child(6) { width:250px;height:250px; top:10%; right:25%; --d:16s; --dl:4s; opacity:0.035; background:var(--gh-gold); }
+    .gh-particles span:nth-child(7) { width:180px;height:180px; bottom:10%; right:10%; --d:21s; --dl:10s; opacity:0.04; }
+    .gh-particles span:nth-child(8) { width:420px;height:420px; top:50%; left:-10%; --d:30s; --dl:5s; opacity:0.025; background:var(--gh-gold); }
+    @keyframes ghDrift {
+      0%   { transform: translate(0,0) scale(1); }
+      100% { transform: translate(40px,60px) scale(1.15); }
+    }
+
+    /* ── Header ── */
+    .gh-header {
+      text-align: center;
+      margin-bottom: 4rem;
+      position: relative; z-index: 2;
+    }
+    .gh-eyebrow {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-family: var(--gh-mono);
+      font-size: 0.65rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--gh-gold);
+      margin-bottom: 1rem;
+    }
+    .gh-eyebrow-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--gh-red);
+      box-shadow: 0 0 8px var(--gh-red);
+      animation: ghDotPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes ghDotPulse {
+      0%,100% { box-shadow: 0 0 4px var(--gh-red); }
+      50%      { box-shadow: 0 0 16px var(--gh-red), 0 0 32px rgba(192,57,43,0.3); }
+    }
+    .gh-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      color: var(--gh-cream);
+      line-height: 1.0;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.75rem;
+    }
+    .gh-title em {
+      font-style: italic;
+      color: var(--gh-red);
+      -webkit-text-stroke: 1px var(--gh-red);
+    }
+    .gh-subtitle {
+      font-family: var(--gh-mono);
+      font-size: 0.8rem; letter-spacing: 0.1em;
+      color: var(--gh-muted);
+    }
+
+    /* ── Card grid ── */
+    .gh-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      max-width: 1280px;
+      margin: 0 auto;
+      position: relative; z-index: 2;
+    }
+    @media (max-width: 1100px) { .gh-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px)  { .gh-grid { grid-template-columns: 1fr; gap: 1rem; } }
+
+    /* ── Individual card ── */
+    .gh-card {
+      background: var(--gh-surface);
+      border: 1px solid var(--gh-border);
+      display: flex; flex-direction: column;
+      position: relative; overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.35s cubic-bezier(0.22,1,0.36,1),
+                  border-color 0.3s, box-shadow 0.3s;
+      animation: ghCardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .gh-card:nth-child(1) { animation-delay: 0.1s; }
+    .gh-card:nth-child(2) { animation-delay: 0.2s; }
+    .gh-card:nth-child(3) { animation-delay: 0.3s; }
+    .gh-card:nth-child(4) { animation-delay: 0.4s; }
+    @keyframes ghCardIn {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .gh-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(192,57,43,0.5);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(192,57,43,0.15);
+    }
+    .gh-card:focus-visible {
+      outline: 2px solid var(--gh-red);
+      outline-offset: 3px;
+    }
+
+    /* Accent top bar — each card gets unique colour strip */
+    .gh-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--card-stripe, var(--gh-red));
+      transition: height 0.3s;
+    }
+    .gh-card:hover::before { height: 5px; }
+    .gh-card--detective { --card-stripe: #c0392b; --gh-accent: #c0392b; }
+    .gh-card--quiz      { --card-stripe: #c9a030; --gh-accent: #c9a030; }
+    .gh-card--flip      { --card-stripe: #2d7d9a; --gh-accent: #2d7d9a; }
+    .gh-card--sort      { --card-stripe: #2d8a4e; --gh-accent: #2d8a4e; }
+
+    /* Radial glow on hover */
+    .gh-card-glow {
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 0%, var(--card-stripe) 0%, transparent 65%);
+      opacity: 0; transition: opacity 0.4s;
+      border-radius: inherit;
+    }
+    .gh-card:hover .gh-card-glow { opacity: 0.07; }
+
+    .gh-card-inner { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+
+    .gh-card-top {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; margin-bottom: 1.1rem;
+    }
+    .gh-icon-wrap {
+      width: 48px; height: 48px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--gh-border);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .gh-card:hover .gh-icon-wrap {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.15);
+    }
+    .gh-icon {
+      width: 26px; height: 26px;
+      color: var(--card-stripe);
+    }
+
+    .gh-card-badge {
+      font-family: var(--gh-mono);
+      font-size: 0.6rem; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--card-stripe);
+      border: 1px solid currentColor;
+      padding: 0.2rem 0.5rem;
+      opacity: 0.8;
+    }
+
+    .gh-card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem; letter-spacing: 0.04em;
+      color: var(--gh-cream);
+      margin-bottom: 0.6rem;
+      transition: color 0.2s;
+    }
+    .gh-card:hover .gh-card-title { color: #fff; }
+
+    .gh-card-desc {
+      font-family: var(--gh-mono);
+      font-size: 0.72rem; line-height: 1.75;
+      color: var(--gh-muted);
+      flex: 1; margin-bottom: 1rem;
+    }
+
+    .gh-card-tags {
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+    .gh-card-tags span {
+      font-family: var(--gh-mono);
+      font-size: 0.58rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.04);
+      padding: 0.2rem 0.5rem;
+    }
+
+    .gh-card-footer {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .gh-difficulty {
+      font-family: var(--gh-mono);
+      font-size: 0.62rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 0.35rem;
+    }
+    .gh-difficulty span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--gh-border);
+    }
+    .gh-difficulty--easy   span:nth-child(1) { background: #2d8a4e; }
+    .gh-difficulty--medium span:nth-child(1),
+    .gh-difficulty--medium span:nth-child(2) { background: #c9a030; }
+    .gh-difficulty--hard span { background: #c0392b; }
+    .gh-difficulty--easy   { color: #2d8a4e; }
+    .gh-difficulty--medium { color: #c9a030; }
+    .gh-difficulty--hard   { color: #c0392b; }
+    .gh-time {
+      font-family: var(--gh-mono);
+      font-size: 0.62rem; color: var(--gh-muted);
+    }
+
+    /* ── Play button ── */
+    .gh-play-btn {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      font-family: var(--gh-mono);
+      font-size: 0.72rem; letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.04);
+      color: var(--gh-cream);
+      border: none;
+      border-top: 1px solid var(--gh-border);
+      padding: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .gh-play-btn::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--card-stripe);
+      transform: translateX(-101%);
+      transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    .gh-play-btn:hover::before { transform: translateX(0); }
+    .gh-play-btn svg, .gh-play-btn span { position: relative; z-index: 1; }
+    .gh-play-btn:hover { color: #fff; }
+
+    /* ── Bottom strip ── */
+    .gh-bottom-strip {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+      max-width: 1280px; margin: 3rem auto 0;
+      padding-top: 2rem;
+      border-top: 1px solid var(--gh-border);
+      position: relative; z-index: 2;
+    }
+    .gh-bottom-strip p {
+      font-family: var(--gh-mono);
+      font-size: 0.68rem; letter-spacing: 0.08em;
+      color: var(--gh-muted);
+    }
+    .gh-strip-link {
+      font-family: var(--gh-mono);
+      font-size: 0.68rem; letter-spacing: 0.1em;
+      color: var(--gh-gold);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .gh-strip-link:hover { border-color: var(--gh-gold); }
+
+    /* ══════════════════════════════════════════
+       GAME MODAL
+    ══════════════════════════════════════════ */
+    .gh-modal {
+      display: none;
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(8px);
+      align-items: flex-start; justify-content: center;
+      padding: 1.5rem 1rem 1rem;
+      overflow-y: auto;
+      animation: ghModalIn 0.3s ease both;
+    }
+    .gh-modal.open { display: flex; }
+    @keyframes ghModalIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .gh-modal-inner {
+      position: relative;
+      width: 100%; max-width: 780px;
+      min-height: 90vh;
+      animation: ghModalSlide 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes ghModalSlide {
+      from { transform: translateY(30px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .gh-modal-close {
+      position: sticky; top: 0; left: 100%;
+      z-index: 10; float: right;
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+      margin-bottom: 0.5rem;
+      flex-shrink: 0;
+    }
+    .gh-modal-close:hover { background: var(--gh-red); border-color: var(--gh-red); }
+    #gh-modal-content { clear: both; }
+
+    /* ══════════════════════════════════════════
+       GAME: DETECTIVE (embedded minimal)
+    ══════════════════════════════════════════ */
+    .gm-detective {
+      --ink: #09080a; --paper: #f2e8d0; --aged: #e8d8b0;
+      --rust: #c0392b; --blood: #8b1a10; --gold: #c9a030;
+      --smoke: #6b5e4a; --mist: #d4c9b0; --stamp: #a83228;
+      --green: #2d5a27;
+      font-family: 'IBM Plex Mono', monospace;
+      background: #09080a;
+      border-radius: 0;
+      min-height: 80vh;
+    }
+    .gm-detective .det-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.8rem 1.5rem;
+      background: #050404;
+      border-bottom: 1px solid #2a1f14;
+    }
+    .det-case-id {
+      font-size: 0.65rem; letter-spacing: 0.2em;
+      color: #6b5e4a; text-transform: uppercase;
+    }
+    .det-case-id em { color: #c9a030; font-style: normal; }
+    .det-progress { display: flex; gap: 5px; align-items: center; }
+    .det-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #2a1f14; border: 1px solid #3a2f20;
+      transition: all 0.4s;
+    }
+    .det-dot.done  { background: #2d5a27; border-color: #2d5a27; }
+    .det-dot.active{ background: #c9a030; border-color: #c9a030; box-shadow: 0 0 8px #c9a030; }
+    .det-score { font-size: 0.7rem; color: #6b5e4a; }
+    .det-score strong { color: #c9a030; }
+
+    .det-area { padding: 1.5rem; }
+
+    .det-dossier {
+      background: #f2e8d0; color: #1a0e06;
+      position: relative;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+      animation: dossierIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes dossierIn {
+      from { opacity:0; transform:translateY(20px) rotate(-0.5deg); }
+      to   { opacity:1; transform:translateY(0) rotate(0); }
+    }
+    .det-dossier-hdr {
+      background: #09080a; color: #f2e8d0;
+      padding: 1rem 1.5rem;
+      border-bottom: 3px solid #c0392b;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .det-file-label { font-size: 0.6rem; letter-spacing: 0.3em; color: #6b5e4a; text-transform:uppercase; margin-bottom:0.2rem; }
+    .det-h2 { font-family: 'IBM Plex Mono',monospace; font-size: clamp(1rem,3vw,1.4rem); color:#f2e8d0; font-weight:700; }
+    .det-step-num { font-size: 2.5rem; font-weight:700; color:#c0392b; opacity:0.4; line-height:1; }
+
+    .det-body { padding: 1.2rem 1.5rem; }
+    .det-doc { font-size:0.83rem; line-height:1.9; color:#2a1806; margin-bottom:1rem; }
+    .det-doc strong { color:#8b1a10; }
+
+    .det-redact {
+      display:inline-block; background:#1a0e06; color:transparent;
+      padding:0 4px; cursor:pointer; transition:all 0.3s;
+      min-width:60px; text-align:center; user-select:none;
+      position:relative;
+    }
+    .det-redact::after { content:'▓▓▓'; color:#2a1a0a; font-size:0.75em; }
+    .det-redact.det-revealed { background:#c0392b; color:#f2e8d0; font-weight:700; animation:revFlash 0.35s ease; }
+    .det-redact.det-revealed::after { content:''; }
+    @keyframes revFlash { 0%{background:#c9a030;} 100%{background:#c0392b;} }
+
+    .det-evidence {
+      display:grid; grid-template-columns:repeat(4,1fr); gap:0.6rem; margin:1rem 0;
+    }
+    @media(max-width:500px){ .det-evidence { grid-template-columns:repeat(2,1fr); } }
+    .det-ev-photo {
+      background:#1a0e06; padding:5px 5px 22px; cursor:pointer;
+      position:relative; transform:rotate(var(--r));
+      transition:transform 0.3s, box-shadow 0.3s;
+      box-shadow:2px 2px 8px rgba(0,0,0,0.5);
+    }
+    .det-ev-photo:hover { transform:rotate(0deg) scale(1.06); z-index:5; box-shadow:5px 5px 20px rgba(0,0,0,0.8); }
+    .det-ev-inner { display:flex; align-items:center; justify-content:center; aspect-ratio:1; font-size:2rem; background:#0e0806; border:1px solid #2a1a0a; }
+    .det-ev-lbl { position:absolute; bottom:3px; left:0; right:0; text-align:center; font-size:0.5rem; color:#6b5e4a; letter-spacing:0.08em; text-transform:uppercase; }
+    .det-ev-photo.det-ev-sel .det-ev-inner { border:2px solid #c0392b; }
+
+    .det-note {
+      background:#fdf5d8; border-left:3px solid #c9a030;
+      padding:0.8rem 1rem; margin:0.8rem 0;
+      font-style:italic; font-size:0.82rem; color:#3a2810; line-height:1.7;
+      transform:rotate(-0.4deg); box-shadow:1px 1px 6px rgba(0,0,0,0.1);
+      position:relative;
+    }
+    .det-note-attr { display:block; text-align:right; font-style:normal; font-size:0.62rem; color:#6b5e4a; margin-top:0.4rem; }
+
+    .det-q-area { border-top:2px dashed #d4c9b0; padding-top:1rem; margin-top:0.5rem; }
+    .det-q-lbl { font-size:0.6rem; letter-spacing:0.25em; color:#6b5e4a; text-transform:uppercase; margin-bottom:0.6rem; }
+    .det-q-text { font-size:clamp(0.88rem,2.2vw,1rem); color:#8b1a10; margin-bottom:1rem; line-height:1.5; font-style:italic; }
+
+    .det-choices { display:flex; flex-direction:column; gap:0.5rem; }
+    .det-choice {
+      display:flex; align-items:flex-start; gap:0.7rem;
+      background:none; border:1px solid #c4b89a; padding:0.6rem 0.9rem;
+      cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:0.78rem;
+      color:#2a1806; text-align:left; transition:all 0.2s; position:relative; overflow:hidden;
+    }
+    .det-choice::before { content:''; position:absolute; inset:0; background:#1a0e06; transform:translateX(-101%); transition:transform 0.25s ease; z-index:0; }
+    .det-choice:hover::before { transform:translateX(0); }
+    .det-choice:hover { color:#f2e8d0; border-color:#1a0e06; }
+    .det-c-ltr { width:18px;height:18px; background:#1a0e06; color:#f2e8d0; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:700; flex-shrink:0; position:relative; z-index:1; }
+    .det-choice:hover .det-c-ltr { background:#c0392b; }
+    .det-c-txt { position:relative; z-index:1; line-height:1.5; }
+    .det-choice.det-correct { border-color:#2d5a27; background:#0a1c0c; color:#7dd87a; pointer-events:none; }
+    .det-choice.det-correct .det-c-ltr { background:#2d5a27; }
+    .det-choice.det-wrong { border-color:#c0392b; background:#180808; color:#e07070; pointer-events:none; text-decoration:line-through; }
+    .det-choice.det-wrong .det-c-ltr { background:#c0392b; }
+    .det-choice.det-disabled { pointer-events:none; opacity:0.4; }
+
+    .det-verdict { display:none; margin-top:1rem; padding:0.9rem 1.1rem; border:2px solid #c0392b; background:#f8ede0; animation:vIn 0.4s ease both; }
+    @keyframes vIn { from{opacity:0;transform:scale(0.97)} to{opacity:1;transform:scale(1)} }
+    .det-verdict.show { display:block; }
+    .det-verdict-lbl { font-size:0.58rem; letter-spacing:0.25em; color:#a83228; text-transform:uppercase; margin-bottom:0.4rem; }
+    .det-verdict-txt { font-size:0.8rem; line-height:1.8; color:#2a1408; }
+    .det-verdict-txt strong { color:#8b1a10; }
+    .det-verdict-stat { display:inline-block; background:#c0392b; color:#f2e8d0; font-size:0.65rem; padding:0.18rem 0.5rem; margin-top:0.5rem; }
+
+    .det-next { display:none; width:100%; background:#09080a; color:#f2e8d0; border:none; font-family:'IBM Plex Mono',monospace; font-size:0.75rem; letter-spacing:0.18em; text-transform:uppercase; padding:0.9rem; cursor:pointer; border-top:2px solid #c0392b; transition:background 0.2s; }
+    .det-next:hover { background:#c0392b; }
+    .det-next.show { display:block; }
+
+    .det-stamp { position:absolute; top:0.8rem; right:1rem; font-family:'IBM Plex Mono',monospace; font-size:0.75rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.3rem 0.7rem; border:2.5px solid; transform:rotate(12deg); opacity:0; transition:opacity 0.4s 0.3s; pointer-events:none; }
+    .det-stamp.show-exposed { color:#a83228; border-color:#a83228; opacity:0.8; }
+    .det-stamp.show-cleared { color:#2d5a27; border-color:#2d5a27; opacity:0.7; }
+
+    /* Detective results */
+    .det-results {
+      min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:3rem 1.5rem; background:#09080a; text-align:center;
+    }
+    .det-closed-stamp {
+      font-family:'IBM Plex Mono',monospace; font-size:2.8rem; font-weight:700;
+      color:#c0392b; border:5px double #c0392b; padding:0.4rem 1.2rem;
+      transform:rotate(-5deg); display:inline-block; margin-bottom:1.5rem;
+      animation:stampBounce 0.5s cubic-bezier(0.36,0.07,0.19,0.97) both;
+    }
+    @keyframes stampBounce { 0%{transform:rotate(-5deg)scale(2);opacity:0} 60%{transform:rotate(-5deg)scale(0.95)} 100%{transform:rotate(-5deg)scale(1);opacity:1} }
+    .det-results h3 { font-family:'IBM Plex Mono',monospace; font-size:clamp(1.1rem,3vw,1.6rem); color:#f2e8d0; margin-bottom:0.8rem; font-weight:700; }
+    .det-final-score { font-size:4rem; font-weight:700; color:#c9a030; line-height:1; margin:0.5rem 0; text-shadow:0 0 30px rgba(201,160,48,0.4); }
+    .det-rank { font-size:0.7rem; letter-spacing:0.25em; color:#6b5e4a; text-transform:uppercase; margin-bottom:2rem; }
+    .det-findings { width:100%; max-width:500px; text-align:left; margin-bottom:1.5rem; }
+    .det-finding { display:flex; gap:0.8rem; padding:0.7rem 0.9rem; border-left:3px solid #c0392b; background:rgba(192,57,43,0.07); margin-bottom:0.5rem; font-size:0.78rem; color:#d4c9b0; line-height:1.6; animation:findIn 0.4s ease both; }
+    .det-finding strong { color:#c9a030; }
+    .det-finding:nth-child(1){animation-delay:0.2s} .det-finding:nth-child(2){animation-delay:0.35s} .det-finding:nth-child(3){animation-delay:0.5s} .det-finding:nth-child(4){animation-delay:0.65s} .det-finding:nth-child(5){animation-delay:0.8s}
+    @keyframes findIn { from{opacity:0;transform:translateX(-16px)} to{opacity:1;transform:translateX(0)} }
+    .det-share-card { background:#f2e8d0; color:#1a0e06; padding:1.2rem; width:100%; max-width:440px; margin:0 auto 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:0.75rem; text-align:left; box-shadow:0 8px 30px rgba(0,0,0,0.5); }
+    .det-share-card h4 { font-size:0.9rem; margin-bottom:0.4rem; font-weight:700; }
+    .det-share-card p { color:#6b5e4a; line-height:1.7; border-top:1px dashed #c4b89a; padding-top:0.5rem; margin-top:0.5rem; }
+    .det-share-url { color:#c0392b; font-size:0.6rem; display:block; margin-top:0.4rem; }
+    .det-btn-row { display:flex; flex-wrap:wrap; gap:0.7rem; justify-content:center; margin-top:0.5rem; }
+    .det-btn-primary { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; background:#c0392b; color:#f2e8d0; border:none; padding:0.8rem 1.8rem; cursor:pointer; transition:background 0.2s; }
+    .det-btn-primary:hover { background:#8b1a10; }
+    .det-btn-sec { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; background:transparent; color:#f2e8d0; border:1px solid rgba(255,255,255,0.2); padding:0.8rem 1.8rem; cursor:pointer; transition:all 0.2s; }
+    .det-btn-sec:hover { border-color:#c9a030; color:#c9a030; }
+
+    /* ══════════════════════════════════════════
+       GAME: TRIVIA QUIZ
+    ══════════════════════════════════════════ */
+    .gm-quiz {
+      background: #09080a;
+      min-height: 80vh;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .quiz-topbar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0.9rem 1.5rem; background:#050404;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    .quiz-title-bar { font-size:0.65rem; letter-spacing:0.2em; color:#6b5e4a; text-transform:uppercase; }
+    .quiz-title-bar em { color:#c9a030; font-style:normal; }
+    .quiz-timer {
+      display:flex; align-items:center; gap:0.5rem;
+      font-size:0.75rem; font-weight:700; color:#c9a030;
+    }
+    .quiz-timer .timer-icon { font-size:1rem; }
+    .quiz-timer.danger { color:#c0392b; animation:timerDanger 0.5s ease-in-out infinite alternate; }
+    @keyframes timerDanger { from{opacity:1} to{opacity:0.4} }
+    .quiz-progress-bar { height:3px; background:rgba(255,255,255,0.06); }
+    .quiz-progress-fill { height:100%; background:var(--gh-red); transition:width 0.8s linear; }
+
+    .quiz-body { padding:2rem 1.5rem; }
+    .quiz-q-num { font-size:0.6rem; letter-spacing:0.25em; color:#c9a030; text-transform:uppercase; margin-bottom:0.6rem; }
+    .quiz-q-text {
+      font-size:clamp(1rem,3vw,1.3rem); color:#f0ebe0;
+      line-height:1.5; margin-bottom:1.8rem;
+      font-weight:700; letter-spacing:-0.01em;
+    }
+    .quiz-choices { display:grid; grid-template-columns:1fr 1fr; gap:0.7rem; margin-bottom:1.5rem; }
+    @media(max-width:500px){ .quiz-choices{grid-template-columns:1fr;} }
+    .quiz-choice {
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.09);
+      padding:0.9rem 1rem;
+      cursor:pointer;
+      font-family:'IBM Plex Mono',monospace;
+      font-size:0.78rem; color:#a09888;
+      text-align:left; transition:all 0.2s;
+      display:flex; gap:0.7rem; align-items:flex-start;
+    }
+    .quiz-choice:hover { background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.2); color:#f0ebe0; }
+    .quiz-c-ltr { width:20px;height:20px; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; font-size:0.62rem; font-weight:700; flex-shrink:0; color:#c9a030; }
+    .quiz-choice.correct { background:rgba(45,90,39,0.2); border-color:#2d5a27; color:#7dd87a; pointer-events:none; }
+    .quiz-choice.correct .quiz-c-ltr { background:#2d5a27; color:#fff; }
+    .quiz-choice.wrong { background:rgba(192,57,43,0.15); border-color:#c0392b; color:#e07070; pointer-events:none; text-decoration:line-through; }
+    .quiz-choice.wrong .quiz-c-ltr { background:#c0392b; color:#fff; }
+    .quiz-choice.disabled { pointer-events:none; opacity:0.4; }
+    .quiz-fact { display:none; background:rgba(201,160,48,0.07); border-left:3px solid #c9a030; padding:0.9rem 1.1rem; font-size:0.78rem; line-height:1.7; color:#c4b89a; margin-bottom:1rem; animation:vIn 0.35s ease both; }
+    .quiz-fact.show { display:block; }
+    .quiz-fact strong { color:#c9a030; }
+    .quiz-next { background:rgba(255,255,255,0.04); border:none; border-top:1px solid rgba(255,255,255,0.06); width:100%; padding:0.9rem; color:#f0ebe0; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; cursor:pointer; display:none; transition:background 0.2s; }
+    .quiz-next:hover { background:rgba(192,57,43,0.3); }
+    .quiz-next.show { display:block; }
+
+    .quiz-score-bar { display:flex; align-items:center; justify-content:space-between; padding:0.6rem 1.5rem; background:rgba(255,255,255,0.02); border-top:1px solid rgba(255,255,255,0.04); font-size:0.65rem; color:#6b5e4a; }
+    .quiz-score-bar strong { color:#c9a030; }
+
+    /* Quiz results */
+    .quiz-results { text-align:center; padding:3rem 1.5rem; background:#09080a; }
+    .quiz-results-score { font-size:5rem; font-weight:700; color:#c9a030; text-shadow:0 0 30px rgba(201,160,48,0.4); }
+    .quiz-results-label { font-size:0.7rem; letter-spacing:0.25em; color:#6b5e4a; text-transform:uppercase; margin:0.3rem 0 1.5rem; }
+    .quiz-results-msg { font-size:clamp(1rem,2.5vw,1.3rem); color:#f0ebe0; font-weight:700; margin-bottom:2rem; }
+    .quiz-result-breakdown { max-width:460px; margin:0 auto 2rem; text-align:left; }
+    .quiz-rb-item { display:flex; justify-content:space-between; padding:0.6rem 0.9rem; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.75rem; color:#a09888; }
+    .quiz-rb-item.q-right { color:#7dd87a; }
+    .quiz-rb-item.q-wrong { color:#e07070; }
+
+    /* ══════════════════════════════════════════
+       GAME: CARD FLIP
+    ══════════════════════════════════════════ */
+    .gm-flip {
+      background:#09080a; min-height:80vh;
+      font-family:'IBM Plex Mono',monospace; padding-bottom:2rem;
+    }
+    .flip-topbar { display:flex; align-items:center; justify-content:space-between; padding:0.9rem 1.5rem; background:#050404; border-bottom:1px solid rgba(255,255,255,0.06); }
+    .flip-topbar-title { font-size:0.65rem; letter-spacing:0.2em; color:#6b5e4a; text-transform:uppercase; }
+    .flip-topbar-title em { color:#2d7d9a; font-style:normal; }
+    .flip-score { font-size:0.7rem; color:#6b5e4a; }
+    .flip-score strong { color:#2d7d9a; }
+    .flip-header { padding:1.5rem 1.5rem 0.5rem; }
+    .flip-intro { font-size:0.78rem; color:#a09888; line-height:1.6; margin-bottom:0.3rem; }
+    .flip-intro em { color:#2d7d9a; font-style:normal; font-weight:700; }
+    .flip-grid {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:0.8rem; padding:1rem 1.5rem;
+    }
+    @media(max-width:600px){ .flip-grid{grid-template-columns:repeat(2,1fr);} }
+    .flip-card-wrap { perspective:1000px; height:140px; cursor:pointer; }
+    @media(max-width:600px){ .flip-card-wrap{height:110px;} }
+    .flip-card {
+      width:100%; height:100%;
+      position:relative; transform-style:preserve-3d;
+      transition:transform 0.6s cubic-bezier(0.4,0,0.2,1);
+    }
+    .flip-card-wrap:hover .flip-card:not(.flipped) { transform:rotateY(12deg); }
+    .flip-card.flipped { transform:rotateY(180deg); }
+    .flip-front, .flip-back {
+      position:absolute; inset:0;
+      backface-visibility:hidden;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:0.6rem; text-align:center;
+    }
+    .flip-front {
+      background:#101416;
+      border:1px solid rgba(45,125,154,0.2);
+    }
+    .flip-front .flip-brand { font-size:0.85rem; font-weight:700; color:#f0ebe0; line-height:1.3; }
+    .flip-front .flip-hint { font-size:0.55rem; letter-spacing:0.15em; color:rgba(45,125,154,0.6); text-transform:uppercase; margin-top:0.5rem; }
+    .flip-front .flip-category { font-size:0.6rem; color:rgba(255,255,255,0.2); text-transform:uppercase; letter-spacing:0.1em; margin-top:0.2rem; }
+    .flip-back {
+      background:#0d1a1f;
+      border:2px solid;
+      transform:rotateY(180deg);
+      padding:0.6rem;
+    }
+    .flip-back.flip-bad { border-color:#c0392b; background:#130808; }
+    .flip-back.flip-ok  { border-color:#c9a030; background:#13100a; }
+    .flip-back.flip-good{ border-color:#2d8a4e; background:#081309; }
+    .flip-back .flip-verdict { font-size:0.62rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.3rem; }
+    .flip-back.flip-bad  .flip-verdict { color:#e07070; }
+    .flip-back.flip-ok   .flip-verdict { color:#e0c870; }
+    .flip-back.flip-good .flip-verdict { color:#7dd87a; }
+    .flip-back .flip-truth { font-size:0.6rem; color:rgba(255,255,255,0.5); line-height:1.5; }
+    .flip-back .flip-score-icon { font-size:1.4rem; margin-bottom:0.3rem; }
+
+    .flip-all-done { display:none; padding:2rem 1.5rem; text-align:center; }
+    .flip-all-done.show { display:block; }
+    .flip-all-done h3 { font-size:1.5rem; font-weight:700; color:#f0ebe0; margin-bottom:0.5rem; }
+    .flip-all-done p { font-size:0.78rem; color:#a09888; margin-bottom:1.5rem; }
+
+    /* ══════════════════════════════════════════
+       GAME: SORT
+    ══════════════════════════════════════════ */
+    .gm-sort {
+      background:#09080a; min-height:80vh;
+      font-family:'IBM Plex Mono',monospace; padding-bottom:2rem;
+    }
+    .sort-topbar { display:flex; align-items:center; justify-content:space-between; padding:0.9rem 1.5rem; background:#050404; border-bottom:1px solid rgba(255,255,255,0.06); }
+    .sort-topbar-title { font-size:0.65rem; letter-spacing:0.2em; color:#6b5e4a; text-transform:uppercase; }
+    .sort-topbar-title em { color:#2d8a4e; font-style:normal; }
+    .sort-progress { font-size:0.65rem; color:#6b5e4a; }
+    .sort-progress strong { color:#2d8a4e; }
+
+    .sort-body { padding:1rem 1.5rem; }
+    .sort-item-area { min-height:100px; display:flex; align-items:center; justify-content:center; padding:1rem; margin-bottom:1rem; }
+    .sort-item-card {
+      background:#181512; border:1px solid rgba(255,255,255,0.08);
+      padding:1.2rem 1.5rem; width:100%; max-width:480px;
+      animation:sortCardIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes sortCardIn { from{opacity:0;transform:translateY(16px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+    .sort-item-icon { font-size:2rem; margin-bottom:0.5rem; }
+    .sort-item-name { font-size:clamp(0.9rem,2.5vw,1.1rem); font-weight:700; color:#f0ebe0; margin-bottom:0.3rem; }
+    .sort-item-clue { font-size:0.72rem; color:#6b5e4a; line-height:1.6; }
+
+    .sort-bins {
+      display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;
+    }
+    .sort-bin {
+      padding:1.2rem 1rem;
+      border:2px dashed;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      min-height:100px;
+      cursor:pointer; transition:all 0.2s; position:relative;
+    }
+    .sort-bin--exploit { border-color:rgba(192,57,43,0.4); }
+    .sort-bin--ethical { border-color:rgba(45,138,78,0.4); }
+    .sort-bin:hover { transform:scale(1.02); }
+    .sort-bin--exploit:hover { border-color:#c0392b; background:rgba(192,57,43,0.08); }
+    .sort-bin--ethical:hover { border-color:#2d8a4e; background:rgba(45,138,78,0.08); }
+    .sort-bin-icon { font-size:1.8rem; margin-bottom:0.4rem; }
+    .sort-bin-label { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; font-weight:700; }
+    .sort-bin--exploit .sort-bin-label { color:#e07070; }
+    .sort-bin--ethical .sort-bin-label { color:#7dd87a; }
+    .sort-bin-sub { font-size:0.57rem; color:#6b5e4a; margin-top:0.2rem; text-align:center; }
+
+    .sort-feedback { display:none; border-left:3px solid; padding:0.8rem 1rem; margin-bottom:1rem; animation:vIn 0.3s ease both; }
+    .sort-feedback.show { display:block; }
+    .sort-feedback.correct { border-color:#2d8a4e; background:rgba(45,138,78,0.08); }
+    .sort-feedback.wrong   { border-color:#c0392b; background:rgba(192,57,43,0.08); }
+    .sort-feedback-label { font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; font-weight:700; margin-bottom:0.4rem; }
+    .sort-feedback.correct .sort-feedback-label { color:#7dd87a; }
+    .sort-feedback.wrong   .sort-feedback-label { color:#e07070; }
+    .sort-feedback-text { font-size:0.75rem; color:#a09888; line-height:1.7; }
+    .sort-feedback-text strong { color:#c9a030; }
+    .sort-next { display:none; width:100%; background:rgba(255,255,255,0.04); border:none; border-top:1px solid rgba(255,255,255,0.06); padding:0.9rem; color:#f0ebe0; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; cursor:pointer; transition:background 0.2s; }
+    .sort-next:hover { background:rgba(45,138,78,0.25); }
+    .sort-next.show { display:block; }
+    .sort-score-bar { display:flex; justify-content:space-between; padding:0.5rem 1.5rem; background:rgba(255,255,255,0.02); border-top:1px solid rgba(255,255,255,0.04); font-size:0.65rem; color:#6b5e4a; }
+    .sort-score-bar strong { color:#2d8a4e; }
+
+    .sort-results { text-align:center; padding:3rem 1.5rem; }
+    .sort-results h3 { font-size:1.5rem; font-weight:700; color:#f0ebe0; margin-bottom:0.5rem; }
+    .sort-final-score { font-size:4.5rem; font-weight:700; color:#2d8a4e; text-shadow:0 0 30px rgba(45,138,78,0.4); }
+    .sort-results-label { font-size:0.7rem; letter-spacing:0.25em; color:#6b5e4a; margin:0.3rem 0 1.5rem; }
+    .sort-results-msg { font-size:0.85rem; color:#a09888; max-width:400px; margin:0 auto 2rem; line-height:1.7; }
+
+    /* Shared reset/share button style for all games */
+    .gm-btn-row { display:flex; flex-wrap:wrap; gap:0.7rem; justify-content:center; margin-top:1rem; }
+    .gm-btn-primary { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; background:#c0392b; color:#f2e8d0; border:none; padding:0.8rem 1.8rem; cursor:pointer; transition:background 0.2s; }
+    .gm-btn-primary:hover { background:#8b1a10; }
+    .gm-btn-sec { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; background:transparent; color:#f0ebe0; border:1px solid rgba(255,255,255,0.15); padding:0.8rem 1.8rem; cursor:pointer; transition:all 0.2s; }
+    .gm-btn-sec:hover { border-color:#c9a030; color:#c9a030; }
+
+    /* ── Scroll-reveal for game hub ── */
+    .game-hub-section .gh-card,
+    .game-hub-section .gh-header {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1);
+    }
+    .game-hub-section.in-view .gh-header { opacity:1; transform:translateY(0); transition-delay:0s; }
+    .game-hub-section.in-view .gh-card:nth-child(1) { opacity:1; transform:translateY(0); transition-delay:0.1s; }
+    .game-hub-section.in-view .gh-card:nth-child(2) { opacity:1; transform:translateY(0); transition-delay:0.18s; }
+    .game-hub-section.in-view .gh-card:nth-child(3) { opacity:1; transform:translateY(0); transition-delay:0.26s; }
+    .game-hub-section.in-view .gh-card:nth-child(4) { opacity:1; transform:translateY(0); transition-delay:0.34s; }
+
+    @media (max-width:600px) {
+      .game-hub-section { padding:4rem 1rem 3rem; }
+      .gh-bottom-strip { flex-direction:column; text-align:center; }
+    }
+  
       .navbar { padding: 0.9rem 1rem !important; }
       .brand span { font-size: 0.82rem !important; }
 
@@ -291,30 +1126,27 @@
 <body>
 
 <!-- PETITION ALERT BANNER -->
-<div class="petition-alert" id="petitionAlert" role="alert">
-  <span class="petition-alert-dot"></span>
-  <span class="petition-alert-text"><strong>Make your voice heard</strong> — sign our petition for supply-chain transparency</span>
-  <a href="petition.html" class="petition-alert-link">Sign Now →</a>
-  <button class="petition-alert-close" id="petitionAlertClose" aria-label="Dismiss">✕</button>
-</div>
+
 
 <!-- ================= NAVBAR ================= -->
-    
-<header class="navbar">
+
+<header class="navbar" id="navbar">
   <a href="index.html" class="brand">
-    <img src="logo.png" alt="Behind The Label Logo" class="logo">
+    <img src="logo.png" alt="Behind The Label" class="logo">
     <span>Behind The Label</span>
   </a>
-
   <nav>
     <a href="index.html#about">About</a>
     <a href="index.html#why">Why It Matters</a>
+    <a href="forced-labour.html" class="learn-more-link">Learn More</a>
     <a href="index.html#tool">Our Tool</a>
     <a href="index.html#team">Team</a>
     <a href="index.html#partner">Partner</a>
-    <a href="index.html#accessibility">Accessibility</a>
     <a href="index.html#action" class="nav-btn">Take Action</a>
     <a href="petition.html">Petition</a>
+    <button class="live-tab" id="liveTabBtn" aria-label="Open Live Feed" onclick="window.location.href='index.html#live'">
+      <span class="live-dot"></span>Live
+    </button>
   </nav>
   <button class="menu-btn" id="menuBtn" aria-label="Open menu">
     <span></span><span></span><span></span>
@@ -324,12 +1156,15 @@
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html#about">About</a>
   <a href="index.html#why">Why It Matters</a>
+  <a href="forced-labour.html">Learn More</a>
   <a href="index.html#tool">Our Tool</a>
   <a href="index.html#team">Team</a>
   <a href="index.html#partner">Partner</a>
-  <a href="index.html#accessibility">Accessibility</a>
   <a href="petition.html">Petition</a>
   <a href="index.html#action" class="nav-btn">Take Action</a>
+  <button class="live-tab live-tab--mobile" onclick="closeMobileNav(); window.location.href='index.html#live'">
+    <span class="live-dot"></span>Live Map
+  </button>
 </div>
 
 <!-- ================= HERO ================= -->
@@ -1165,13 +2000,781 @@
   </div>
 </section>
 
+<!-- ================= GAME HUB ================= -->
+<section id="game-hub" class="game-hub-section">
+
+  <!-- Ambient background particles -->
+  <div class="gh-particles" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+  </div>
+
+  <!-- Section header -->
+  <div class="gh-header">
+    <p class="gh-eyebrow">
+      <span class="gh-eyebrow-dot"></span>
+      Interactive Learning
+    </p>
+    <h2 class="gh-title">Test What You <em>Really</em> Know</h2>
+    <p class="gh-subtitle">Four ways to go deeper. Pick your challenge.</p>
+  </div>
+
+  <!-- Game mode cards -->
+  <div class="gh-grid">
+
+    <!-- CARD 1: Detective Investigation -->
+    <div class="gh-card gh-card--detective" data-game="detective" tabindex="0">
+      <div class="gh-card-glow"></div>
+      <div class="gh-card-inner">
+        <div class="gh-card-top">
+          <div class="gh-icon-wrap">
+            <svg class="gh-icon" viewBox="0 0 48 48" fill="none">
+              <circle cx="20" cy="20" r="12" stroke="currentColor" stroke-width="2.5"/>
+              <circle cx="20" cy="20" r="7" fill="currentColor" opacity="0.12"/>
+              <line x1="29" y1="29" x2="42" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              <path d="M16 19 L19 22 L24 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
+              <circle cx="20" cy="14" r="1.5" fill="currentColor" opacity="0.6"/>
+              <circle cx="26" cy="18" r="1.5" fill="currentColor" opacity="0.6"/>
+            </svg>
+          </div>
+          <div class="gh-card-badge">5 cases</div>
+        </div>
+        <h3 class="gh-card-title">The Supply Chain Files</h3>
+        <p class="gh-card-desc">Investigate a fashion brand's hidden supply chain. Unredact classified documents, examine evidence, and expose what they don't want you to find.</p>
+        <div class="gh-card-tags">
+          <span>Investigation</span><span>Story-driven</span><span>Shocking facts</span>
+        </div>
+        <div class="gh-card-footer">
+          <span class="gh-difficulty gh-difficulty--hard">
+            <span></span><span></span><span></span> Hard
+          </span>
+          <span class="gh-time">~8 min</span>
+        </div>
+      </div>
+      <button class="gh-play-btn" onclick="openGame('detective')">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.54L6.3 2.84z"/></svg>
+        Open Case Files
+      </button>
+    </div>
+
+    <!-- CARD 2: Trivia Quiz -->
+    <div class="gh-card gh-card--quiz" data-game="quiz" tabindex="0">
+      <div class="gh-card-glow"></div>
+      <div class="gh-card-inner">
+        <div class="gh-card-top">
+          <div class="gh-icon-wrap">
+            <svg class="gh-icon" viewBox="0 0 48 48" fill="none">
+              <rect x="6" y="8" width="36" height="32" rx="3" stroke="currentColor" stroke-width="2.5"/>
+              <line x1="14" y1="18" x2="34" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+              <line x1="14" y1="24" x2="34" y2="24" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+              <line x1="14" y1="30" x2="24" y2="30" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+              <circle cx="37" cy="37" r="8" fill="var(--gh-accent)"/>
+              <text x="37" y="41" text-anchor="middle" font-size="10" fill="white" font-weight="700">?</text>
+            </svg>
+          </div>
+          <div class="gh-card-badge">10 questions</div>
+        </div>
+        <h3 class="gh-card-title">Supply Chain Trivia</h3>
+        <p class="gh-card-desc">Fast-fire questions about forced labour, child labour stats, and brand accountability. How much do you really know? Race against the clock.</p>
+        <div class="gh-card-tags">
+          <span>Trivia</span><span>Timed</span><span>Shareable score</span>
+        </div>
+        <div class="gh-card-footer">
+          <span class="gh-difficulty gh-difficulty--medium">
+            <span></span><span></span><span></span> Medium
+          </span>
+          <span class="gh-time">~4 min</span>
+        </div>
+      </div>
+      <button class="gh-play-btn" onclick="openGame('quiz')">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.54L6.3 2.84z"/></svg>
+        Start Quiz
+      </button>
+    </div>
+
+    <!-- CARD 3: Card Flip -->
+    <div class="gh-card gh-card--flip" data-game="flip" tabindex="0">
+      <div class="gh-card-glow"></div>
+      <div class="gh-card-inner">
+        <div class="gh-card-top">
+          <div class="gh-icon-wrap">
+            <svg class="gh-icon" viewBox="0 0 48 48" fill="none">
+              <rect x="6" y="10" width="22" height="30" rx="3" stroke="currentColor" stroke-width="2.5" transform="rotate(-8 6 10)"/>
+              <rect x="18" y="8" width="22" height="30" rx="3" stroke="currentColor" stroke-width="2.5" fill="var(--gh-accent)" opacity="0.15" transform="rotate(6 18 8)"/>
+              <path d="M20 22 L28 22 M24 18 L24 26" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" transform="rotate(6 18 8)"/>
+            </svg>
+          </div>
+          <div class="gh-card-badge">16 cards</div>
+        </div>
+        <h3 class="gh-card-title">Flip the Label</h3>
+        <p class="gh-card-desc">Flip a brand card to reveal the hidden truth behind its supply chain. Some will shock you. Match brands to their practices before time runs out.</p>
+        <div class="gh-card-tags">
+          <span>Card flip</span><span>Brands revealed</span><span>Surprising</span>
+        </div>
+        <div class="gh-card-footer">
+          <span class="gh-difficulty gh-difficulty--easy">
+            <span></span><span></span><span></span> Easy
+          </span>
+          <span class="gh-time">~3 min</span>
+        </div>
+      </div>
+      <button class="gh-play-btn" onclick="openGame('flip')">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.54L6.3 2.84z"/></svg>
+        Flip Cards
+      </button>
+    </div>
+
+    <!-- CARD 4: Drag & Drop Sort -->
+    <div class="gh-card gh-card--sort" data-game="sort" tabindex="0">
+      <div class="gh-card-glow"></div>
+      <div class="gh-card-inner">
+        <div class="gh-card-top">
+          <div class="gh-icon-wrap">
+            <svg class="gh-icon" viewBox="0 0 48 48" fill="none">
+              <rect x="4" y="16" width="18" height="22" rx="2.5" stroke="currentColor" stroke-width="2.5"/>
+              <rect x="26" y="10" width="18" height="22" rx="2.5" stroke="currentColor" stroke-width="2.5" opacity="0.5"/>
+              <path d="M13 10 L13 4 L35 4 L35 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="13" cy="27" r="3" fill="currentColor" opacity="0.4"/>
+              <circle cx="35" cy="21" r="3" fill="var(--gh-accent)" opacity="0.8"/>
+              <path d="M20 8 L28 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 2"/>
+            </svg>
+          </div>
+          <div class="gh-card-badge">20 items</div>
+        </div>
+        <h3 class="gh-card-title">Sort the Supply Chain</h3>
+        <p class="gh-card-desc">Drag products into ethical or exploitative buckets. Think you know which brands are accountable? The answers will challenge what you assume.</p>
+        <div class="gh-card-tags">
+          <span>Drag & drop</span><span>Decision</span><span>Eye-opening</span>
+        </div>
+        <div class="gh-card-footer">
+          <span class="gh-difficulty gh-difficulty--medium">
+            <span></span><span></span><span></span> Medium
+          </span>
+          <span class="gh-time">~5 min</span>
+        </div>
+      </div>
+      <button class="gh-play-btn" onclick="openGame('sort')">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.54L6.3 2.84z"/></svg>
+        Start Sorting
+      </button>
+    </div>
+
+  </div><!-- /gh-grid -->
+
+  <!-- Bottom CTA strip -->
+  <div class="gh-bottom-strip">
+    <p>All games are grounded in verified data from ILO, Walk Free, and peer-reviewed sources.</p>
+    <a href="btl-detective.html" class="gh-strip-link">Play the full detective game →</a>
+  </div>
+
+</section>
+
+<!-- ================= GAME MODAL OVERLAY ================= -->
+<div id="gh-modal" class="gh-modal" role="dialog" aria-modal="true" aria-label="Game">
+  <div class="gh-modal-inner">
+    <button class="gh-modal-close" onclick="closeGame()" aria-label="Close game">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="18"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+    </button>
+    <div id="gh-modal-content"></div>
+  </div>
+</div>
+
 <!-- ================= FOOTER ================= -->
 <footer>
   <p>© 2026 Behind The Label • Built for ethical awareness</p>
 </footer>
 
 
-<script src="btl.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════
+// SCROLL REVEAL for game hub
+// ══════════════════════════════════════════════════════════
+(function(){
+  const hub = document.getElementById('game-hub');
+  if (!hub) return;
+  const obs = new IntersectionObserver(([e]) => {
+    if (e.isIntersecting) { hub.classList.add('in-view'); obs.disconnect(); }
+  }, { threshold: 0.1 });
+  obs.observe(hub);
+})();
+
+// ══════════════════════════════════════════════════════════
+// MODAL OPEN / CLOSE
+// ══════════════════════════════════════════════════════════
+function openGame(type) {
+  const modal = document.getElementById('gh-modal');
+  const content = document.getElementById('gh-modal-content');
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if      (type === 'detective') renderDetective(content);
+  else if (type === 'quiz')      renderQuiz(content);
+  else if (type === 'flip')      renderFlip(content);
+  else if (type === 'sort')      renderSort(content);
+}
+function closeGame() {
+  document.getElementById('gh-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  // Reset all game states
+  detState = null; quizState = null; flipState = null; sortState = null;
+}
+// Close on backdrop click
+document.getElementById('gh-modal').addEventListener('click', function(e){
+  if (e.target === this) closeGame();
+});
+
+// ══════════════════════════════════════════════════════════
+// ── GAME 1: DETECTIVE ────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+let detState = null;
+
+const DET_CASES = [
+  { id:'001', title:'The $8 T-Shirt', subtitle:'Investigate the price tag', step:'01',
+    doc:`A popular fast-fashion retailer advertises a <strong>cotton t-shirt for $7.99</strong>. It is their bestselling item. A whistleblower leaked internal docs to our unit. The factory's country of origin: <span class="det-redact" data-r="Dhaka, Bangladesh">█████</span>. The compliance audit was <span class="det-redact" data-r="falsified">████████</span> last quarter.`,
+    evidence:[{i:'👕',l:'Garment Tag'},{i:'📋',l:'Audit Report'},{i:'💰',l:'Wage Ledger'},{i:'🏭',l:'Factory Photo'}],
+    rot:['-2deg','1.5deg','-1deg','2deg'],
+    note:'A worker earns ~$95/month. The CEO earned $14.2M last year. The shirt retails for $7.99.',
+    noteAttr:'— Leaked memo, March 2024',
+    q:'If a garment worker earns $95/month making 250+ shirts daily, how much do they earn per shirt?',
+    choices:['About $0.38 — less than half a percent of the retail price','About $2.00 — the brand takes the rest as margin','About $4.00 — roughly half the price','About $0.02 — close to nothing at all'],
+    correct:0,
+    verdict:`The garment worker earns approximately <strong>$0.38 per shirt</strong> — that's just <strong>0.6% of the $7.99 retail price</strong>. Logistics, brand margin, and executive pay absorb the rest. This is systemic, not incidental.`,
+    stat:'Workers earn ≈ 0.6% of retail price', stamp:'EXPOSED' },
+
+  { id:'002', title:'The Cocoa Connection', subtitle:'Follow the supply chain upstream', step:'02',
+    doc:`Customs records flagged cocoa beans from Côte d'Ivoire to a UK confectionery brand. ILO field reports confirm workers as young as <span class="det-redact" data-r="10 years old">████████</span> on source plantations. International certification logos appear on all final products despite no on-site verification in <span class="det-redact" data-r="4 years">███████</span>.`,
+    evidence:[{i:'🍫',l:'Chocolate Bar'},{i:'🌿',l:'Farm Records'},{i:'🚢',l:'Shipping Log'},{i:'🏷️',l:'Fair Trade Cert'}],
+    rot:['2deg','-1.5deg','1deg','-2deg'],
+    note:'Children on these farms often cannot attend school. Harvest season runs October to March — exactly when school terms run.',
+    noteAttr:'— ILO Field Report, 2023',
+    q:'Chocolate companies pledged to eliminate child labour in 2001. What happened to child labour in cocoa by 2020?',
+    choices:['It fell by 90% — the Harkin-Engel Protocol succeeded','It fell by 50% — progress but the job is half done','It stayed flat — no change over two decades','It actually INCREASED by 14%'],
+    correct:3,
+    verdict:`Washington State University found child labour in cocoa farming <strong>increased by 14%</strong> between 2009–2019, despite 20 years of voluntary industry pledges. An estimated <strong>1.56 million children</strong> still work in hazardous cocoa conditions.`,
+    stat:'+14% child labour increase since 2001 pledges', stamp:'CONFIRMED' },
+
+  { id:'003', title:'The Cotton Trail', subtitle:'State-sponsored forced labour', step:'03',
+    doc:`Satellite imagery confirms mass labour mobilisation in Xinjiang's cotton fields. Government documents describe a <span class="det-redact" data-r="surplus labour transfer">"████████"</span> programme. Workers identified as <span class="det-redact" data-r="Uyghur minority">████████</span>. China produces <span class="det-redact" data-r="85%">███</span> of its cotton supply from Xinjiang alone.`,
+    evidence:[{i:'🛰️',l:'Satellite Image'},{i:'📑',l:'Govt. Document'},{i:'🧵',l:'Cotton Sample'},{i:'✈️',l:'Export Manifest'}],
+    rot:['-1.5deg','2deg','-2deg','1.5deg'],
+    note:'When brands were asked if their supply chains were free of Xinjiang cotton, most responded with form letters. None provided documentation.',
+    noteAttr:'— Sheffield Hallam University, 2021',
+    q:'Under the US Uyghur Forced Labor Prevention Act (2022), what happens to goods from Xinjiang?',
+    choices:['They face a higher tariff but trade continues freely','They are presumed forced labour and BANNED unless proven otherwise','They require a special import licence only','Nothing — the Act only applies to companies over $1B revenue'],
+    correct:1,
+    verdict:`The UFLPA creates a <strong>rebuttable presumption</strong>: all goods from Xinjiang are presumed made with forced labour and are <strong>banned from US import</strong>. The burden is reversed — brands must prove innocence, not the government prove guilt.`,
+    stat:'20% of global cotton linked to Xinjiang forced labour', stamp:'CLASSIFIED' },
+
+  { id:'004', title:'The Living Wage Gap', subtitle:'Audit the numbers', step:'04',
+    doc:`In Bangladesh, the minimum wage for garment workers is <span class="det-redact" data-r="$95/month">████████</span>. Economists estimate a living wage — covering rent, food, healthcare, one child's education — requires <span class="det-redact" data-r="$310/month">████████</span>. Brand sustainability reports call this "at or above minimum wage." Technically accurate.`,
+    evidence:[{i:'📊',l:'Wage Data'},{i:'🏠',l:'Rent Costs'},{i:'🍚',l:'Food Budget'},{i:'📄',l:'Sustainability\nReport'}],
+    rot:['1.5deg','-2deg','2deg','-1deg'],
+    note:'Minimum wage ≠ living wage. Industry lobbying keeps legal minimums far below what a dignified life requires. In Myanmar the gap exceeds 200%.',
+    noteAttr:'— Asia Floor Wage Alliance, 2024',
+    q:'In 2013, workers at the Rana Plaza factory noticed large cracks in the building. What happened next?',
+    choices:['Management immediately evacuated and the building was demolished','Workers were told to return to work or lose a month\'s wages — the building collapsed killing 1,134','An inspection was ordered and workers were given paid leave','Workers went on strike successfully and the factory was fined'],
+    correct:1,
+    verdict:`Workers discovered <strong>large cracks on April 23, 2013</strong> and many refused to enter. Management inspected and declared it safe. Workers were ordered back or <strong>face losing a month's wages</strong>. The building collapsed in 90 seconds — <strong>1,134 workers died</strong>. 28+ international brands sourced from Rana Plaza.`,
+    stat:'1,134 workers killed at Rana Plaza, April 2013', stamp:'VERIFIED' },
+
+  { id:'005', title:'Your Wardrobe', subtitle:'The final case', step:'05',
+    doc:`The average person in the UK, USA, or Canada buys <span class="det-redact" data-r="68 new garments">████████████</span> per year — up from 11 in the 1980s. The global fashion industry produces <span class="det-redact" data-r="100 billion">████████████</span> garments annually for 8 billion people. The retail price of clothing has dropped <span class="det-redact" data-r="30%">███</span> in real terms over 15 years. Someone paid for that drop.`,
+    evidence:[{i:'👗',l:'Your Wardrobe'},{i:'🌍',l:'Global Data'},{i:'♻️',l:'Waste Report'},{i:'🪞',l:'The Mirror'}],
+    rot:['-2deg','1.5deg','-1.5deg','2deg'],
+    note:'You are not the villain. You are operating inside a system designed to keep labour invisible. Awareness is the first weapon. Transparency is the demand.',
+    noteAttr:'— Ada, BTL Investigation Unit',
+    q:'What is the most impactful single action a consumer can take against supply chain exploitation?',
+    choices:['Only buy certified \'ethical\' brands — their labels guarantee fair wages','Demand brand transparency: ask who made this and for what wage, then share what you find','Recycle old garments — environmental responsibility solves labour problems too','Stop buying clothes entirely — the only clean choice is no choice'],
+    correct:1,
+    verdict:`Certification schemes are inconsistently audited. Full abstention isn't realistic at scale. Recycling addresses waste, not labour. <strong>Radical transparency</strong> — legally required full supply chain data — is what advocates consistently identify as highest-leverage. <strong>Ask loudly. Share what you find.</strong>`,
+    stat:'Transparency + consumer pressure = systemic change', stamp:'CASE CLOSED' }
+];
+
+function renderDetective(el) {
+  detState = { case: 0, score: 0, answered: false };
+  el.innerHTML = '<div class="gm-detective" id="det-root"></div>';
+  renderDetCase();
+}
+
+function renderDetCase() {
+  const root = document.getElementById('det-root');
+  const c = DET_CASES[detState.case];
+  detState.answered = false;
+
+  const dots = DET_CASES.map((_, i) => {
+    const cls = i < detState.case ? 'done' : i === detState.case ? 'active' : '';
+    return `<div class="det-dot ${cls}"></div>`;
+  }).join('');
+
+  const evHtml = c.evidence.map((ev, i) =>
+    `<div class="det-ev-photo" style="--r:${c.rot[i]}" onclick="this.classList.toggle('det-ev-sel')">
+      <div class="det-ev-inner">${ev.i}</div>
+      <div class="det-ev-lbl">${ev.l}</div>
+    </div>`
+  ).join('');
+
+  const choicesHtml = c.choices.map((ch, i) =>
+    `<button class="det-choice" onclick="detAnswer(this,${i === c.correct})">
+      <span class="det-c-ltr">${'ABCD'[i]}</span>
+      <span class="det-c-txt">${ch}</span>
+    </button>`
+  ).join('');
+
+  root.innerHTML = `
+    <div class="det-topbar">
+      <div class="det-case-id">CASE // <em>${c.id}</em></div>
+      <div class="det-progress">${dots}</div>
+      <div class="det-score">LEADS: <strong>${detState.score}</strong></div>
+    </div>
+    <div class="det-area">
+      <div class="det-dossier">
+        <div class="det-stamp" id="det-stamp">${c.stamp}</div>
+        <div class="det-dossier-hdr">
+          <div>
+            <div class="det-file-label">Case File // ${c.id} — ${c.subtitle}</div>
+            <div class="det-h2">${c.title}</div>
+          </div>
+          <div class="det-step-num">${c.step}</div>
+        </div>
+        <div class="det-body">
+          <div class="det-doc">${c.doc}</div>
+          <div class="det-evidence">${evHtml}</div>
+          <div class="det-note">${c.note}<span class="det-note-attr">${c.noteAttr}</span></div>
+          <div class="det-q-area">
+            <div class="det-q-lbl">◈ Investigator's Question</div>
+            <div class="det-q-text">${c.q}</div>
+            <div class="det-choices">${choicesHtml}</div>
+            <div class="det-verdict" id="det-verdict">
+              <div class="det-verdict-lbl">◈ Case Intelligence</div>
+              <div class="det-verdict-txt">${c.verdict}</div>
+              <span class="det-verdict-stat">${c.stat}</span>
+            </div>
+            <button class="det-next" id="det-next" onclick="detNext()">
+              ${detState.case < DET_CASES.length-1 ? '▶ Open Next Case File' : '▶ File Final Report'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // Bind redact clicks
+  root.querySelectorAll('.det-redact').forEach(el => {
+    el.addEventListener('click', function() {
+      if (this.classList.contains('det-revealed')) return;
+      this.classList.add('det-revealed');
+      this.textContent = this.dataset.r;
+    });
+  });
+}
+
+function detAnswer(btn, isCorrect) {
+  if (detState.answered) return;
+  detState.answered = true;
+  const allBtns = btn.closest('.det-choices').querySelectorAll('.det-choice');
+  if (isCorrect) {
+    btn.classList.add('det-correct');
+    detState.score++;
+    const stamp = document.getElementById('det-stamp');
+    if (stamp) stamp.classList.add('show-exposed');
+  } else {
+    btn.classList.add('det-wrong');
+    const c = DET_CASES[detState.case];
+    allBtns.forEach((b, i) => { if (i === c.correct) b.classList.add('det-correct'); });
+  }
+  allBtns.forEach(b => { if (!b.classList.contains('det-correct') && !b.classList.contains('det-wrong')) b.classList.add('det-disabled'); });
+  const v = document.getElementById('det-verdict');
+  const n = document.getElementById('det-next');
+  if (v) v.classList.add('show');
+  if (n) n.classList.add('show');
+  setTimeout(() => v?.scrollIntoView({ behavior:'smooth', block:'nearest' }), 300);
+}
+
+function detNext() {
+  detState.case++;
+  if (detState.case >= DET_CASES.length) detShowResults();
+  else { renderDetCase(); document.getElementById('gh-modal-content').scrollTop = 0; }
+}
+
+function detShowResults() {
+  const root = document.getElementById('det-root');
+  const s = detState.score; const t = DET_CASES.length;
+  const rank = s >= 4 ? 'LEAD INVESTIGATOR' : s >= 3 ? 'FIELD AGENT' : s >= 2 ? 'ANALYST' : 'RECRUIT';
+  const msg = s >= 4 ? 'You cracked the case. Now make noise.' : s >= 3 ? 'Strong work. Supply chain exposed.' : 'The system counts on your silence. Not anymore.';
+  const findings = ['A garment worker earns <strong>less than 1%</strong> of a shirt\'s retail price.','Child labour in cocoa <strong>increased 14%</strong> despite 20 years of pledges.','<strong>20% of global cotton</strong> is linked to Xinjiang forced labour.','1,134 workers died at Rana Plaza after being <strong>ordered into a cracked building</strong>.','<strong>Demand transparency.</strong> Ask brands: who made this? What did they earn?'];
+  root.innerHTML = `
+    <div class="det-results">
+      <div class="det-closed-stamp">CASE CLOSED</div>
+      <h3>"${msg}"</h3>
+      <div class="det-final-score">${s}/${t}</div>
+      <div class="det-rank">Rank: ${rank} // ${Math.round(s/t*100)}% accuracy</div>
+      <div class="det-findings">${findings.map(f=>`<div class="det-finding"><span>◈</span><span>${f}</span></div>`).join('')}</div>
+      <div class="det-share-card">
+        <h4>The Supply Chain Files</h4>
+        <p>I investigated hidden labour practices in global supply chains.<br/>Score: ${s}/${t} — Rank: ${rank}<br/><br/>Garment workers earn &lt;1% of retail price. Child labour in cocoa has INCREASED since 2001 pledges.</p>
+        <span class="det-share-url">behindthelabel.ca // @BehindTheLabel</span>
+      </div>
+      <div class="det-btn-row">
+        <button class="det-btn-primary" onclick="copyDetShare(${s},${t},'${rank}')">📋 Copy & Share</button>
+        <button class="det-btn-sec" onclick="detState.case=0;detState.score=0;renderDetCase()">↩ Restart</button>
+        <button class="det-btn-sec" onclick="closeGame()">← Back</button>
+      </div>
+    </div>`;
+}
+function copyDetShare(s,t,rank) {
+  const txt = `I investigated hidden labour in fashion supply chains with @BehindTheLabel.\n\nScore: ${s}/${t} — Rank: ${rank}\n\nGarment workers earn <1% of retail price. Child labour in cocoa is UP 14% since 2001. 1,134 workers died at Rana Plaza after being ordered into a cracked building.\n\nbehindthelabel.ca`;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.querySelector('.det-btn-primary');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '📋 Copy & Share', 2000); }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// ── GAME 2: TRIVIA QUIZ ───────────────────────────────────
+// ══════════════════════════════════════════════════════════
+let quizState = null;
+
+const QUIZ_QS = [
+  { q:'How many children are estimated to be in child labour worldwide according to ILO 2022?', choices:['80 million','160 million','230 million','40 million'], correct:1, fact:'The ILO estimates <strong>160 million children</strong> are in child labour globally — 63 million girls and 97 million boys.' },
+  { q:'What percentage of workers in Bangladesh\'s garment sector are women?', choices:['30%','50%','65%','80%'], correct:3, fact:'Approximately <strong>80% of Bangladesh\'s 4 million garment workers are women</strong> — many are sole household breadwinners.' },
+  { q:'Which industry employs the most child labourers globally?', choices:['Manufacturing','Mining','Agriculture','Domestic service'], correct:2, fact:'<strong>Agriculture employs 70%</strong> of all child labourers — including cocoa, coffee, cotton, and tobacco farming.' },
+  { q:'The Rana Plaza collapse in 2013 killed how many workers?', choices:['412','786','1,134','2,400'], correct:2, fact:'<strong>1,134 workers died</strong> and over 2,500 were injured when the eight-story Rana Plaza building collapsed in Dhaka, Bangladesh.' },
+  { q:'Xinjiang, China produces approximately what percentage of the world\'s cotton supply?', choices:['5%','20%','40%','60%'], correct:1, fact:'Xinjiang produces <strong>20% of the world\'s cotton</strong> and 85% of China\'s cotton — making supply chain scrutiny critical.' },
+  { q:'How many people are estimated to be living in modern slavery globally (Walk Free, 2022)?', choices:['10 million','40 million','50 million','22 million'], correct:1, fact:'The Global Slavery Index 2023 estimates <strong>49.6 million people</strong> are in modern slavery on any given day — the highest figure ever recorded.' },
+  { q:'In fashion supply chains, what does "Tier 1 supplier" mean?', choices:['The most ethical factory','The factory that cuts and sews the final garment','The raw material supplier','The brand\'s direct retail outlet'], correct:1, fact:'Tier 1 is the <strong>final assembly factory</strong>. Tier 2 is fabric mills. Tier 3 is yarn/fibre. Most brands only audit Tier 1 — leaving deeper layers invisible.' },
+  { q:'Child labour in West African cocoa farming changed how between 2001 and 2020?', choices:['Fell 90%','Fell 50%','Stayed flat','Increased 14%'], correct:3, fact:'Despite industry pledges in 2001, <strong>child labour increased 14%</strong> between 2009-2019 per Washington State University research.' },
+  { q:'What does "living wage" mean compared to "minimum wage"?', choices:['They are the same — minimum wage is set to cover living costs','Living wage covers actual dignified living costs; minimum wage is often far below this','Living wage is a voluntary target; minimum wage is legally higher','Living wage is specific to developed countries only'], correct:1, fact:'<strong>Minimum wage is often set by industry lobbying</strong> — far below what workers need. In Bangladesh, min wage is $95/mo; living wage estimates are $310/mo.' },
+  { q:'The ILO defines "forced labour" as work performed under what condition?', choices:['Work paid below minimum wage','Work performed involuntarily under threat of penalty','Work exceeding 40 hours per week','Work without a written contract'], correct:1, fact:'The ILO defines forced labour as <strong>"work performed involuntarily under menace of any penalty"</strong> — including debt bondage, document confiscation, and threats.' },
+];
+
+let quizTimer = null;
+
+function renderQuiz(el) {
+  quizState = { q: 0, score: 0, answered: false, timeLeft: 20, results: [] };
+  el.innerHTML = '<div class="gm-quiz" id="quiz-root"></div>';
+  renderQuizQ();
+}
+
+function renderQuizQ() {
+  if (quizState.q >= QUIZ_QS.length) { quizShowResults(); return; }
+  clearInterval(quizTimer);
+  const q = QUIZ_QS[quizState.q];
+  quizState.answered = false;
+  quizState.timeLeft = 20;
+  const root = document.getElementById('quiz-root');
+  const pct = (quizState.q / QUIZ_QS.length) * 100;
+  const choicesHtml = q.choices.map((c, i) =>
+    `<button class="quiz-choice" onclick="quizAnswer(this,${i === q.correct})">
+      <span class="quiz-c-ltr">${'ABCD'[i]}</span>
+      <span>${c}</span>
+    </button>`
+  ).join('');
+
+  root.innerHTML = `
+    <div class="quiz-topbar">
+      <div class="quiz-title-bar">Supply Chain Trivia // Q<em>${quizState.q+1}</em> of ${QUIZ_QS.length}</div>
+      <div class="quiz-timer" id="quiz-timer"><span class="timer-icon">⏱</span><span id="timer-num">20</span>s</div>
+    </div>
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
+    <div class="quiz-body">
+      <div class="quiz-q-num">Question ${quizState.q+1} / ${QUIZ_QS.length}</div>
+      <div class="quiz-q-text">${q.q}</div>
+      <div class="quiz-choices">${choicesHtml}</div>
+      <div class="quiz-fact" id="quiz-fact">${q.fact}</div>
+      <button class="quiz-next" id="quiz-next" onclick="quizNext()">${quizState.q < QUIZ_QS.length-1 ? '▶ Next Question' : '▶ See Results'}</button>
+    </div>
+    <div class="quiz-score-bar">Score: <strong>${quizState.score}/${QUIZ_QS.length}</strong> correct so far</div>`;
+
+  // Start timer
+  quizTimer = setInterval(() => {
+    quizState.timeLeft--;
+    const timerEl = document.getElementById('timer-num');
+    const timerWrap = document.getElementById('quiz-timer');
+    if (timerEl) timerEl.textContent = quizState.timeLeft;
+    if (timerWrap && quizState.timeLeft <= 5) timerWrap.classList.add('danger');
+    if (quizState.timeLeft <= 0) {
+      clearInterval(quizTimer);
+      if (!quizState.answered) quizTimeUp();
+    }
+  }, 1000);
+}
+
+function quizTimeUp() {
+  quizState.answered = true;
+  quizState.results.push(false);
+  const q = QUIZ_QS[quizState.q];
+  const allBtns = document.querySelectorAll('.quiz-choice');
+  allBtns.forEach((b,i) => { b.classList.add(i === q.correct ? 'correct' : 'disabled'); });
+  const fact = document.getElementById('quiz-fact');
+  const next = document.getElementById('quiz-next');
+  if (fact) fact.classList.add('show');
+  if (next) next.classList.add('show');
+}
+
+function quizAnswer(btn, isCorrect) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+  clearInterval(quizTimer);
+  const q = QUIZ_QS[quizState.q];
+  quizState.results.push(isCorrect);
+  if (isCorrect) { quizState.score++; btn.classList.add('correct'); }
+  else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.quiz-choice').forEach((b,i) => { if (i === q.correct) b.classList.add('correct'); });
+  }
+  document.querySelectorAll('.quiz-choice').forEach(b => { if (!b.classList.contains('correct') && !b.classList.contains('wrong')) b.classList.add('disabled'); });
+  const fact = document.getElementById('quiz-fact');
+  const next = document.getElementById('quiz-next');
+  if (fact) fact.classList.add('show');
+  if (next) next.classList.add('show');
+}
+
+function quizNext() {
+  clearInterval(quizTimer);
+  quizState.q++;
+  renderQuizQ();
+  document.getElementById('gh-modal-content').scrollTop = 0;
+}
+
+function quizShowResults() {
+  clearInterval(quizTimer);
+  const s = quizState.score; const t = QUIZ_QS.length;
+  const pct = Math.round(s/t*100);
+  const msg = s >= 8 ? 'Expert. You know what\'s hidden.' : s >= 6 ? 'Informed. You\'re ahead of most.' : s >= 4 ? 'Aware. Keep digging.' : 'Surprised? That\'s how they keep it hidden.';
+  const root = document.getElementById('quiz-root');
+  const breakdown = QUIZ_QS.map((q,i) => `<div class="quiz-rb-item ${quizState.results[i] ? 'q-right' : 'q-wrong'}">${quizState.results[i] ? '✓' : '✗'} ${q.q.substring(0,55)}...</div>`).join('');
+  root.innerHTML = `
+    <div class="quiz-results">
+      <div class="quiz-results-score">${s}/${t}</div>
+      <div class="quiz-results-label">${pct}% accuracy</div>
+      <div class="quiz-results-msg">"${msg}"</div>
+      <div class="quiz-result-breakdown">${breakdown}</div>
+      <div class="gm-btn-row">
+        <button class="gm-btn-primary" onclick="copyQuizShare(${s},${t})">📋 Share Score</button>
+        <button class="gm-btn-sec" onclick="renderQuiz(document.getElementById('gh-modal-content'))">↩ Retry</button>
+        <button class="gm-btn-sec" onclick="closeGame()">← Back</button>
+      </div>
+    </div>`;
+}
+function copyQuizShare(s, t) {
+  const txt = `I scored ${s}/${t} on the Supply Chain Trivia quiz by @BehindTheLabel.\n\nDid you know child labour in cocoa INCREASED by 14% since 2001 despite industry pledges? Or that garment workers earn <1% of the retail price?\n\nTest yourself: behindthelabel.ca`;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.querySelector('.gm-btn-primary');
+    if (btn) { const o=btn.textContent; btn.textContent='✓ Copied!'; setTimeout(()=>btn.textContent=o,2000); }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// ── GAME 3: CARD FLIP ─────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+let flipState = null;
+
+const FLIP_CARDS = [
+  { brand:'H&M', cat:'Fast Fashion', rating:'bad', verdict:'Problematic', truth:'Faced allegations of wage theft in Myanmar. Workers paid as little as $1.96/day.' },
+  { brand:'Patagonia', cat:'Outdoor Gear', rating:'good', verdict:'Transparent', truth:'Publishes full factory list. Fair Trade certified factories. B Corp certified.' },
+  { brand:'Zara (Inditex)', cat:'Fast Fashion', rating:'bad', verdict:'Concerning', truth:'57 micro-seasons per year. Suppliers in Morocco paid below living wage.' },
+  { brand:'Nestlé', cat:'Food & Drink', rating:'bad', verdict:'Problematic', truth:'Admitted in 2021 that child labour is present in its cocoa supply chain.' },
+  { brand:'Tony\'s Chocolonely', cat:'Chocolate', rating:'good', verdict:'Leading', truth:'Mission-driven brand that traces each cocoa bean. Publishes impact report.' },
+  { brand:'Nike', cat:'Sportswear', rating:'ok', verdict:'Mixed', truth:'Has improved transparency but still faces criticism over supplier wages in SE Asia.' },
+  { brand:'Primark', cat:'Fast Fashion', rating:'bad', verdict:'High Risk', truth:'No public living wage commitment. Lowest prices require lowest wages somewhere.' },
+  { brand:'Eileen Fisher', cat:'Fashion', rating:'good', verdict:'Accountable', truth:'100% sustainability commitment. Repair & reuse programme. Certified B Corp.' },
+  { brand:'Mars', cat:'Chocolate', rating:'bad', verdict:'Concerning', truth:'One of the companies that pledged to eliminate child labour in 2001. Child labour continues in its supply chain.' },
+  { brand:'Apple', cat:'Electronics', rating:'ok', verdict:'Improving', truth:'Foxconn working conditions remain an issue. Apple publishes progress reports.' },
+  { brand:'Everlane', cat:'Fashion', rating:'ok', verdict:'Partial', truth:'Claims radical transparency but has faced criticism for not publishing wages.' },
+  { brand:'Uniqlo', cat:'Fast Fashion', rating:'bad', verdict:'Opaque', truth:'Linked to Xinjiang cotton. Refused to disclose supplier list until 2021 pressure.' },
+  { brand:'Reformation', cat:'Fashion', rating:'good', verdict:'Transparent', truth:'Publishes sustainability reports and wages for its Los Angeles manufacturing.' },
+  { brand:'Cadbury (Mondelēz)', cat:'Chocolate', rating:'bad', verdict:'Problematic', truth:'Commitments to end child cocoa labour repeatedly delayed and unfulfilled.' },
+  { brand:'Levi\'s', cat:'Denim', rating:'ok', verdict:'Mixed', truth:'Has a living wage commitment in roadmap form but implementation lags targets.' },
+  { brand:'The North Face', cat:'Outdoor Gear', rating:'ok', verdict:'Partial', truth:'VF Corp subsidiary — improving transparency but supply chain depth still limited.' },
+];
+
+function renderFlip(el) {
+  flipState = { flipped: 0, total: FLIP_CARDS.length };
+  el.innerHTML = '<div class="gm-flip" id="flip-root"></div>';
+  const root = document.getElementById('flip-root');
+
+  const cardsHtml = FLIP_CARDS.map((c, i) => `
+    <div class="flip-card-wrap" onclick="flipCard(${i})">
+      <div class="flip-card" id="fc-${i}">
+        <div class="flip-front">
+          <div class="flip-brand">${c.brand}</div>
+          <div class="flip-category">${c.cat}</div>
+          <div class="flip-hint">tap to reveal</div>
+        </div>
+        <div class="flip-back flip-${c.rating}">
+          <div class="flip-score-icon">${c.rating==='good'?'✅':c.rating==='ok'?'⚠️':'🚨'}</div>
+          <div class="flip-verdict">${c.verdict}</div>
+          <div class="flip-truth">${c.truth}</div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  root.innerHTML = `
+    <div class="flip-topbar">
+      <div class="flip-topbar-title">Flip the Label // <em>Brand Reality Check</em></div>
+      <div class="flip-score">Revealed: <strong id="flip-count">0</strong>/${flipState.total}</div>
+    </div>
+    <div class="flip-header">
+      <div class="flip-intro">Tap each card to reveal what's <em>really</em> behind the brand. Some will surprise you.</div>
+    </div>
+    <div class="flip-grid">${cardsHtml}</div>
+    <div class="flip-all-done" id="flip-done">
+      <h3>All cards revealed.</h3>
+      <p>The fashion, food, and electronics industries all have supply chain accountability gaps. Some brands lead — most lag. Transparency is the only way to tell the difference.</p>
+      <div class="gm-btn-row">
+        <button class="gm-btn-primary" onclick="copyFlipShare()">📋 Share This</button>
+        <button class="gm-btn-sec" onclick="renderFlip(document.getElementById('gh-modal-content'))">↩ Reset</button>
+        <button class="gm-btn-sec" onclick="closeGame()">← Back</button>
+      </div>
+    </div>`;
+}
+
+function flipCard(i) {
+  const card = document.getElementById(`fc-${i}`);
+  if (!card || card.classList.contains('flipped')) return;
+  card.classList.add('flipped');
+  flipState.flipped++;
+  const countEl = document.getElementById('flip-count');
+  if (countEl) countEl.textContent = flipState.flipped;
+  if (flipState.flipped === flipState.total) {
+    setTimeout(() => {
+      const done = document.getElementById('flip-done');
+      if (done) { done.classList.add('show'); done.scrollIntoView({ behavior:'smooth', block:'start' }); }
+    }, 600);
+  }
+}
+
+function copyFlipShare() {
+  const txt = `I just flipped the labels on 16 major brands with @BehindTheLabel.\n\nNestlé admitted child labour in its cocoa supply. Primark has no living wage commitment. Brands making pledges without publishing wages are not accountable.\n\nSee for yourself: behindthelabel.ca`;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.querySelector('.gm-btn-primary');
+    if (btn) { const o=btn.textContent; btn.textContent='✓ Copied!'; setTimeout(()=>btn.textContent=o,2000); }
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// ── GAME 4: SORT ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+let sortState = null;
+
+const SORT_ITEMS = [
+  { icon:'👟', name:'$15 trainers from a fast fashion app', clue:'Produced in Bangladesh. Retail price below cost of ethical production.', answer:'exploit', explanation:`At $15, it is mathematically impossible to pay living wages, cover materials, shipping, and retail margin. <strong>Someone paid — and it wasn't the brand.</strong>` },
+  { icon:'🍫', name:'Chocolate bar with "Rainforest Alliance" logo', clue:'Certification requires only 30% of ingredients to be certified.', answer:'exploit', explanation:`Rainforest Alliance only requires <strong>30% certified content</strong> to carry the logo. The other 70% may involve uncertified labour.` },
+  { icon:'☕', name:'Direct Trade coffee — price paid published', clue:'The roaster publishes the price paid to farmers on the bag.', answer:'ethical', explanation:`<strong>Transparency is the key signal.</strong> Publishing farm-gate price means accountability. This is a leading practice.` },
+  { icon:'👕', name:'T-shirt from a brand with a public factory list', clue:'The brand publishes names, addresses, and audit results of every supplier.', answer:'ethical', explanation:`<strong>Supplier list publication is a foundational transparency step.</strong> Without it, claims of ethics are unverifiable.` },
+  { icon:'💍', name:'Gold ring — no provenance information', clue:'Gold mining is one of the sectors with highest rates of child and forced labour.', answer:'exploit', explanation:`<strong>Artisanal and small-scale gold mining</strong> employs over 10 million people including children in sub-Saharan Africa and Latin America with little oversight.` },
+  { icon:'🧴', name:'"Ethically sourced" label — no third party audit', clue:'Self-reported only. No independent verification published.', answer:'exploit', explanation:`<strong>Self-reported ethics claims without independent verification are greenwashing.</strong> Any brand can print "ethically sourced" with no legal liability.` },
+  { icon:'🎽', name:'Sportswear brand with a published living wage roadmap', clue:'Has committed to living wages with a timeline and annual progress reports.', answer:'ethical', explanation:`A published roadmap with <strong>measurable annual milestones</strong> is a meaningful accountability step — distinct from vague "commitments."` },
+  { icon:'🍅', name:'Supermarket own-brand tinned tomatoes', clue:'Italian tomato processing has documented cases of migrant worker exploitation.', answer:'exploit', explanation:`Italian agri-processing has been documented using <strong>migrant workers paid as little as €2–3/hour</strong> under illegal caporalato gang labour systems.` },
+  { icon:'📱', name:'Smartphone — no conflict mineral disclosure', clue:'Contains cobalt. DRC cobalt mining employs children in hazardous conditions.', answer:'exploit', explanation:`Without a <strong>Section 1502 / OECD conflict mineral disclosure</strong>, cobalt sourcing is untraceable. An estimated 40,000 children mine cobalt in the DRC.` },
+  { icon:'🧶', name:'Handmade item direct from an artisan co-op', clue:'Purchased directly — the artisan receives full price minus platform fee.', answer:'ethical', explanation:`<strong>Direct purchasing from artisan co-ops</strong> removes exploitative middlemen and ensures workers receive fair compensation.` },
+];
+
+function renderSort(el) {
+  const shuffled = [...SORT_ITEMS].sort(() => Math.random() - 0.5);
+  sortState = { items: shuffled, current: 0, score: 0, answered: false };
+  el.innerHTML = '<div class="gm-sort" id="sort-root"></div>';
+  renderSortItem();
+}
+
+function renderSortItem() {
+  if (sortState.current >= sortState.items.length) { sortShowResults(); return; }
+  const item = sortState.items[sortState.current];
+  sortState.answered = false;
+  const root = document.getElementById('sort-root');
+  root.innerHTML = `
+    <div class="sort-topbar">
+      <div class="sort-topbar-title">Sort the Supply Chain // <em>Ethical or Exploitative?</em></div>
+      <div class="sort-progress">Item <strong>${sortState.current+1}</strong> of ${sortState.items.length}</div>
+    </div>
+    <div class="sort-body">
+      <div class="sort-item-area">
+        <div class="sort-item-card">
+          <div class="sort-item-icon">${item.icon}</div>
+          <div class="sort-item-name">${item.name}</div>
+          <div class="sort-item-clue">${item.clue}</div>
+        </div>
+      </div>
+      <div class="sort-bins">
+        <div class="sort-bin sort-bin--exploit" onclick="sortAnswer('exploit')">
+          <div class="sort-bin-icon">🚨</div>
+          <div class="sort-bin-label">Exploitative</div>
+          <div class="sort-bin-sub">High risk of forced or child labour</div>
+        </div>
+        <div class="sort-bin sort-bin--ethical" onclick="sortAnswer('ethical')">
+          <div class="sort-bin-icon">✅</div>
+          <div class="sort-bin-label">Ethical Signal</div>
+          <div class="sort-bin-sub">Meaningful accountability present</div>
+        </div>
+      </div>
+      <div class="sort-feedback" id="sort-feedback">
+        <div class="sort-feedback-label" id="sort-fb-label"></div>
+        <div class="sort-feedback-text" id="sort-fb-text"></div>
+      </div>
+      <button class="sort-next" id="sort-next" onclick="sortNext()">${sortState.current < sortState.items.length-1 ? '▶ Next Item' : '▶ See Results'}</button>
+    </div>
+    <div class="sort-score-bar">Score: <strong>${sortState.score}</strong> / ${sortState.current} correct so far</div>`;
+}
+
+function sortAnswer(pick) {
+  if (sortState.answered) return;
+  sortState.answered = true;
+  const item = sortState.items[sortState.current];
+  const correct = pick === item.answer;
+  if (correct) sortState.score++;
+
+  const fb = document.getElementById('sort-feedback');
+  const lbl = document.getElementById('sort-fb-label');
+  const txt = document.getElementById('sort-fb-text');
+  const next = document.getElementById('sort-next');
+  const bins = document.querySelectorAll('.sort-bin');
+
+  bins.forEach(b => b.style.pointerEvents = 'none');
+
+  fb.classList.add('show', correct ? 'correct' : 'wrong');
+  lbl.textContent = correct ? `✓ Correct — ${item.answer === 'exploit' ? 'Exploitative' : 'Ethical Signal'}` : `✗ Not quite — this is ${item.answer === 'exploit' ? 'exploitative' : 'an ethical signal'}`;
+  txt.innerHTML = item.explanation;
+  if (next) next.classList.add('show');
+
+  // Highlight picked bin
+  document.querySelectorAll('.sort-bin').forEach(b => {
+    if (b.classList.contains(`sort-bin--${pick}`)) {
+      b.style.borderStyle = 'solid';
+      b.style.borderColor = correct ? '#2d8a4e' : '#c0392b';
+    }
+  });
+}
+
+function sortNext() {
+  sortState.current++;
+  renderSortItem();
+}
+
+function sortShowResults() {
+  const s = sortState.score; const t = sortState.items.length;
+  const pct = Math.round(s/t*100);
+  const msg = s >= 8 ? 'Sharp eye. You can spot greenwashing.' : s >= 6 ? 'Good instincts. Most people score lower.' : s >= 4 ? 'Getting there. Corporations bank on confusion.' : 'Don\'t feel bad — companies spend millions to make this confusing.';
+  const root = document.getElementById('sort-root');
+  root.innerHTML = `
+    <div class="sort-results">
+      <h3>Sort Complete</h3>
+      <div class="sort-final-score">${s}/${t}</div>
+      <div class="sort-results-label">${pct}% correct</div>
+      <div class="sort-results-msg">"${msg}"</div>
+      <div class="gm-btn-row">
+        <button class="gm-btn-primary" onclick="copySortShare(${s},${t})">📋 Share Result</button>
+        <button class="gm-btn-sec" onclick="renderSort(document.getElementById('gh-modal-content'))">↩ Play Again</button>
+        <button class="gm-btn-sec" onclick="closeGame()">← Back</button>
+      </div>
+    </div>`;
+}
+function copySortShare(s, t) {
+  const txt = `I scored ${s}/${t} sorting ethical vs exploitative products with @BehindTheLabel.\n\nAn $15 trainer is impossible to make ethically. Rainforest Alliance only requires 30% certification. 40,000 children mine cobalt for smartphones.\n\nCan you do better? behindthelabel.ca`;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.querySelector('.gm-btn-primary');
+    if (btn) { const o=btn.textContent; btn.textContent='✓ Copied!'; setTimeout(()=>btn.textContent=o,2000); }
+  });
+}
+</script>
+<script src="btl.js?v=2"></script>
 <script>
 // ── Mobile Menu ──
 const menuBtn = document.getElementById('menuBtn');
