@@ -2057,6 +2057,168 @@
       }
     }
 
+    /* ===========================
+       PETITION NUDGE MODAL
+    =========================== */
+    .petition-nudge {
+      position: fixed;
+      inset: 0;
+      z-index: 2200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(6, 6, 6, 0.72);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .petition-nudge.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .petition-nudge-card {
+      position: relative;
+      width: min(560px, 92vw);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(243,201,96,0.16), transparent 45%),
+        linear-gradient(160deg, rgba(17,17,17,0.98), rgba(8,8,8,0.98));
+      border: 1px solid rgba(243,201,96,0.5);
+      border-radius: 20px;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.6), 0 0 34px rgba(243,201,96,0.22);
+      padding: 2rem 1.8rem 1.6rem;
+      overflow: hidden;
+      transform: translateY(22px) scale(0.96);
+      opacity: 0;
+      transition: transform 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease;
+    }
+    .petition-nudge.open .petition-nudge-card {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    .petition-nudge-card::before {
+      content: '';
+      position: absolute;
+      inset: -40% -30%;
+      background: linear-gradient(120deg, transparent 25%, rgba(255,248,214,0.22) 50%, transparent 75%);
+      transform: translateX(-65%);
+      animation: petitionNudgeShimmer 3.4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes petitionNudgeShimmer {
+      0%, 60% { transform: translateX(-65%); opacity: 0; }
+      70% { opacity: 0.9; }
+      100% { transform: translateX(65%); opacity: 0; }
+    }
+    .petition-nudge-close {
+      position: absolute;
+      right: 0.8rem;
+      top: 0.8rem;
+      border: 0;
+      background: transparent;
+      color: rgba(255,255,255,0.65);
+      font-size: 1.2rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0.3rem;
+      z-index: 2;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+    .petition-nudge-close:hover {
+      color: #fff;
+      transform: scale(1.06);
+    }
+    .petition-nudge-eyebrow {
+      margin: 0 0 0.6rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,236,177,0.92);
+    }
+    .petition-nudge-title {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 4vw, 2.1rem);
+      line-height: 1.1;
+      color: #fff8e6;
+      text-shadow: 0 0 24px rgba(243,201,96,0.26);
+    }
+    .petition-nudge-copy {
+      margin: 0.8rem 0 1.4rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.96rem;
+      line-height: 1.6;
+      color: rgba(240,235,224,0.92);
+      max-width: 42ch;
+    }
+    .petition-nudge-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+    .petition-nudge-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.78rem 1.2rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,234,163,0.9);
+      background: linear-gradient(135deg, rgba(166,124,35,0.45), rgba(245,208,112,0.25));
+      color: #fffdf0;
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      box-shadow: 0 0 18px rgba(243,201,96,0.32);
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+      z-index: 1;
+    }
+    .petition-nudge-cta:hover {
+      transform: translateY(-1px);
+      border-color: #fff0be;
+      box-shadow: 0 0 24px rgba(243,201,96,0.46);
+    }
+    .petition-nudge-dismiss {
+      border: 1px solid rgba(255,255,255,0.2);
+      background: transparent;
+      color: rgba(240,235,224,0.88);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0.72rem 1.05rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      z-index: 1;
+    }
+    .petition-nudge-dismiss:hover {
+      border-color: rgba(255,255,255,0.48);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    @media (max-width: 640px) {
+      .petition-nudge-card { padding: 1.7rem 1.2rem 1.2rem; }
+      .petition-nudge-copy { font-size: 0.9rem; }
+      .petition-nudge-actions { width: 100%; }
+      .petition-nudge-cta, .petition-nudge-dismiss { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .petition-nudge,
+      .petition-nudge-card,
+      .petition-nudge-card::before {
+        animation: none !important;
+        transition: none !important;
+      }
+      .petition-nudge.open .petition-nudge-card { transform: none; }
+    }
+
 </style>
 </head>
 <body>
@@ -2087,6 +2249,21 @@ window.switchLiveView = window.switchLiveView || function() {};
   <span class="petition-alert-text"><strong>Make your voice heard</strong> — sign our petition for supply-chain transparency</span>
   <a href="petition.html" class="petition-alert-link">Sign Now →</a>
   <button class="petition-alert-close" id="petitionAlertClose" aria-label="Dismiss">✕</button>
+</div>
+
+<div class="petition-nudge" id="petitionNudgeModal" role="dialog" aria-modal="true" aria-labelledby="petitionNudgeTitle" aria-describedby="petitionNudgeCopy">
+  <div class="petition-nudge-card">
+    <button class="petition-nudge-close" type="button" aria-label="Close petition prompt" data-petition-nudge-close>&times;</button>
+    <p class="petition-nudge-eyebrow">Action Needed</p>
+    <h3 class="petition-nudge-title" id="petitionNudgeTitle">Help end forced labour in supply chains.</h3>
+    <p class="petition-nudge-copy" id="petitionNudgeCopy">
+      Your signature pushes leaders to enforce real transparency and protect vulnerable workers.
+    </p>
+    <div class="petition-nudge-actions">
+      <a href="petition.html" class="petition-nudge-cta" data-petition-nudge-cta>Sign the Petition</a>
+      <button class="petition-nudge-dismiss" type="button" data-petition-nudge-close>Not now</button>
+    </div>
+  </div>
 </div>
 
 <!-- ===========================
@@ -2866,6 +3043,71 @@ document.querySelector('.hero-ctas a').addEventListener('click', e => {
 })();
 
 // ── Mobile Menu — global scope so inline onclick handlers work ──
+(function () {
+  const modal = document.getElementById('petitionNudgeModal');
+  if (!modal) return;
+
+  const closeTriggers = modal.querySelectorAll('[data-petition-nudge-close]');
+  const cta = modal.querySelector('[data-petition-nudge-cta]');
+  const storageKey = 'btl_petition_nudge_seen_home';
+  const minDelay = 5000;
+  const maxDelay = 10000;
+
+  let timerId = null;
+  let timerArmed = false;
+  let hasShown = false;
+
+  const alreadySeen = () => {
+    try { return sessionStorage.getItem(storageKey) === '1'; }
+    catch { return false; }
+  };
+
+  const markSeen = () => {
+    try { sessionStorage.setItem(storageKey, '1'); }
+    catch {}
+  };
+
+  const hideModal = () => {
+    modal.classList.remove('open');
+    markSeen();
+  };
+
+  const showModal = () => {
+    if (hasShown || alreadySeen()) return;
+    hasShown = true;
+    modal.classList.add('open');
+  };
+
+  const armTimer = () => {
+    if (timerArmed || alreadySeen()) return;
+    timerArmed = true;
+    const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+    timerId = setTimeout(showModal, delay);
+  };
+
+  const onFirstScroll = () => {
+    if (window.scrollY > 35) {
+      armTimer();
+      window.removeEventListener('scroll', onFirstScroll);
+    }
+  };
+
+  window.addEventListener('scroll', onFirstScroll, { passive: true });
+  if (window.scrollY > 35) armTimer();
+
+  closeTriggers.forEach(btn => btn.addEventListener('click', hideModal));
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) hideModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) hideModal();
+  });
+  if (cta) cta.addEventListener('click', markSeen);
+  window.addEventListener('pagehide', () => {
+    if (timerId) clearTimeout(timerId);
+  });
+})();
+
 const menuBtn  = document.getElementById('menuBtn');
 const mobileNav = document.getElementById('mobileNav');
 
