@@ -47,7 +47,7 @@ NAVIGATION: When directing users to a page, ALWAYS format links as markdown: [Pa
 
   /* ── STYLES ─────────────────────────────────────────────────── */
   const css = `
-    /* Wrap — sits above the two 50px FABs (bottom:2rem + 50px + 0.8rem gap + 50px + 1rem breathing room) */
+    /* Wrap — bottom-right, above the camera + search FABs */
     #ada-wrap {
       position: fixed;
       bottom: calc(2rem + 50px + 0.8rem + 50px + 1.2rem);
@@ -290,7 +290,7 @@ NAVIGATION: When directing users to a page, ALWAYS format links as markdown: [Pa
     @media(max-width:480px){
       #ada-wrap {
         bottom: calc(1rem + 44px + 0.8rem + 44px + 1rem);
-        right:1rem;
+        right: 1rem;
       }
       #ada-chat { width:calc(100vw - 2.2rem); }
     }

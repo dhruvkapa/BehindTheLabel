@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>The Supply Chain Files — BTL Investigation</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:    #0a0806;
+  --paper:  #f2e8d0;
+  --aged:   #e8d8b0;
+  --rust:   #c0392b;
+  --blood:  #8b1a10;
+  --gold:   #c9a030;
+  --smoke:  #6b5e4a;
+  --mist:   #d4c9b0;
+  --stamp:  #a83228;
+  --green:  #2d5a27;
+  --typeface: 'Courier Prime', monospace;
+  --display: 'Special Elite', cursive;
+  --serif: 'Playfair Display', serif;
+}
+
+html, body {
+  height: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--typeface);
+  overflow-x: hidden;
+  padding-top: 68px;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 9999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity: 0.4;
+}
+
+/* ── SCANLINES ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 9998;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+}
+
+/* ══════════════════════════════════════════
+   INTRO SCREEN
+══════════════════════════════════════════ */
+#intro {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 2rem;
+  background: radial-gradient(ellipse at 30% 40%, #1a0d08 0%, var(--ink) 70%);
+  position: relative;
+  overflow: hidden;
+}
+
+#intro .case-stamp {
+  position: absolute;
+  top: 3rem; right: 3rem;
+  font-family: var(--display);
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  color: var(--smoke);
+  border: 1px solid #2a2018;
+  padding: 0.4rem 0.8rem;
+  text-transform: uppercase;
+}
+
+.crime-tape {
+  position: absolute;
+  width: 140%;
+  height: 36px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--gold) 0px, var(--gold) 20px,
+    #1a1000 20px, #1a1000 40px
+  );
+  opacity: 0.12;
+  transform: rotate(-3deg);
+}
+.crime-tape.t1 { top: 18%; }
+.crime-tape.t2 { bottom: 22%; }
+
+#intro .badge {
+  width: 80px; height: 80px;
+  margin-bottom: 2rem;
+  animation: badgePulse 3s ease-in-out infinite;
+}
+@keyframes badgePulse {
+  0%,100% { filter: drop-shadow(0 0 8px rgba(201,160,48,0.3)); }
+  50%      { filter: drop-shadow(0 0 22px rgba(201,160,48,0.7)); }
+}
+
+#intro h1 {
+  font-family: var(--display);
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
+  text-align: center;
+  color: var(--paper);
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  text-shadow: 3px 3px 0 var(--blood);
+  margin-bottom: 0.5rem;
+}
+#intro h1 span { color: var(--rust); font-style: italic; }
+
+#intro .subtitle {
+  font-family: var(--typeface);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  color: var(--smoke);
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+}
+
+#intro .brief {
+  max-width: 520px;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--mist);
+  margin-bottom: 3rem;
+  border-left: 2px solid var(--rust);
+  padding-left: 1.2rem;
+  text-align: left;
+}
+#intro .brief strong { color: var(--gold); }
+
+.btn-primary {
+  font-family: var(--display);
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: var(--rust);
+  color: var(--paper);
+  border: none;
+  padding: 1rem 2.5rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.btn-primary::before {
+  content: '';
+  position: absolute; inset: 2px;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  border: 1px solid rgba(255,255,255,0.2);
+  pointer-events: none;
+}
+.btn-primary:hover {
+  background: var(--blood);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(192,57,43,0.4);
+}
+
+/* ══════════════════════════════════════════
+   GAME SCREEN
+══════════════════════════════════════════ */
+#game {
+  display: none;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+/* ── TOP BAR ── */
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 2rem;
+  background: #080604;
+  border-bottom: 1px solid #2a1f14;
+  position: sticky; top: 0; z-index: 100;
+}
+#topbar .case-id {
+  font-family: var(--display);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--smoke);
+}
+#topbar .case-id span { color: var(--gold); }
+#progress-track {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.prog-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #2a1f14;
+  border: 1px solid #3a2f20;
+  transition: all 0.4s;
+}
+.prog-dot.done { background: var(--green); border-color: var(--green); }
+.prog-dot.active { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 8px var(--gold); }
+#score-display {
+  font-family: var(--typeface);
+  font-size: 0.75rem;
+  color: var(--smoke);
+}
+#score-display span { color: var(--gold); font-weight: 700; }
+
+/* ── CASE FILE ── */
+#case-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 4rem;
+  background: radial-gradient(ellipse at 50% 0%, #140e08 0%, var(--ink) 60%);
+}
+
+/* ── DOSSIER CARD ── */
+.dossier {
+  width: 100%;
+  max-width: 720px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(0,0,0,0.15);
+  animation: fileIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes fileIn {
+  from { opacity: 0; transform: translateY(30px) rotate(-0.5deg); }
+  to   { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+
+.dossier-header {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 3px solid var(--rust);
+}
+.dossier-header .file-label {
+  font-family: var(--display);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  color: var(--smoke);
+  text-transform: uppercase;
+}
+.dossier-header h2 {
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  color: var(--paper);
+  line-height: 1.2;
+  margin-top: 0.2rem;
+}
+.dossier-header .step-num {
+  font-family: var(--serif);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--rust);
+  opacity: 0.5;
+  line-height: 1;
+}
+
+/* REDACTED DOCUMENT EFFECT */
+.dossier-body {
+  padding: 1.5rem;
+}
+
+.doc-text {
+  font-family: var(--typeface);
+  font-size: 0.88rem;
+  line-height: 1.9;
+  color: #2a1e12;
+  margin-bottom: 1.2rem;
+}
+.doc-text strong { color: var(--blood); }
+
+.redacted {
+  display: inline-block;
+  background: var(--ink);
+  color: transparent;
+  padding: 0 4px;
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s;
+  min-width: 80px;
+  text-align: center;
+  user-select: none;
+}
+.redacted.revealed {
+  background: var(--rust);
+  color: var(--paper);
+  font-weight: 700;
+  animation: revealFlash 0.4s ease;
+}
+@keyframes revealFlash {
+  0%   { background: var(--gold); }
+  100% { background: var(--rust); }
+}
+.redacted::after {
+  content: '▓▓▓▓';
+  color: #3a2a18;
+  font-size: 0.7em;
+}
+.redacted.revealed::after { content: ''; }
+
+/* EVIDENCE PHOTOS */
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.8rem;
+  margin: 1.2rem 0;
+}
+.evidence-photo {
+  background: var(--ink);
+  padding: 6px 6px 28px;
+  cursor: pointer;
+  position: relative;
+  transform: rotate(var(--rot));
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 3px 3px 12px rgba(0,0,0,0.4);
+}
+.evidence-photo:hover {
+  transform: rotate(0deg) scale(1.06);
+  z-index: 10;
+  box-shadow: 6px 6px 24px rgba(0,0,0,0.7);
+}
+.evidence-photo .photo-inner {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  background: #1a1008;
+  border: 1px solid #3a2818;
+}
+.evidence-photo .photo-label {
+  position: absolute;
+  bottom: 6px; left: 0; right: 0;
+  text-align: center;
+  font-family: var(--typeface);
+  font-size: 0.58rem;
+  color: var(--smoke);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.evidence-photo.selected .photo-inner {
+  border: 2px solid var(--rust);
+  background: #2a0a04;
+}
+.evidence-photo.selected .photo-label { color: var(--rust); }
+
+/* HANDWRITTEN NOTE */
+.handwritten-note {
+  background: #fdf5d8;
+  border-left: 4px solid var(--gold);
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  position: relative;
+  font-family: 'Courier Prime', monospace;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #3a2810;
+  line-height: 1.7;
+  transform: rotate(-0.5deg);
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+}
+.handwritten-note::before {
+  content: '"';
+  font-family: var(--serif);
+  font-size: 4rem;
+  color: var(--gold);
+  opacity: 0.3;
+  position: absolute;
+  top: -0.5rem; left: 0.5rem;
+  line-height: 1;
+}
+.handwritten-note .note-attr {
+  display: block;
+  text-align: right;
+  font-style: normal;
+  font-size: 0.7rem;
+  color: var(--smoke);
+  margin-top: 0.5rem;
+  font-family: var(--display);
+  letter-spacing: 0.1em;
+}
+
+/* QUESTION AREA */
+.question-area {
+  border-top: 2px dashed var(--mist);
+  padding-top: 1.2rem;
+  margin-top: 0.5rem;
+}
+.question-label {
+  font-family: var(--display);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  color: var(--smoke);
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.question-text {
+  font-family: var(--serif);
+  font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+  font-style: italic;
+  color: var(--blood);
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.choice-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  background: none;
+  border: 1px solid var(--mist);
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-family: var(--typeface);
+  font-size: 0.85rem;
+  color: var(--ink);
+  text-align: left;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.choice-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+  z-index: 0;
+}
+.choice-btn:hover::before { transform: translateX(0); }
+.choice-btn:hover { color: var(--paper); border-color: var(--ink); }
+.choice-btn .choice-letter {
+  font-family: var(--display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  background: var(--ink);
+  color: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  position: relative; z-index: 1;
+  margin-top: 1px;
+}
+.choice-btn:hover .choice-letter { background: var(--rust); }
+.choice-btn .choice-text { position: relative; z-index: 1; line-height: 1.5; }
+
+.choice-btn.correct {
+  border-color: var(--green);
+  background: #0d2010;
+  color: #7dd87a;
+  pointer-events: none;
+}
+.choice-btn.correct .choice-letter { background: var(--green); }
+.choice-btn.wrong {
+  border-color: var(--rust);
+  background: #200808;
+  color: #e07070;
+  pointer-events: none;
+  text-decoration: line-through;
+}
+.choice-btn.wrong .choice-letter { background: var(--rust); }
+.choice-btn.disabled { pointer-events: none; opacity: 0.4; }
+
+/* VERDICT / REVEAL */
+.verdict-box {
+  display: none;
+  margin-top: 1.2rem;
+  padding: 1rem 1.2rem;
+  border: 2px solid var(--rust);
+  background: #f8ede0;
+  animation: verdictIn 0.5s ease both;
+}
+@keyframes verdictIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.verdict-box.show { display: block; }
+.verdict-box .verdict-label {
+  font-family: var(--display);
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  color: var(--stamp);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.verdict-box .verdict-text {
+  font-family: var(--typeface);
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: #2a1408;
+}
+.verdict-box .verdict-text strong { color: var(--blood); }
+.verdict-box .verdict-stat {
+  display: inline-block;
+  background: var(--rust);
+  color: var(--paper);
+  font-family: var(--display);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  padding: 0.2rem 0.6rem;
+  margin-top: 0.6rem;
+}
+
+.next-btn {
+  width: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  font-family: var(--display);
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.2s;
+  border-top: 2px solid var(--rust);
+  display: none;
+}
+.next-btn:hover { background: var(--rust); }
+.next-btn.show { display: block; }
+
+/* STAMP EFFECT */
+.stamp {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  font-family: var(--display);
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.8rem;
+  border: 3px solid;
+  transform: rotate(12deg);
+  opacity: 0;
+  transition: opacity 0.4s 0.3s;
+  pointer-events: none;
+}
+.stamp.exposed {
+  color: var(--stamp);
+  border-color: var(--stamp);
+  opacity: 0.8;
+}
+.stamp.cleared {
+  color: var(--green);
+  border-color: var(--green);
+  opacity: 0.7;
+}
+
+/* ══════════════════════════════════════════
+   RESULTS SCREEN
+══════════════════════════════════════════ */
+#results {
+  display: none;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  background: radial-gradient(ellipse at 50% 30%, #1a0808 0%, var(--ink) 65%);
+  text-align: center;
+}
+
+#results .case-closed-stamp {
+  font-family: var(--display);
+  font-size: 3.5rem;
+  color: var(--rust);
+  border: 6px double var(--rust);
+  padding: 0.5rem 1.5rem;
+  transform: rotate(-5deg);
+  display: inline-block;
+  margin-bottom: 2rem;
+  text-shadow: 3px 3px 0 var(--blood);
+  animation: stampBounce 0.5s cubic-bezier(0.36,0.07,0.19,0.97) both;
+}
+@keyframes stampBounce {
+  0%   { transform: rotate(-5deg) scale(2); opacity: 0; }
+  60%  { transform: rotate(-5deg) scale(0.95); }
+  100% { transform: rotate(-5deg) scale(1); opacity: 1; }
+}
+
+#results h2 {
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  color: var(--paper);
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+#results .score-badge {
+  font-family: var(--display);
+  font-size: 5rem;
+  color: var(--gold);
+  line-height: 1;
+  text-shadow: 0 0 40px rgba(201,160,48,0.5);
+  margin: 1rem 0;
+}
+#results .score-label {
+  font-family: var(--typeface);
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  color: var(--smoke);
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+}
+
+.findings-list {
+  max-width: 560px;
+  width: 100%;
+  text-align: left;
+  margin: 0 auto 2.5rem;
+}
+.finding-item {
+  display: flex;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-left: 3px solid var(--rust);
+  background: rgba(192,57,43,0.08);
+  margin-bottom: 0.6rem;
+  font-family: var(--typeface);
+  font-size: 0.85rem;
+  color: var(--mist);
+  line-height: 1.6;
+  animation: findingIn 0.4s ease both;
+}
+.finding-item:nth-child(1) { animation-delay: 0.3s; }
+.finding-item:nth-child(2) { animation-delay: 0.5s; }
+.finding-item:nth-child(3) { animation-delay: 0.7s; }
+.finding-item:nth-child(4) { animation-delay: 0.9s; }
+.finding-item:nth-child(5) { animation-delay: 1.1s; }
+@keyframes findingIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.finding-item .finding-icon { font-size: 1.1rem; flex-shrink: 0; }
+.finding-item strong { color: var(--gold); }
+
+.share-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.share-section p {
+  font-family: var(--typeface);
+  font-size: 0.8rem;
+  color: var(--smoke);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.share-card {
+  background: var(--paper);
+  color: var(--ink);
+  max-width: 440px;
+  width: 100%;
+  padding: 1.5rem;
+  position: relative;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+}
+.share-card .sc-title {
+  font-family: var(--display);
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.05em;
+}
+.share-card .sc-body {
+  font-size: 0.8rem;
+  color: var(--smoke);
+  line-height: 1.7;
+  border-top: 1px dashed var(--mist);
+  padding-top: 0.6rem;
+  margin-top: 0.6rem;
+}
+.share-card .sc-url {
+  font-family: var(--display);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--rust);
+  margin-top: 0.6rem;
+  display: block;
+}
+
+.btn-row {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.btn-secondary {
+  font-family: var(--display);
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--paper);
+  border: 1px solid var(--smoke);
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── TYPEWRITER ── */
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid var(--rust);
+  animation: typing 1.2s steps(40,end) both, blink 0.8s step-end 5;
+}
+@keyframes typing { from { width: 0; } to { width: 100%; } }
+@keyframes blink { 0%,100% { border-color: var(--rust); } 50% { border-color: transparent; } }
+
+/* ── FLICKER ── */
+@keyframes flicker {
+  0%,100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.7; }
+  94% { opacity: 1; }
+  96% { opacity: 0.8; }
+  97% { opacity: 1; }
+}
+
+/* LOADING REDACTION ANIMATION */
+.classifying {
+  font-family: var(--display);
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  color: var(--smoke);
+  text-align: center;
+  padding: 1rem;
+  animation: flicker 4s infinite;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .dossier-header { flex-direction: column; gap: 0.3rem; }
+  .dossier-header .step-num { position: absolute; top: 0.8rem; right: 1rem; }
+  .evidence-grid { grid-template-columns: repeat(2, 1fr); }
+  #topbar { padding: 0.6rem 1rem; }
+  #topbar .case-id { font-size: 0.6rem; }
+}
+/* ── Navbar (matches index.html) ── */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 3rem;
+  background: rgba(8,8,8,0.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(192,57,43,0.25);
+  transition: border-bottom-color 0.4s;
+}
+.navbar.scrolled { border-bottom-color: rgba(192,57,43,0.4); }
+.brand { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; }
+.brand .logo { width: 36px; height: 36px; object-fit: contain; filter: brightness(0) invert(1); }
+.brand span {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; font-weight: 700; letter-spacing: 0.08em;
+  color: #f0ebe0; text-transform: uppercase;
+}
+.navbar nav { display: flex; align-items: center; gap: 2rem; }
+.navbar nav a {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: #9a9a9a; text-decoration: none; transition: color 0.2s; position: relative;
+}
+.navbar nav a::after {
+  content: ''; position: absolute; bottom: -3px; left: 0; right: 100%;
+  height: 1px; background: #c0392b; transition: right 0.3s;
+}
+.navbar nav a:hover { color: #f0ebe0; }
+.navbar nav a:hover::after { right: 0; }
+.navbar nav a.nav-btn { padding: 0.45rem 1.1rem; border: 1px solid #c0392b; color: #e74c3c; }
+.navbar nav a.nav-btn::after { display: none; }
+.navbar nav a.nav-btn:hover { background: #c0392b; color: #f0ebe0; }
+.navbar nav a.petition-glow,
+.mobile-nav a.petition-glow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.95rem;
+  border: 1px solid rgba(243,201,96,0.88);
+  border-radius: 999px;
+  color: #fff7d1;
+  background: linear-gradient(135deg, rgba(166,124,35,0.38), rgba(245,208,112,0.20));
+  box-shadow: 0 0 0 0 rgba(243,201,96,0.62);
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+  animation: petitionGlowPulse 2.2s ease-in-out infinite;
+}
+.navbar nav a.petition-glow::before,
+.mobile-nav a.petition-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 999px;
+  background: linear-gradient(120deg, transparent 20%, rgba(255,248,214,0.62) 50%, transparent 80%);
+  transform: translateX(-140%);
+  opacity: 0;
+  animation: petitionShimmer 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+.navbar nav a.petition-glow::after,
+.mobile-nav a.petition-glow::after {
+  display: none;
+}
+.navbar nav a.petition-glow:hover,
+.mobile-nav a.petition-glow:hover {
+  color: #fffdf2;
+  border-color: rgba(255,234,163,0.98);
+  box-shadow: 0 0 16px rgba(243,201,96,0.70), 0 0 34px rgba(243,201,96,0.40);
+  transform: translateY(-1px);
+}
+.mobile-nav a.petition-glow {
+  border-bottom: none;
+}
+@keyframes petitionGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(243,201,96,0.58), 0 0 12px rgba(243,201,96,0.26);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(243,201,96,0), 0 0 24px rgba(243,201,96,0.50);
+  }
+}
+@keyframes petitionShimmer {
+  0%, 64% {
+    transform: translateX(-140%);
+    opacity: 0;
+  }
+  72% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(140%);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .navbar nav a.petition-glow,
+  .mobile-nav a.petition-glow,
+  .navbar nav a.petition-glow::before,
+  .mobile-nav a.petition-glow::before {
+    animation: none !important;
+  }
+  .navbar nav a.petition-glow,
+  .mobile-nav a.petition-glow {
+    box-shadow: 0 0 12px rgba(243,201,96,0.35);
+  }
+}
+.live-tab {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  font-family: 'DM Mono', monospace; font-size: 0.7rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: #e74c3c; background: none; border: 1px solid rgba(231,76,60,0.4);
+  padding: 0.35rem 0.85rem; cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.live-tab:hover { background: rgba(231,76,60,0.1); border-color: #e74c3c; color: #f0ebe0; }
+.live-dot {
+  width: 7px; height: 7px; background: #e74c3c; border-radius: 50%; flex-shrink: 0;
+  animation: livePulse 1.4s ease-in-out infinite;
+}
+@keyframes livePulse {
+  0%,100% { opacity:1; transform:scale(1); box-shadow:0 0 0 0 rgba(231,76,60,0.7); }
+  50% { opacity:0.85; transform:scale(1.15); box-shadow:0 0 0 5px rgba(231,76,60,0); }
+}
+.live-tab--mobile { margin-top:1.5rem; width:100%; justify-content:center; font-size:0.8rem; padding:1rem; border-color:#c0392b; }
+.menu-btn {
+  display: none; flex-direction: column; justify-content: center; gap: 5px;
+  width: 40px; height: 40px; background: none; border: none;
+  padding: 8px; cursor: pointer; z-index: 600; position: relative;
+}
+.menu-btn span {
+  display: block; width: 22px; height: 2px; background: #f0ebe0;
+  border-radius: 2px; transition: transform 0.3s, opacity 0.3s; transform-origin: center;
+}
+.menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mobile-nav {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(8,8,8,0.98); z-index: 550;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 0; padding: 6rem 2rem 2rem; overflow-y: auto;
+}
+.mobile-nav.open { display: flex; }
+.mobile-nav a {
+  font-family: 'DM Mono', monospace; font-size: 0.8rem; letter-spacing: 0.25em;
+  text-transform: uppercase; color: #9a9a9a; text-decoration: none;
+  padding: 1.2rem 0; width: 100%; text-align: center;
+  border-bottom: 1px solid #2c2c2c; transition: color 0.2s;
+}
+.mobile-nav a:first-child { border-top: 1px solid #2c2c2c; }
+.mobile-nav a:hover, .mobile-nav a:active { color: #f0ebe0; }
+.mobile-nav a.nav-btn { margin-top:1.5rem; border:1px solid #c0392b; color:#e74c3c; padding:1rem; }
+@media (max-width: 900px) {
+  .navbar { padding: 1rem 1.5rem !important; }
+  .navbar nav { display: none !important; }
+  .menu-btn { display: flex !important; }
+}
+@media (max-width: 480px) { .navbar { padding: 0.9rem 1rem !important; } }
+</style>
+</head>
+<body>
+
+<header class="navbar" id="navbar">
+  <a href="index.html" class="brand">
+    <img src="logo.png" alt="Behind The Label" class="logo">
+    <span>Behind The Label</span>
+  </a>
+  <nav>
+    <a href="index.html#about">About</a>
+    <a href="index.html#why">Why It Matters</a>
+    <a href="forced-labour.html" class="learn-more-link">Learn More</a>
+    <a href="index.html#tool">Our Tool</a>
+    <a href="index.html#team">Team</a>
+    <a href="index.html#partner">Partner</a>
+    <a href="index.html#action" class="nav-btn">Take Action</a>
+    <a href="petition.html" class="petition-glow">Petition</a>
+  </nav>
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html#about">About</a>
+  <a href="index.html#why">Why It Matters</a>
+  <a href="forced-labour.html">Learn More</a>
+  <a href="index.html#tool">Our Tool</a>
+  <a href="index.html#team">Team</a>
+  <a href="index.html#partner">Partner</a>
+  <a href="petition.html" class="petition-glow">Petition</a>
+  <a href="index.html#action" class="nav-btn">Take Action</a>
+</div>
+
+<!-- ══════════════════════════════ INTRO ══════════════════════════════ -->
+<div id="intro">
+  <div class="crime-tape t1"></div>
+  <div class="crime-tape t2"></div>
+  <div class="case-stamp">BTL // CLASSIFIED DOSSIER</div>
+
+  <!-- Badge SVG -->
+  <svg class="badge" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="40,5 50,15 63,12 68,25 79,32 75,46 79,58 67,63 62,75 49,72 40,79 31,72 18,75 13,63 1,58 5,46 1,32 12,25 17,12 30,15" fill="none" stroke="#c9a030" stroke-width="1.5" opacity="0.6"/>
+    <polygon points="40,10 49,19 60,16 65,28 74,34 71,47 74,57 63,62 59,72 47,69 40,75 33,69 21,72 17,62 6,57 9,47 6,34 15,28 20,16 31,19" fill="#0a0806" stroke="#c9a030" stroke-width="1"/>
+    <text x="40" y="32" text-anchor="middle" font-family="Special Elite,cursive" font-size="7" fill="#c9a030" letter-spacing="1">CASE</text>
+    <text x="40" y="42" text-anchor="middle" font-family="Special Elite,cursive" font-size="8" fill="#c0392b">FILE</text>
+    <text x="40" y="52" text-anchor="middle" font-family="Special Elite,cursive" font-size="5.5" fill="#c9a030" letter-spacing="0.5">ACTIVE</text>
+    <line x1="22" y1="45" x2="58" y2="45" stroke="#c9a030" stroke-width="0.5" opacity="0.5"/>
+  </svg>
+
+  <p class="subtitle">Behind The Label // Investigation Unit</p>
+  <h1>The Supply<br/><span>Chain Files</span></h1>
+
+  <div class="brief">
+    You're a <strong>supply chain investigator</strong>. A major fashion brand is under suspicion. 
+    Your job: follow the thread from store shelf back to the factory floor — 
+    and expose what they don't want you to find.<br/><br/>
+    <strong>5 case files. 5 chances to uncover the truth.</strong> The evidence doesn't lie.
+  </div>
+
+  <button class="btn-primary" onclick="startGame()">▶ Open Case File #1</button>
+</div>
+
+<!-- ══════════════════════════════ GAME ══════════════════════════════ -->
+<div id="game">
+  <div id="topbar">
+    <div class="case-id">CASE // <span id="case-num">001</span></div>
+    <div id="progress-track"></div>
+    <div id="score-display">LEADS: <span id="score-val">0</span></div>
+  </div>
+  <div id="case-area"></div>
+</div>
+
+<!-- ══════════════════════════════ RESULTS ══════════════════════════════ -->
+<div id="results"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// CASE DATA
+// ══════════════════════════════════════════════════════════════
+const CASES = [
+  {
+    id: "001",
+    title: "The $8 T-Shirt",
+    subtitle: "Investigate the price tag",
+    stepNum: "01",
+    docText: `A popular fast-fashion retailer advertises a <strong>cotton t-shirt for $7.99</strong>. It is their bestselling item. The brand's marketing department describes it as "ethically sourced." A whistleblower inside the company has leaked internal documents to our unit. The documents contain <span class="redacted" onclick="revealRedacted(this)" data-reveal="Dhaka, Bangladesh">█████████</span> as the garment's country of origin. The factory's compliance audit was <span class="redacted" onclick="revealRedacted(this)" data-reveal="falsified">███████</span> last quarter.`,
+    evidenceItems: [
+      { icon: "👕", label: "EXHIBIT A\nGarment Tag" },
+      { icon: "📋", label: "EXHIBIT B\nAudit Report" },
+      { icon: "💰", label: "EXHIBIT C\nWage Ledger" },
+      { icon: "🏭", label: "EXHIBIT D\nFactory Photo" }
+    ],
+    note: "A worker at the factory earns approximately $95 per month. The t-shirt retails for $7.99. The brand's CEO earned $14.2 million last year.",
+    noteAttr: "— Leaked memo, March 2024",
+    question: "A garment worker in Bangladesh earns roughly $95/month. If they made $7.99 t-shirts all day, how many would they need to sell to cover their own monthly wage?",
+    choices: [
+      { text: "About 5 — the brand keeps the rest as profit margin", correct: false },
+      { text: "About 12 — the retail price is mostly overhead & brand markup", correct: true },
+      { text: "About 100 — workers receive most of the sale price", correct: false },
+      { text: "Exactly 1 — each shirt directly funds one worker's daily wage", correct: false }
+    ],
+    verdict: `Correct. A garment worker earning $95/month, making 250+ shirts per day, earns <strong>less than $0.38 per garment</strong>. Of a $7.99 shirt, the worker receives roughly <strong>0.6%</strong> of the retail price. The rest goes to logistics, brand margin, and executive compensation. This is systemic — not incidental.`,
+    stat: "Workers earn ≈ 0.6% of retail price",
+    stamp: "EXPOSED"
+  },
+  {
+    id: "002",
+    title: "The Cocoa Connection",
+    subtitle: "Follow the supply chain upstream",
+    stepNum: "02",
+    docText: `Customs records flagged a shipment of <strong>cocoa beans</strong> moving from Côte d'Ivoire through a Belgian processing facility to a UK confectionery brand. Cross-referencing with ILO field reports, the source plantation employed workers as young as <span class="redacted" onclick="revealRedacted(this)" data-reveal="10 years old">██ █████ ███</span>. The plantation owner holds contracts with <span class="redacted" onclick="revealRedacted(this)" data-reveal="7 major chocolate brands">█ █████ █████████ ██████</span> simultaneously. International certification logos appear on all final products despite no on-site verification in <span class="redacted" onclick="revealRedacted(this)" data-reveal="4 years">█ █████</span>.`,
+    evidenceItems: [
+      { icon: "🍫", label: "EXHIBIT A\nChocolate Bar" },
+      { icon: "🌿", label: "EXHIBIT B\nFarm Records" },
+      { icon: "🚢", label: "EXHIBIT C\nShipping Log" },
+      { icon: "🏷️", label: "EXHIBIT D\nFair Trade Cert" }
+    ],
+    note: "The children on these farms often cannot attend school. The harvest season runs October to March — exactly when school terms are held. Many will never leave the farm.",
+    noteAttr: "— ILO Field Investigator Report, 2023",
+    question: "The world's largest chocolate companies pledged in 2001 to eliminate child labour from cocoa supply chains. What percentage reduction had they achieved by 2020?",
+    choices: [
+      { text: "90% reduction — the Harkin-Engel Protocol was largely successful", correct: false },
+      { text: "50% reduction — meaningful progress, but the job is half done", correct: false },
+      { text: "Only 5% — nearly no change over two decades of pledges", correct: false },
+      { text: "Child labour actually increased by 14% over that period", correct: true }
+    ],
+    verdict: `Washington State University found child labour in Ghanaian and Ivorian cocoa farming <strong>increased by 14%</strong> between 2009 and 2019, despite 20 years of industry pledges. An estimated <strong>1.56 million children</strong> still work in hazardous cocoa farming conditions. Corporate voluntary commitments without legally binding enforcement have repeatedly failed.`,
+    stat: "+14% child labour increase since 2001 pledges",
+    stamp: "CONFIRMED"
+  },
+  {
+    id: "003",
+    title: "The Cotton Trail",
+    subtitle: "State-sponsored forced labour",
+    stepNum: "03",
+    docText: `Satellite imagery analysis confirms <strong>mass labour mobilisation</strong> in Xinjiang's cotton fields. Government documents obtained through OSINT sources describe a "surplus labour transfer" programme. Workers are described as <span class="redacted" onclick="revealRedacted(this)" data-reveal="Uyghur minority">██████ ████████</span> transferred from re-education facilities. Western brands caught importing this cotton include both <span class="redacted" onclick="revealRedacted(this)" data-reveal="luxury and budget">██████ and ██████</span> fashion labels. China produces <span class="redacted" onclick="revealRedacted(this)" data-reveal="85%">███</span> of the world's cotton supply from Xinjiang alone.`,
+    evidenceItems: [
+      { icon: "🛰️", label: "EXHIBIT A\nSatellite Image" },
+      { icon: "📑", label: "EXHIBIT B\nGovt. Document" },
+      { icon: "🧵", label: "EXHIBIT C\nCotton Sample" },
+      { icon: "✈️", label: "EXHIBIT D\nExport Manifest" }
+    ],
+    note: "When brands were asked directly whether their supply chains were free of Xinjiang cotton, most responded with a form letter citing 'commitment to human rights.' None could provide documentation.",
+    noteAttr: "— Sheffield Hallam University Report, 2021",
+    question: "Xinjiang produces approximately 85% of China's cotton and 20% of the world's supply. Under the US Uyghur Forced Labor Prevention Act (2022), what happens to goods from Xinjiang?",
+    choices: [
+      { text: "They are taxed at a higher tariff rate to discourage import", correct: false },
+      { text: "They are presumed to involve forced labour and banned unless proven otherwise", correct: true },
+      { text: "They require a special import licence, but trade continues freely", correct: false },
+      { text: "Nothing — the Act only applies to companies with over $1B in revenue", correct: false }
+    ],
+    verdict: `The UFLPA creates a <strong>rebuttable presumption</strong>: all goods from Xinjiang are presumed made with forced labour and are <strong>banned from import</strong> unless companies can prove otherwise. The burden is reversed — brands must prove innocence, not the government prove guilt. Despite this, enforcement has been inconsistent and many brands continue to struggle to trace cotton origins beyond Tier 1 suppliers.`,
+    stat: "20% of global cotton linked to Xinjiang forced labour",
+    stamp: "CLASSIFIED"
+  },
+  {
+    id: "004",
+    title: "The Living Wage Gap",
+    subtitle: "Audit the numbers",
+    stepNum: "04",
+    docText: `Our financial analysis unit has cross-referenced <strong>living wage benchmarks</strong> against actual factory payroll data across 12 supplier countries. The gap between what workers are paid and what constitutes a dignified living wage is consistent across all facilities reviewed. One brand's <span class="redacted" onclick="revealRedacted(this)" data-reveal="Sustainability Report">█████████████ ██████</span> claims all workers earn "at or above minimum wage." Technically accurate. However, minimum wages in garment-producing countries are set by <span class="redacted" onclick="revealRedacted(this)" data-reveal="industry lobbying">████████ ████████</span> and fall dramatically below living wage benchmarks. In Myanmar, the gap is <span class="redacted" onclick="revealRedacted(this)" data-reveal="over 200%">████ ████</span>.`,
+    evidenceItems: [
+      { icon: "📊", label: "EXHIBIT A\nWage Data" },
+      { icon: "🏠", label: "EXHIBIT B\nRent Costs" },
+      { icon: "🍚", label: "EXHIBIT C\nFood Budget" },
+      { icon: "📄", label: "EXHIBIT D\nSustainability\nReport" }
+    ],
+    note: "Minimum wage ≠ living wage. In Bangladesh, the minimum wage for garment workers is $95/month. Economists estimate a living wage — covering rent, food, healthcare, and one child's education — requires $310/month.",
+    noteAttr: "— Asia Floor Wage Alliance, 2024",
+    question: "In 2013, the Rana Plaza factory complex in Bangladesh collapsed, killing 1,134 garment workers. What were workers reportedly told the day before the collapse?",
+    choices: [
+      { text: "They were offered a pay rise and told the building had been inspected", correct: false },
+      { text: "They were warned of structural cracks but management dismissed concerns", correct: false },
+      { text: "Workers noticed cracks and refused to enter — then were ordered back inside or lose pay", correct: true },
+      { text: "The collapse was sudden with no prior warning signs", correct: false }
+    ],
+    verdict: `Workers discovered <strong>large cracks in the building</strong> on April 23, 2013, and many refused to enter. Management inspected the building and declared it safe. Workers were told to return or <strong>lose a month's wages</strong>. The next morning, the building collapsed in 90 seconds. 1,134 workers died. Brands sourcing from Rana Plaza included over <strong>28 international labels</strong>. Compensation processes took years and many families received nothing.`,
+    stat: "1,134 workers died at Rana Plaza, April 2013",
+    stamp: "VERIFIED"
+  },
+  {
+    id: "005",
+    title: "Your Wardrobe",
+    subtitle: "The final case",
+    stepNum: "05",
+    docText: `The average person in the UK, USA, or Canada buys approximately <span class="redacted" onclick="revealRedacted(this)" data-reveal="68 new garments">██ ███ ████████</span> per year — up from 11 in the 1980s. The global fashion industry produces an estimated <span class="redacted" onclick="revealRedacted(this)" data-reveal="100 billion">███ ███████</span> garments annually for a population of 8 billion. Fast fashion brands release <span class="redacted" onclick="revealRedacted(this)" data-reveal="52 micro-seasons">██ ████-███████</span> per year — essentially a new collection every week. The price of clothing has dropped <span class="redacted" onclick="revealRedacted(this)" data-reveal="30%">███</span> in real terms over the last 15 years. Someone paid for that price drop — and it wasn't the CEO.`,
+    evidenceItems: [
+      { icon: "👗", label: "EXHIBIT A\nYour Wardrobe" },
+      { icon: "🌍", label: "EXHIBIT B\nGlobal Data" },
+      { icon: "♻️", label: "EXHIBIT C\nWaste Report" },
+      { icon: "🪞", label: "EXHIBIT D\nThe Mirror" }
+    ],
+    note: "You are not the villain. You are operating inside a system designed to keep labour invisible and prices low. But awareness is the first weapon. Transparency is the demand. You can use both.",
+    noteAttr: "— Ada, BTL Investigation Unit",
+    question: "What is the single most impactful action an individual consumer can take to reduce their contribution to exploitative labour in fashion supply chains?",
+    choices: [
+      { text: "Buy only certified 'ethical' brands — their labels guarantee fair wages", correct: false },
+      { text: "Stop buying clothes entirely — the only clean choice is no choice", correct: false },
+      { text: "Demand brand transparency: ask where it's made, by whom, and for what wage — then share what you find", correct: true },
+      { text: "Recycle old garments — environmental responsibility solves the labour problem too", correct: false }
+    ],
+    verdict: `Certification schemes are a starting point but are inconsistently audited. Full abstention is not realistic at scale. Recycling addresses waste, not labour exploitation. <strong>Radical transparency</strong> — brands being legally required to publish full supply chain data, wage rates, and audit results — is what supply chain justice advocates consistently identify as the highest-leverage demand. <strong>Ask loudly. Share what you find. Follow @BehindTheLabel.</strong>`,
+    stat: "Transparency + consumer pressure = systemic change",
+    stamp: "CASE CLOSED"
+  }
+];
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let currentCase = 0;
+let score = 0;
+let answered = false;
+let correctAnswers = [];
+
+// ══════════════════════════════════════════════════════════════
+// START
+// ══════════════════════════════════════════════════════════════
+function startGame() {
+  document.getElementById('intro').style.display = 'none';
+  const game = document.getElementById('game');
+  game.style.display = 'flex';
+  buildProgressDots();
+  renderCase(currentCase);
+}
+
+function buildProgressDots() {
+  const track = document.getElementById('progress-track');
+  track.innerHTML = '';
+  CASES.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'prog-dot' + (i === 0 ? ' active' : '');
+    dot.id = `dot-${i}`;
+    track.appendChild(dot);
+  });
+}
+
+function updateDots() {
+  CASES.forEach((_, i) => {
+    const dot = document.getElementById(`dot-${i}`);
+    if (!dot) return;
+    dot.className = 'prog-dot';
+    if (i < currentCase) dot.classList.add('done');
+    if (i === currentCase) dot.classList.add('active');
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER CASE
+// ══════════════════════════════════════════════════════════════
+function renderCase(idx) {
+  const c = CASES[idx];
+  answered = false;
+  document.getElementById('case-num').textContent = c.id;
+  document.getElementById('score-val').textContent = score;
+  updateDots();
+
+  const area = document.getElementById('case-area');
+  area.innerHTML = '';
+
+  const dossier = document.createElement('div');
+  dossier.className = 'dossier';
+
+  // Stamp
+  dossier.innerHTML = `<div class="stamp" id="case-stamp">${c.stamp}</div>`;
+
+  // Header
+  dossier.innerHTML += `
+    <div class="dossier-header">
+      <div>
+        <div class="file-label">Case File // ${c.id} — ${c.subtitle}</div>
+        <h2>${c.title}</h2>
+      </div>
+      <div class="step-num">${c.stepNum}</div>
+    </div>`;
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'dossier-body';
+
+  // Doc text
+  body.innerHTML += `<div class="doc-text">${c.docText}</div>`;
+
+  // Evidence grid
+  const rotations = ['-2deg','1.5deg','-1deg','2.5deg'];
+  let egHtml = '<div class="evidence-grid">';
+  c.evidenceItems.forEach((ev, i) => {
+    egHtml += `
+      <div class="evidence-photo" style="--rot:${rotations[i]}" onclick="selectEvidence(this)" data-idx="${i}">
+        <div class="photo-inner">${ev.icon}</div>
+        <div class="photo-label">${ev.label}</div>
+      </div>`;
+  });
+  egHtml += '</div>';
+  body.innerHTML += egHtml;
+
+  // Handwritten note
+  body.innerHTML += `
+    <div class="handwritten-note">
+      ${c.note}
+      <span class="note-attr">${c.noteAttr}</span>
+    </div>`;
+
+  // Question
+  let choicesHtml = '<div class="choices">';
+  const letters = ['A','B','C','D'];
+  c.choices.forEach((ch, i) => {
+    choicesHtml += `
+      <button class="choice-btn" onclick="answerQuestion(this, ${ch.correct})">
+        <span class="choice-letter">${letters[i]}</span>
+        <span class="choice-text">${ch.text}</span>
+      </button>`;
+  });
+  choicesHtml += '</div>';
+
+  body.innerHTML += `
+    <div class="question-area">
+      <div class="question-label">◈ Investigator's Question</div>
+      <div class="question-text">${c.question}</div>
+      ${choicesHtml}
+      <div class="verdict-box" id="verdict-box">
+        <div class="verdict-label">◈ Case Intelligence</div>
+        <div class="verdict-text">${c.verdict}</div>
+        <span class="verdict-stat">${c.stat}</span>
+      </div>
+      <button class="next-btn" id="next-btn" onclick="nextCase()">
+        ${idx < CASES.length - 1 ? '▶ Open Next Case File' : '▶ File Final Report'}
+      </button>
+    </div>`;
+
+  dossier.appendChild(body);
+  area.appendChild(dossier);
+
+  // Scroll to top
+  area.scrollTop = 0;
+  window.scrollTo(0, 0);
+}
+
+// ══════════════════════════════════════════════════════════════
+// INTERACTIONS
+// ══════════════════════════════════════════════════════════════
+function revealRedacted(el) {
+  if (el.classList.contains('revealed')) return;
+  el.classList.add('revealed');
+  el.textContent = el.dataset.reveal;
+  el.onclick = null;
+}
+
+function selectEvidence(el) {
+  el.classList.toggle('selected');
+}
+
+function answerQuestion(btn, isCorrect) {
+  if (answered) return;
+  answered = true;
+
+  const allBtns = btn.closest('.choices').querySelectorAll('.choice-btn');
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    score++;
+    correctAnswers.push(currentCase);
+    document.getElementById('score-val').textContent = score;
+    // Show stamp
+    const stamp = document.getElementById('case-stamp');
+    if (stamp) stamp.classList.add('exposed');
+  } else {
+    btn.classList.add('wrong');
+    // Reveal correct
+    allBtns.forEach(b => {
+      const txt = b.querySelector('.choice-text').textContent;
+      const caseData = CASES[currentCase];
+      const correct = caseData.choices.find(c => c.correct);
+      if (txt === correct.text) b.classList.add('correct');
+    });
+  }
+
+  allBtns.forEach(b => {
+    if (!b.classList.contains('correct') && !b.classList.contains('wrong')) {
+      b.classList.add('disabled');
+    }
+  });
+
+  // Show verdict
+  const verdict = document.getElementById('verdict-box');
+  if (verdict) verdict.classList.add('show');
+
+  // Show next
+  const nextBtn = document.getElementById('next-btn');
+  if (nextBtn) nextBtn.classList.add('show');
+
+  // Scroll to verdict
+  setTimeout(() => {
+    verdict?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 300);
+}
+
+function nextCase() {
+  currentCase++;
+  if (currentCase >= CASES.length) {
+    showResults();
+  } else {
+    renderCase(currentCase);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// RESULTS
+// ══════════════════════════════════════════════════════════════
+function showResults() {
+  document.getElementById('game').style.display = 'none';
+  const results = document.getElementById('results');
+  results.style.display = 'flex';
+
+  const pct = Math.round((score / CASES.length) * 100);
+  const grade = score >= 4 ? 'LEAD INVESTIGATOR' : score >= 3 ? 'FIELD AGENT' : score >= 2 ? 'ANALYST' : 'RECRUIT';
+  const headline = score >= 4
+    ? 'You cracked the case. Now make noise.'
+    : score >= 3
+    ? 'Strong work. The supply chain exposed.'
+    : 'The system counts on your silence. Not anymore.';
+
+  const findings = [
+    { icon: '👕', text: 'A garment worker earns <strong>less than 1%</strong> of a t-shirt\'s retail price.' },
+    { icon: '🍫', text: 'Child labour in cocoa farming <strong>increased 14%</strong> despite 20 years of industry pledges.' },
+    { icon: '🧵', text: '<strong>20% of global cotton</strong> is linked to Uyghur forced labour in Xinjiang.' },
+    { icon: '🏭', text: '1,134 workers died at Rana Plaza after being <strong>ordered back into a cracked building</strong>.' },
+    { icon: '🌍', text: '<strong>Demand transparency.</strong> Ask brands: who made this? What did they earn?' },
+  ];
+
+  results.innerHTML = `
+    <div class="case-closed-stamp">CASE CLOSED</div>
+    <h2>"${headline}"</h2>
+    <div class="score-badge">${score}/${CASES.length}</div>
+    <div class="score-label">Rank: ${grade} // ${pct}% accuracy</div>
+
+    <div class="findings-list">
+      <div style="font-family:var(--display);font-size:0.65rem;letter-spacing:0.3em;color:var(--smoke);text-transform:uppercase;margin-bottom:1rem;">◈ Key Findings</div>
+      ${findings.map(f => `
+        <div class="finding-item">
+          <span class="finding-icon">${f.icon}</span>
+          <span>${f.text}</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="share-section">
+      <p>Share your findings</p>
+      <div class="share-card">
+        <div class="sc-title">The Supply Chain Files</div>
+        <div class="sc-body">
+          I just investigated the hidden labour practices behind the clothes on my back.<br/>
+          Score: ${score}/${CASES.length} — Rank: ${grade}<br/><br/>
+          Did you know garment workers earn less than 1% of the retail price of their clothes?
+          Child labour in cocoa has <em>increased</em> since 2001 despite corporate pledges.
+        </div>
+        <span class="sc-url">behindthelabel.ca // @BehindTheLabel</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="copyShareText()">📋 Copy & Share</button>
+        <button class="btn-secondary" onclick="resetGame()">↩ Reopen Case Files</button>
+        <button class="btn-secondary" onclick="window.location.href='index.html'">← Back to BTL</button>
+      </div>
+    </div>`;
+}
+
+function copyShareText() {
+  const text = `I investigated the hidden labour in fashion supply chains with @BehindTheLabel.\n\nScore: ${score}/5 — Rank: ${score >= 4 ? 'LEAD INVESTIGATOR' : score >= 3 ? 'FIELD AGENT' : 'ANALYST'}\n\nGarment workers earn <1% of retail price. Child labour in cocoa is UP 14% since 2001. Rana Plaza killed 1,134 workers who were forced into a cracked building.\n\nOpen your own case file: behindthelabel.ca`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.btn-primary');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ Copied!';
+    setTimeout(() => btn.innerHTML = orig, 2000);
+  });
+}
+
+function resetGame() {
+  currentCase = 0;
+  score = 0;
+  answered = false;
+  correctAnswers = [];
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('game').style.display = 'flex';
+  buildProgressDots();
+  renderCase(0);
+  window.scrollTo(0, 0);
+}
+// Mobile nav toggle
+const menuBtn = document.getElementById('menuBtn');
+const mobileNav = document.getElementById('mobileNav');
+if (menuBtn && mobileNav) {
+  menuBtn.addEventListener('click', () => {
+    menuBtn.classList.toggle('open');
+    mobileNav.classList.toggle('open');
+  });
+  mobileNav.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      menuBtn.classList.remove('open');
+      mobileNav.classList.remove('open');
+    });
+  });
+}
+// Navbar scroll effect
+window.addEventListener('scroll', () => {
+  const nb = document.getElementById('navbar');
+  if (nb) nb.classList.toggle('scrolled', window.scrollY > 30);
+});
+</script>
+<script src="btl-guide.js?v=2"></script>
+</body>
+</html>

@@ -137,6 +137,81 @@
     }
     nav a.nav-btn::after { display: none; }
     nav a.nav-btn:hover { background: var(--red); color: var(--cream); }
+    nav a.petition-glow,
+    .mobile-nav a.petition-glow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.45rem 0.95rem;
+      border: 1px solid rgba(243,201,96,0.88);
+      border-radius: 999px;
+      color: #fff7d1;
+      background: linear-gradient(135deg, rgba(166,124,35,0.38), rgba(245,208,112,0.20));
+      box-shadow: 0 0 0 0 rgba(243,201,96,0.62);
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+      animation: petitionGlowPulse 2.2s ease-in-out infinite;
+    }
+    nav a.petition-glow::before,
+    .mobile-nav a.petition-glow::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 999px;
+      background: linear-gradient(120deg, transparent 20%, rgba(255,248,214,0.62) 50%, transparent 80%);
+      transform: translateX(-140%);
+      opacity: 0;
+      animation: petitionShimmer 3.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    nav a.petition-glow::after,
+    .mobile-nav a.petition-glow::after {
+      display: none;
+    }
+    nav a.petition-glow:hover,
+    .mobile-nav a.petition-glow:hover {
+      color: #fffdf2;
+      border-color: rgba(255,234,163,0.98);
+      box-shadow: 0 0 16px rgba(243,201,96,0.70), 0 0 34px rgba(243,201,96,0.40);
+      transform: translateY(-1px);
+    }
+    .mobile-nav a.petition-glow {
+      border-bottom: none;
+    }
+    @keyframes petitionGlowPulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(243,201,96,0.58), 0 0 12px rgba(243,201,96,0.26);
+      }
+      50% {
+        box-shadow: 0 0 0 7px rgba(243,201,96,0), 0 0 24px rgba(243,201,96,0.50);
+      }
+    }
+    @keyframes petitionShimmer {
+      0%, 64% {
+        transform: translateX(-140%);
+        opacity: 0;
+      }
+      72% {
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateX(140%);
+        opacity: 0;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      nav a.petition-glow,
+      .mobile-nav a.petition-glow,
+      nav a.petition-glow::before,
+      .mobile-nav a.petition-glow::before {
+        animation: none !important;
+      }
+      nav a.petition-glow,
+      .mobile-nav a.petition-glow {
+        box-shadow: 0 0 12px rgba(243,201,96,0.35);
+      }
+    }
 
     /* ===========================
        HERO
@@ -2030,10 +2105,7 @@ window.switchLiveView = window.switchLiveView || function() {};
     <a href="#team">Team</a>
     <a href="#partner">Partner</a>
     <a href="#action" class="nav-btn">Take Action</a>
-    <a href="petition.html">Petition</a>
-    <button class="live-tab" id="liveTabBtn" aria-label="Open Live Feed" onclick="openLiveFeed()">
-      <span class="live-dot"></span>Live
-    </button>
+    <a href="petition.html" class="petition-glow">Petition</a>
   </nav>
   <button class="menu-btn" id="menuBtn" aria-label="Open menu">
     <span></span><span></span><span></span>
@@ -2048,14 +2120,8 @@ window.switchLiveView = window.switchLiveView || function() {};
   <a href="#tool">Our Tool</a>
   <a href="#team">Team</a>
   <a href="#partner">Partner</a>
-  <a href="petition.html">Petition</a>
+  <a href="petition.html" class="petition-glow">Petition</a>
   <a href="#action" class="nav-btn">Take Action</a>
-  <button class="live-tab live-tab--mobile" onclick="closeMobileNav(); openLiveFeed()">
-    <span class="live-dot"></span>Live Map
-  </button>
-  <button class="live-tab live-tab--mobile" style="margin-top:0.5rem" onclick="closeMobileNav(); window.openLiveFeedCams && window.openLiveFeedCams()">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Live Cameras
-  </button>
 </div>
 
 <!-- ===========================
@@ -2975,7 +3041,6 @@ function closeLiveFeed() {
   if (tickerInterval) clearInterval(tickerInterval);
 }
 
-document.getElementById('liveTabBtn').addEventListener('click', openLiveFeed);
 document.getElementById('liveCloseBtn').addEventListener('click', closeLiveFeed);
 document.getElementById('focusCardClose').addEventListener('click', () => {
   document.getElementById('focusCard').classList.remove('show');
@@ -3363,5 +3428,6 @@ window.initLiveFeed   = initLiveFeed;
 }); // end DOMContentLoaded
 
 </script>
+<script src="btl-guide.js?v=2"></script>
 </body>
 </html>
