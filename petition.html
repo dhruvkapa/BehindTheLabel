@@ -1127,7 +1127,8 @@
     <a href="index.html#about">About</a>
     <a href="index.html#why">Why It Matters</a>
     <a href="forced-labour.html" class="learn-more-link">Learn More</a>
-    <a href="index.html#tool">Our Tool</a>
+    <a href="swap.html">Ethical Swap</a>
+    <a href="rewards.html">Rewards</a>
     <a href="index.html#team">Team</a>
     <a href="index.html#partner">Partner</a>
     <a href="index.html#action" class="nav-btn">Take Action</a>
@@ -1143,7 +1144,8 @@
   <a href="index.html#about">About</a>
   <a href="index.html#why">Why It Matters</a>
   <a href="forced-labour.html">Learn More</a>
-  <a href="index.html#tool">Our Tool</a>
+  <a href="swap.html">Ethical Swap</a>
+  <a href="rewards.html">Rewards</a>
   <a href="index.html#team">Team</a>
   <a href="index.html#partner">Partner</a>
   <a href="petition.html" class="petition-glow">Petition</a>
@@ -1847,10 +1849,15 @@ document.getElementById('badgeShareIG').addEventListener('click', async (e) => {
     await navigator.clipboard.writeText(caption);
     const btn = e.currentTarget;
     const orig = btn.innerHTML;
-    btn.innerHTML = '✓ Copied!';
-    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+    btn.innerHTML = '✓ Copied! Opening Instagram…';
+    setTimeout(() => {
+      btn.innerHTML = orig;
+      // Open Instagram — mobile deep-link falls back to web profile
+      window.open('https://www.instagram.com/btl.org_', '_blank');
+    }, 1200);
   } catch {
     alert('Caption:\n\n' + caption);
+    window.open('https://www.instagram.com/btl.org_', '_blank');
   }
 });
 </script>

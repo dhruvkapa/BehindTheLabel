@@ -613,27 +613,57 @@ NAVIGATION: When directing users to a page, ALWAYS format links as markdown: [Pa
     sendBtn.disabled = true;
     showTyping();
 
-    try {
-      const res  = await fetch(GROQ_URL, {
-        method : 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
-        body   : JSON.stringify({
-          model      : 'llama-3.3-70b-versatile',
-          max_tokens : 300,
-          temperature: 0.7,
-          messages   : [{ role: 'system', content: SYSTEM_PROMPT }, ...history],
-        }),
-      });
-      const data  = await res.json();
-      if (data.error) throw new Error(data.error.message);
-      const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't connect. Try again!";
-      history.push({ role: 'assistant', content: reply });
+    const MAX_RETRIES = 2;
+    let attempt = 0;
+    let lastErr = null;
+
+    while (attempt <= MAX_RETRIES) {
+      try {
+        const res = await fetch(GROQ_URL, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
+          body   : JSON.stringify({
+            model      : 'llama-3.3-70b-versatile',
+            max_tokens : 300,
+            temperature: 0.7,
+            messages   : [{ role: 'system', content: SYSTEM_PROMPT }, ...history],
+          }),
+        });
+        const data = await res.json();
+        if (data.error) {
+          // Auth error — don't retry
+          if (res.status === 401 || res.status === 403) {
+            throw new Error('__auth__');
+          }
+          // Rate limit — wait then retry
+          if (res.status === 429) {
+            await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+            attempt++;
+            continue;
+          }
+          throw new Error(data.error.message);
+        }
+        const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't get a response. Please try again!";
+        history.push({ role: 'assistant', content: reply });
+        hideTyping();
+        addMsg('ada', reply);
+        lastErr = null;
+        break;
+      } catch (err) {
+        lastErr = err;
+        if (err.message === '__auth__' || attempt >= MAX_RETRIES) break;
+        attempt++;
+        await new Promise(r => setTimeout(r, 800));
+      }
+    }
+
+    if (lastErr) {
       hideTyping();
-      addMsg('ada', reply);
-    } catch (err) {
-      hideTyping();
-      addMsg('ada', "Hmm, I'm having trouble connecting right now. Please try again!");
-      console.warn('[Ada]', err);
+      const msg = lastErr.message === '__auth__'
+        ? "I'm having a connection issue right now. In the meantime — you can [explore the site](index.html), [read the evidence](forced-labour.html), or [sign the petition](petition.html)! 💎"
+        : "I'm having trouble connecting right now. Please try again in a moment, or explore the site yourself! 💎";
+      addMsg('ada', msg);
+      console.warn('[Ada]', lastErr);
     }
 
     isBusy = false;
